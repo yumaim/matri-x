@@ -1,0 +1,168 @@
+// matri-x Prisma Schema
+// Dev: SQLite | Prod: PostgreSQL
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // hashed password (null for OAuth users)
+  role          String    @default("USER") // USER | MODERATOR | ADMIN
+  plan          String    @default("FREE") // FREE | STANDARD | PRO
+  company       String?
+  bio           String?
+  website       String?
+  xHandle       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts    Account[]
+  sessions    Session[]
+  posts       ForumPost[]
+  comments    Comment[]
+  votes       Vote[]
+  simulations Simulation[]
+  bookmarks   Bookmark[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ForumPost {
+  id         String   @id @default(cuid())
+  title      String
+  content    String
+  category   String   // ALGORITHM | VERIFICATION | STRATEGY | UPDATES | QUESTIONS
+  tags       String   @default("[]") // JSON array stored as string (SQLite compat)
+  authorId   String
+  isPinned   Boolean  @default(false)
+  isVerified Boolean  @default(false)
+  status     String   @default("PUBLISHED") // DRAFT | PUBLISHED | FLAGGED | REMOVED
+  viewCount  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  author    User       @relation(fields: [authorId], references: [id])
+  comments  Comment[]
+  votes     Vote[]
+  bookmarks Bookmark[]
+  evidence  Evidence[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  postId    String
+  parentId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author  User      @relation(fields: [authorId], references: [id])
+  post    ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+  votes   Vote[]
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  value     Int      // +1 or -1
+  userId    String
+  postId    String?
+  commentId String?
+  createdAt DateTime @default(now())
+
+  user    User       @relation(fields: [userId], references: [id])
+  post    ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment Comment?   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+}
+
+model Evidence {
+  id          String   @id @default(cuid())
+  postId      String
+  type        String   // IMPRESSION_TEST | ENGAGEMENT_TEST | TIMING_TEST | CONTENT_TEST | HASHTAG_TEST | OTHER
+  description String
+  beforeData  String?  // JSON string (SQLite compat)
+  afterData   String?  // JSON string (SQLite compat)
+  conclusion  String?
+  createdAt   DateTime @default(now())
+
+  post ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Simulation {
+  id        String   @id @default(cuid())
+  userId    String
+  inputs    String   // JSON string (SQLite compat)
+  result    Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User      @relation(fields: [userId], references: [id])
+  post ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model AlgorithmUpdate {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  source      String?
+  impact      String   // CRITICAL | HIGH | MEDIUM | LOW
+  category    String
+  publishedAt DateTime @default(now())
+}
