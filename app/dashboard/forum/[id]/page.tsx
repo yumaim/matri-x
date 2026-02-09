@@ -20,6 +20,8 @@ import {
   Pencil,
   Trash2,
   Plus,
+  Link2,
+  Check,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
