@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAuth, handleApiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 // GET /api/notifications — 通知一覧
 export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const session = await requireAuth();
 
     const notifications = await prisma.notification.findMany({
       where: { userId: session.user.id },
@@ -22,21 +19,14 @@ export async function GET() {
 
     return NextResponse.json({ notifications, unreadCount });
   } catch (error) {
-    console.error("GET /api/notifications error:", error);
-    return NextResponse.json(
-      { error: "通知の取得に失敗しました" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // PUT /api/notifications — 既読マーク
 export async function PUT(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const session = await requireAuth();
 
     const body = await request.json();
     const { notificationIds, markAll } = body;
@@ -58,10 +48,6 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("PUT /api/notifications error:", error);
-    return NextResponse.json(
-      { error: "通知の更新に失敗しました" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
