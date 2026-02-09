@@ -19,6 +19,7 @@ import {
   Menu,
   MessageCircle,
   History,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ const navigation = [
 ];
 
 const bottomNavigation = [
+  { name: "プロフィール", href: "/dashboard/profile", icon: User },
   { name: "設定", href: "/dashboard/settings", icon: Settings },
 ];
 
