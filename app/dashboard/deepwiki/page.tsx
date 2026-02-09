@@ -28,12 +28,13 @@ interface Message {
   content: string;
   codeBlocks?: { language: string; code: string; file?: string }[];
   sources?: { title: string; path: string }[];
+  relatedQuestions?: string[];
 }
 
 const suggestedQuestions = [
   "TweepCredスコアはどのように計算されますか？",
   "SimClustersの仕組みを教えてください",
-  "リプライの重み付け150xはどこで定義されていますか？",
+  "エンゲージメント重み付けについて教えてください",
   "Out-of-Network推薦の候補取得ロジックは？",
   "Heavy Rankerモデルの入力特徴量は何ですか？",
   "Trust & Safetyフィルターの実装を見せてください",
@@ -47,87 +48,6 @@ const initialMessages: Message[] = [
       "こんにちは！私はXアルゴリズムに特化したAIアシスタントです。オープンソース化されたX(旧Twitter)の推薦アルゴリズムについて何でも質問してください。ソースコードの解説、実装の詳細、最適化戦略についてお答えします。",
   },
 ];
-
-const mockResponses: Record<string, Message> = {
-  "TweepCredスコアはどのように計算されますか？": {
-    id: "mock-1",
-    role: "assistant",
-    content: `TweepCredスコアは、ユーザーの信頼度を表すスコアで、PageRankアルゴリズムをベースに計算されます。主な要素は以下の通りです：
-
-**1. フォロワー/フォロー比率**
-- フォロワー数とフォロー数の比率が考慮されます
-- 比率が高いほど信頼度が高いとみなされます
-
-**2. エンゲージメント品質**
-- 受け取るエンゲージメントの質と量
-- 特にリプライが重視されます
-
-**3. アカウント年齢**
-- 90日未満のアカウントにはペナルティが適用されます
-- 長期間アクティブなアカウントほど有利
-
-**4. アクティブフォロワー比率**
-- 90日以内にアクティブなフォロワーの割合
-- 非アクティブなフォロワーは除外されます`,
-    codeBlocks: [
-      {
-        language: "scala",
-        file: "src/scala/com/twitter/simclusters_v2/tweepcred/TweepCred.scala",
-        code: `object TweepCred {
-  def computeScore(
-    followers: Long,
-    following: Long,
-    engagementRate: Double,
-    accountAgeDays: Int,
-    activeFollowerRatio: Double
-  ): Double = {
-    val ffRatio = math.min(followers.toDouble / math.max(following, 1), 10.0) / 10.0
-    val ageBonus = math.min(accountAgeDays / 365.0, 1.0) * 0.2
-    val agePenalty = if (accountAgeDays < 90) 0.3 else 0.0
-    
-    (ffRatio * 0.3) + (engagementRate * 0.3) + ageBonus + (activeFollowerRatio * 0.2) - agePenalty
-  }
-}`,
-      },
-    ],
-    sources: [
-      { title: "TweepCred.scala", path: "src/scala/com/twitter/simclusters_v2/tweepcred/" },
-      { title: "PageRank Implementation", path: "src/scala/com/twitter/graph/" },
-    ],
-  },
-  "リプライの重み付け150xはどこで定義されていますか？": {
-    id: "mock-2",
-    role: "assistant",
-    content: `リプライの重み付け係数は、Heavy Rankerの設定ファイルで定義されています。具体的には、著者とのリプライの組み合わせが150xという最高の重み付けを持ちます。
-
-**重み付けの内訳：**
-- リプライ単体: 約50x
-- 著者からの返信: 約100x
-- 合計: 150x
-
-この設計は、双方向のコミュニケーションを促進するためのものです。`,
-    codeBlocks: [
-      {
-        language: "python",
-        file: "home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/scorer/",
-        code: `# Engagement weights configuration
-ENGAGEMENT_WEIGHTS = {
-    "reply": 50.0,
-    "reply_engaged_by_author": 100.0,  # Combined = 150x
-    "favorite": 30.0,
-    "retweet": 20.0,
-    "profile_click": 12.0,
-    "detail_expand": 11.0,
-    "dwell_time_gt_2min": 10.0,
-}`,
-      },
-    ],
-    sources: [
-      { title: "Scoring Configuration", path: "home-mixer/server/src/main/scala/" },
-      { title: "Heavy Ranker Model", path: "src/python/twitter/deepbird/" },
-    ],
-  },
-};
 
 export default function DeepWikiPage() {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
@@ -156,23 +76,43 @@ export default function DeepWikiPage() {
     setInput("");
     setIsLoading(true);
 
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const allMessages = [...messages, userMessage];
+      const res = await fetch("/api/deepwiki/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: allMessages
+            .filter((m) => m.role === "user" || m.role === "assistant")
+            .map((m) => ({ role: m.role, content: m.content })),
+        }),
+      });
 
-    const mockResponse = mockResponses[question] || {
-      id: Date.now().toString() + "-response",
-      role: "assistant" as const,
-      content: `「${question}」についてお答えします。
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`);
+      }
 
-Xの推薦アルゴリズムは複雑なシステムですが、ご質問の内容に関連する主要なポイントをお伝えします。
+      const data = await res.json();
+      const assistantMessage: Message = {
+        id: Date.now().toString() + "-response",
+        role: "assistant",
+        content: data.message.content,
+        codeBlocks: data.message.codeBlocks,
+        sources: data.message.sources,
+        relatedQuestions: data.message.relatedQuestions,
+      };
 
-詳細については、GitHubリポジトリのソースコードを直接確認することをお勧めします。また、シミュレーターページでインタラクティブに学ぶこともできます。
-
-他にご質問があればお気軽にどうぞ！`,
-    };
-
-    setMessages((prev) => [...prev, mockResponse]);
-    setIsLoading(false);
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      const errorMessage: Message = {
+        id: Date.now().toString() + "-error",
+        role: "assistant",
+        content: "エラーが発生しました。もう一度お試しください。",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCopyCode = (code: string) => {
@@ -202,7 +142,7 @@ Xの推薦アルゴリズムは複雑なシステムですが、ご質問の内�
                 <Bot className="h-5 w-5 text-primary" />
                 AI アシスタント
                 <Badge variant="secondary" className="ml-2">
-                  Pro: 47/50 回
+                  ナレッジベース検索
                 </Badge>
               </CardTitle>
             </CardHeader>
@@ -299,6 +239,27 @@ Xの推薦アルゴリズムは複雑なシステムですが、ご質問の内�
                           ))}
                         </div>
                       )}
+
+                      {/* Related Questions */}
+                      {message.relatedQuestions && message.relatedQuestions.length > 0 && (
+                        <div className="space-y-1.5">
+                          <p className="text-xs text-muted-foreground font-medium">
+                            関連する質問:
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {message.relatedQuestions.map((q, index) => (
+                              <button
+                                key={index}
+                                onClick={() => handleSubmit(q)}
+                                disabled={isLoading}
+                                className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+                              >
+                                {q}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -312,7 +273,7 @@ Xの推薦アルゴリズムは複雑なシステムですが、ご質問の内�
                     <div className="flex items-center gap-2 rounded-2xl bg-muted px-4 py-3">
                       <Loader2 className="h-4 w-4 animate-spin text-primary" />
                       <span className="text-sm text-muted-foreground">
-                        考え中...
+                        検索中...
                       </span>
                     </div>
                   </div>
