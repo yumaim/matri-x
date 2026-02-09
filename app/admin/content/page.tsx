@@ -1,19 +1,41 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Plus, ExternalLink } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useEffect, useState, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+  Plus,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 interface AlgorithmUpdate {
   id: string;
@@ -25,126 +47,372 @@ interface AlgorithmUpdate {
   publishedAt: string;
 }
 
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+const IMPACTS = ["CRITICAL", "HIGH", "MEDIUM", "LOW"] as const;
+const CATEGORIES = [
+  "RANKING",
+  "ENGAGEMENT",
+  "CONTENT",
+  "MODERATION",
+  "MONETIZATION",
+  "OTHER",
+] as const;
+
 const impactColors: Record<string, string> = {
-  CRITICAL: "destructive",
-  HIGH: "default",
-  MEDIUM: "secondary",
-  LOW: "outline",
+  CRITICAL: "bg-red-900/50 text-red-300 border-red-700",
+  HIGH: "bg-orange-900/50 text-orange-300 border-orange-700",
+  MEDIUM: "bg-yellow-900/50 text-yellow-300 border-yellow-700",
+  LOW: "bg-green-900/50 text-green-300 border-green-700",
+};
+
+const defaultFormData = {
+  title: "",
+  description: "",
+  source: "",
+  impact: "MEDIUM" as string,
+  category: "OTHER" as string,
 };
 
 export default function AdminContentPage() {
-  const [updates, setUpdates] = useState<AlgorithmUpdate[]>([]);
+  const [items, setItems] = useState<AlgorithmUpdate[]>([]);
+  const [pagination, setPagination] = useState<Pagination>({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState({
-    title: "", description: "", source: "", impact: "MEDIUM", category: "",
-  });
+  const [formData, setFormData] = useState(defaultFormData);
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
-  const fetchUpdates = async () => {
+  const fetchItems = useCallback(async (page = 1) => {
     setLoading(true);
-    const res = await fetch("/api/admin/content");
-    const data = await res.json();
-    setUpdates(data.updates || []);
-    setLoading(false);
+    try {
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: "20",
+      });
+      const res = await fetch(`/api/admin/content?${params}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      setItems(data.items);
+      setPagination(data.pagination);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title || !formData.description) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/admin/content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          source: formData.source || null,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to create");
+      setFormData(defaultFormData);
+      setDialogOpen(false);
+      fetchItems(1);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  useEffect(() => { fetchUpdates(); }, []);
+  const handleDelete = async (id: string) => {
+    if (!confirm("このアルゴリズムアップデートを削除しますか？")) return;
+    setDeleting(id);
+    try {
+      const res = await fetch(`/api/admin/content?id=${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete");
+      setItems((prev) => prev.filter((item) => item.id !== id));
+      setPagination((prev) => ({ ...prev, total: prev.total - 1 }));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeleting(null);
+    }
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    await fetch("/api/admin/content", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString("ja-JP", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
     });
-    setForm({ title: "", description: "", source: "", impact: "MEDIUM", category: "" });
-    setDialogOpen(false);
-    setSubmitting(false);
-    fetchUpdates();
   };
 
   return (
     <div className="space-y-6">
+      {/* Header with Create Button */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{updates.length} 件のアップデート</p>
+        <div>
+          <h3 className="text-lg font-semibold">アルゴリズムアップデート</h3>
+          <p className="text-sm text-muted-foreground">
+            X（Twitter）のアルゴリズム変更を管理します
+          </p>
+        </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="h-4 w-4 mr-2" />新規作成</Button>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              新規作成
+            </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="bg-card border-border sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>アルゴリズムアップデートを追加</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label>タイトル *</Label>
-                <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">タイトル *</Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, title: e.target.value }))
+                  }
+                  placeholder="アルゴリズム変更のタイトル"
+                  className="bg-secondary border-border"
+                  required
+                />
               </div>
-              <div>
-                <Label>説明 *</Label>
-                <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} required />
+
+              <div className="space-y-2">
+                <Label htmlFor="description">説明 *</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData((p) => ({
+                      ...p,
+                      description: e.target.value,
+                    }))
+                  }
+                  placeholder="変更の詳細..."
+                  className="bg-secondary border-border min-h-[100px]"
+                  required
+                />
               </div>
-              <div>
-                <Label>ソースURL</Label>
-                <Input value={form.source} onChange={(e) => setForm({ ...form, source: e.target.value })} placeholder="https://github.com/..." />
+
+              <div className="space-y-2">
+                <Label htmlFor="source">ソース</Label>
+                <Input
+                  id="source"
+                  value={formData.source}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, source: e.target.value }))
+                  }
+                  placeholder="https://..."
+                  className="bg-secondary border-border"
+                />
               </div>
+
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>影響度 *</Label>
-                  <Select value={form.impact} onValueChange={(v) => setForm({ ...form, impact: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                <div className="space-y-2">
+                  <Label>影響度</Label>
+                  <Select
+                    value={formData.impact}
+                    onValueChange={(val) =>
+                      setFormData((p) => ({ ...p, impact: val }))
+                    }
+                  >
+                    <SelectTrigger className="bg-secondary border-border">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="CRITICAL">CRITICAL</SelectItem>
-                      <SelectItem value="HIGH">HIGH</SelectItem>
-                      <SelectItem value="MEDIUM">MEDIUM</SelectItem>
-                      <SelectItem value="LOW">LOW</SelectItem>
+                      {IMPACTS.map((impact) => (
+                        <SelectItem key={impact} value={impact}>
+                          {impact}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label>カテゴリ *</Label>
-                  <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="Ranking, TweepCred..." required />
+
+                <div className="space-y-2">
+                  <Label>カテゴリ</Label>
+                  <Select
+                    value={formData.category}
+                    onValueChange={(val) =>
+                      setFormData((p) => ({ ...p, category: val }))
+                    }
+                  >
+                    <SelectTrigger className="bg-secondary border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting ? "保存中..." : "保存"}
-              </Button>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                >
+                  キャンセル
+                </Button>
+                <Button type="submit" disabled={submitting}>
+                  {submitting ? "作成中..." : "作成"}
+                </Button>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      {loading ? (
-        <div className="space-y-3">{[1,2,3].map(i => <Card key={i} className="animate-pulse"><CardContent className="p-4"><div className="h-12 bg-muted rounded" /></CardContent></Card>)}</div>
-      ) : updates.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-8">アップデートがありません</p>
-      ) : (
-        <div className="space-y-3">
-          {updates.map((u) => (
-            <Card key={u.id}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-1 flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium">{u.title}</h3>
-                      <Badge variant={impactColors[u.impact] as any} className="text-xs">{u.impact}</Badge>
-                      <Badge variant="outline" className="text-xs">{u.category}</Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{u.description}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(u.publishedAt).toLocaleDateString("ja-JP")}</p>
-                  </div>
-                  {u.source && (
-                    <a href={u.source} target="_blank" rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-foreground">
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
+      {/* Content Table */}
+      <Card className="bg-card border-border">
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="space-y-2 p-6">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="text-muted-foreground">
+                      タイトル
+                    </TableHead>
+                    <TableHead className="text-muted-foreground">
+                      カテゴリ
+                    </TableHead>
+                    <TableHead className="text-muted-foreground">
+                      影響度
+                    </TableHead>
+                    <TableHead className="text-muted-foreground">
+                      公開日
+                    </TableHead>
+                    <TableHead className="text-muted-foreground text-right">
+                      アクション
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="py-8 text-center text-muted-foreground"
+                      >
+                        アップデートがありません
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    items.map((item) => (
+                      <TableRow key={item.id} className="border-border">
+                        <TableCell className="max-w-[300px]">
+                          <div>
+                            <p className="truncate text-sm font-medium">
+                              {item.title}
+                            </p>
+                            <p className="truncate text-xs text-muted-foreground">
+                              {item.description.slice(0, 80)}
+                              {item.description.length > 80 ? "..." : ""}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className="text-[10px]"
+                          >
+                            {item.category}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={`inline-flex rounded border px-1.5 py-0.5 text-[10px] font-medium ${
+                              impactColors[item.impact] ??
+                              "bg-zinc-700 text-zinc-300"
+                            }`}
+                          >
+                            {item.impact}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {formatDate(item.publishedAt)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            title="削除"
+                            disabled={deleting === item.id}
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5 text-red-400" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
                   )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Pagination */}
+      {pagination.totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={pagination.page <= 1}
+            onClick={() => fetchItems(pagination.page - 1)}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            {pagination.page} / {pagination.totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={pagination.page >= pagination.totalPages}
+            onClick={() => fetchItems(pagination.page + 1)}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       )}
     </div>
