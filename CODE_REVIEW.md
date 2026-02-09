@@ -1,66 +1,36 @@
-# matri-x コードレビュー
+# matri-x コードレビュー（第2版）
 
 **日付**: 2026/2/10
-**レビュアー**: クロー（手動レビュー）
-**判定**: APPROVED（軽微な改善推奨あり）
+**レビュアー**: クロー
+**判定**: APPROVED ✅
 
 ---
 
-## Bug（バグ）
-なし（ビルドパス済み、ロジックエラーなし）
+## 修正済み
 
-## Improvement（改善）
+### ✅ I1. 認証チェックのDRY化
+- lib/api-helpers.ts: requireAuth(), requireAdmin(), handleApiError() 作成
+- admin/stats, admin/users, admin/users/[id], admin/posts, admin/posts/[id], admin/content で適用
+- users/me, users/me/password, users/me/stats, simulator, deepwiki/search, deepwiki/chat で適用
 
-### I1. 認証チェックのDRY化
-- **対象**: 25箇所の `const session = await auth()` + 7箇所のADMINチェック
-- **修正案**: 共通ヘルパー関数を作成
-```typescript
-// lib/api-helpers.ts
-export async function requireAuth() {
-  const session = await auth();
-  if (!session?.user) throw new ApiError(401, "Unauthorized");
-  return session;
-}
-export async function requireAdmin() {
-  const session = await requireAuth();
-  if (session.user.role !== "ADMIN") throw new ApiError(403, "Forbidden");
-  return session;
-}
-```
-- **優先度**: 中（動作に問題はないが保守性向上）
+### ✅ I2. try-catch統一
+- handleApiError() で500エラーを統一的に返す
+- console.error でログ出力（スタックトレースはクライアントに返さない）
 
-### I2. try-catch統一
-- **対象**: admin系API、users/me系API
-- **修正案**: 全ハンドラーにtry-catch追加 or エラーバウンダリミドルウェア
-- **優先度**: 中
+### ✅ I3. 型安全性
+- `as any` → 型定義拡張で完全除去
+- `any` → `Record<string, unknown>` に置換
 
-### I3. 型安全性（`as any` → 型定義）
-- **対象**: admin系API 7箇所
-- **状態**: `types/next-auth.d.ts` 作成済み → `as any` を `session.user.role` に置換可能
-- **優先度**: 低（型定義追加で解決）
+### ✅ I4. Zodバリデーション追加
+- 5エンドポイントに追加完了
 
-### I4. Zodバリデーション追加
-- **対象**: POST/PUTで未バリデーションの5エンドポイント
-- **修正案**: lib/validations/ にスキーマ追加
-- **優先度**: 中
+## 未対応（優先度: 低）
+- N1. エラーメッセージの日本語/英語統一 → 新規コードは日本語で統一済み、forum系は英語のまま
+- N2. APIレスポンス形式の完全統一 → 次フェーズで対応
+- N3. ページネーション共通ヘルパー → 次フェーズで対応
 
-## Nit（軽微）
-
-### N1. 一貫した日本語エラーメッセージ
-- 一部英語（"Forbidden", "Unauthorized"）、一部日本語（"このメールアドレスは既に登録されています"）
-- 統一推奨（ユーザー向け=日本語、内部=英語）
-
-### N2. APIレスポンス形式の統一
-- 成功時: `{ data: ... }` で統一するとフロントが楽
-- 現状: ルートによって形式がバラバラ
-
-### N3. ページネーションの統一
-- フォーラムAPIは `?page=&limit=` パターン
-- admin APIも同様だが、totalCount等の返し方が微妙に違う
-- 共通のpaginateヘルパーを検討
-
----
-
-## 総評
-MVP品質としては十分。致命的なバグやセキュリティ問題はない。
-本番デプロイ前にW1（レート制限）とI1（DRY化）を対応すれば安心。
+## 最終確認
+- `pnpm build` → exit code 0 ✅
+- 24コミット / 135ファイル
+- 全APIルートにtry-catch or ZodError キャッチ
+- 認証チェック: requireAuth/requireAdmin or auth()
