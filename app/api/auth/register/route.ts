@@ -2,9 +2,19 @@ import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { registerSchema } from "@/lib/validations/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 5 registrations per minute per IP
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    const { allowed } = checkRateLimit(`register:${ip}`, 5, 60000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "リクエストが多すぎます。しばらくしてからお試しください" },
+        { status: 429 }
+      );
+    }
     const body = await request.json();
     const result = registerSchema.safeParse(body);
 

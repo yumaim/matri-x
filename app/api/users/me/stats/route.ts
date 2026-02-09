@@ -1,28 +1,17 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAuth, handleApiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
+    const session = await requireAuth();
     const userId = session.user.id;
 
     const [simulationCount, postCount, commentCount, receivedVotes] =
       await Promise.all([
-        prisma.simulation.count({
-          where: { userId },
-        }),
-        prisma.forumPost.count({
-          where: { authorId: userId },
-        }),
-        prisma.comment.count({
-          where: { authorId: userId },
-        }),
-        // Count votes received on user's posts and comments
+        prisma.simulation.count({ where: { userId } }),
+        prisma.forumPost.count({ where: { authorId: userId } }),
+        prisma.comment.count({ where: { authorId: userId } }),
         prisma.vote.count({
           where: {
             OR: [
@@ -40,10 +29,6 @@ export async function GET() {
       receivedVotes,
     });
   } catch (error) {
-    console.error("Failed to fetch user stats:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch user stats" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

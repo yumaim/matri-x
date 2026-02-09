@@ -1,11 +1,16 @@
-import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { requireAuth, handleApiError } from "@/lib/api-helpers";
 import { knowledgeBase, KnowledgeEntry } from "@/lib/knowledge/x-algorithm";
+import { z } from "zod";
 
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
+const chatMessageSchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z.string(),
+});
+
+const chatSchema = z.object({
+  messages: z.array(chatMessageSchema).min(1, "メッセージが必要です"),
+});
 
 function normalizeQuery(query: string): string[] {
   return query
@@ -141,29 +146,32 @@ function formatResponse(query: string, entries: KnowledgeEntry[]) {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
-    const { messages } = await request.json();
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json({ error: "messages array is required" }, { status: 400 });
+    await requireAuth();
+
+    const body = await request.json();
+    const parsed = chatSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.errors[0].message },
+        { status: 400 }
+      );
     }
 
+    const { messages } = parsed.data;
+
     // Get the latest user message
-    const userMessages = messages.filter((m: ChatMessage) => m.role === "user");
+    const userMessages = messages.filter((m) => m.role === "user");
     const latestQuery = userMessages[userMessages.length - 1]?.content;
     if (!latestQuery) {
-      return NextResponse.json({ error: "No user message found" }, { status: 400 });
+      return NextResponse.json({ error: "ユーザーメッセージが見つかりません" }, { status: 400 });
     }
 
     const entries = searchKnowledge(latestQuery);
     const response = formatResponse(latestQuery, entries);
 
     return NextResponse.json(response);
-  } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  } catch (error) {
+    return handleApiError(error);
   }
 }

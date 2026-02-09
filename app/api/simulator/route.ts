@@ -1,20 +1,23 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAuth, handleApiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
+import { z } from "zod";
+
+const simulationSchema = z.object({
+  inputs: z.record(z.unknown()),
+  result: z.number(),
+});
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
-    const body = await request.json();
-    const { inputs, result } = body;
+    const session = await requireAuth();
 
-    if (!inputs || typeof result !== "number") {
+    const body = await request.json();
+    const parsed = simulationSchema.safeParse(body);
+
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid request: inputs and result are required" },
+        { error: "inputs（オブジェクト）と result（数値）が必要です" },
         { status: 400 }
       );
     }
@@ -22,28 +25,21 @@ export async function POST(request: Request) {
     const simulation = await prisma.simulation.create({
       data: {
         userId: session.user.id,
-        inputs: JSON.stringify(inputs),
-        result,
+        inputs: JSON.stringify(parsed.data.inputs),
+        result: parsed.data.result,
       },
     });
 
     return NextResponse.json(simulation, { status: 201 });
   } catch (error) {
-    console.error("Failed to save simulation:", error);
-    return NextResponse.json(
-      { error: "Failed to save simulation" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
+    const session = await requireAuth();
+
     const simulations = await prisma.simulation.findMany({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
@@ -52,10 +48,6 @@ export async function GET() {
 
     return NextResponse.json(simulations);
   } catch (error) {
-    console.error("Failed to fetch simulations:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch simulations" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

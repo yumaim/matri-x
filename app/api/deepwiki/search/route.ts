@@ -1,6 +1,11 @@
-import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { requireAuth, handleApiError } from "@/lib/api-helpers";
 import { knowledgeBase, KnowledgeEntry } from "@/lib/knowledge/x-algorithm";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  query: z.string().min(1, "検索キーワードを入力してください").max(200),
+});
 
 interface SearchResult {
   entry: KnowledgeEntry;
@@ -51,18 +56,19 @@ function escapeRegExp(str: string): string {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
-    const { query } = await request.json();
-    if (!query || typeof query !== "string") {
-      return NextResponse.json({ error: "query is required" }, { status: 400 });
+    await requireAuth();
+
+    const body = await request.json();
+    const parsed = searchSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.errors[0].message },
+        { status: 400 }
+      );
     }
 
-    const tokens = normalizeQuery(query);
+    const tokens = normalizeQuery(parsed.data.query);
     if (tokens.length === 0) {
       return NextResponse.json({ results: [] });
     }
@@ -82,7 +88,7 @@ export async function POST(request: Request) {
         snippet: r.entry.content.slice(0, 200) + (r.entry.content.length > 200 ? "..." : ""),
       })),
     });
-  } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  } catch (error) {
+    return handleApiError(error);
   }
 }
