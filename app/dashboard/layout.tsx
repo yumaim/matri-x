@@ -2,7 +2,7 @@
 
 import React from "react"
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -20,10 +20,17 @@ import {
   MessageCircle,
   History,
   User,
+  Trophy,
+  CheckCheck,
+  MessageSquare,
+  ThumbsUp,
+  Info,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +38,155 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+interface Notification {
+  id: string;
+  type: string;
+  message: string;
+  postId: string | null;
+  isRead: boolean;
+  createdAt: string;
+}
+
+function NotificationIcon({ type }: { type: string }) {
+  switch (type) {
+    case "COMMENT":
+      return <MessageSquare className="h-4 w-4 text-blue-400" />;
+    case "VOTE":
+      return <ThumbsUp className="h-4 w-4 text-emerald-400" />;
+    default:
+      return <Info className="h-4 w-4 text-orange-400" />;
+  }
+}
+
+function timeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "たった今";
+  if (diffMin < 60) return `${diffMin}分前`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}時間前`;
+  const diffDay = Math.floor(diffHr / 24);
+  if (diffDay < 30) return `${diffDay}日前`;
+  return `${Math.floor(diffDay / 30)}ヶ月前`;
+}
+
+function NotificationBell() {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [open, setOpen] = useState(false);
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const res = await fetch("/api/notifications");
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data.notifications);
+        setUnreadCount(data.unreadCount);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [fetchNotifications]);
+
+  const markAllRead = async () => {
+    try {
+      await fetch("/api/notifications", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ markAll: true }),
+      });
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="end">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <h4 className="text-sm font-semibold">通知</h4>
+          {unreadCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto px-2 py-1 text-xs text-muted-foreground hover:text-foreground gap-1"
+              onClick={markAllRead}
+            >
+              <CheckCheck className="h-3 w-3" />
+              すべて既読
+            </Button>
+          )}
+        </div>
+        <ScrollArea className="max-h-[360px]">
+          {notifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+              <Bell className="h-8 w-8 mb-2 opacity-50" />
+              <p className="text-sm">通知はありません</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-border">
+              {notifications.map((n) => (
+                <Link
+                  key={n.id}
+                  href={n.postId ? `/dashboard/forum/${n.postId}` : "/dashboard"}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "flex gap-3 px-4 py-3 transition-colors hover:bg-muted/50",
+                    !n.isRead && "bg-primary/5"
+                  )}
+                >
+                  <div className="mt-0.5 shrink-0">
+                    <NotificationIcon type={n.type} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={cn("text-sm leading-snug", !n.isRead && "font-medium")}>
+                      {n.message}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {timeAgo(n.createdAt)}
+                    </p>
+                  </div>
+                  {!n.isRead && (
+                    <div className="mt-1.5 shrink-0">
+                      <div className="h-2 w-2 rounded-full bg-primary" />
+                    </div>
+                  )}
+                </Link>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 const navigation = [
   { name: "ダッシュボード", href: "/dashboard", icon: LayoutDashboard },
@@ -40,6 +195,7 @@ const navigation = [
   { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3 },
   { name: "DeepWiki AI検索", href: "/dashboard/deepwiki", icon: Search },
   { name: "フォーラム", href: "/dashboard/forum", icon: MessageCircle },
+  { name: "ランキング", href: "/dashboard/ranking", icon: Trophy },
   { name: "更新履歴", href: "/dashboard/updates", icon: History },
 ];
 
@@ -205,9 +361,7 @@ export default function DashboardLayout({
           <span className="text-lg font-bold text-gradient">Matri-X</span>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-          </Button>
+          <NotificationBell />
           <Avatar className="h-8 w-8">
             <AvatarFallback className="bg-primary/20 text-primary text-sm">
               MX
