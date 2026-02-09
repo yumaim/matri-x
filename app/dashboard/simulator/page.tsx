@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Users,
   UserCheck,
@@ -16,12 +16,16 @@ import {
   Video,
   FileText,
   Link2,
+  History,
+  RotateCcw,
+  Save,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +37,13 @@ interface SimulatorInputs {
   avgReplies: number;
   avgRetweets: number;
   activeFollowerRatio: number;
+}
+
+interface SimulationRecord {
+  id: string;
+  inputs: string;
+  result: number;
+  createdAt: string;
 }
 
 const mediaBoosts = [
@@ -90,6 +101,54 @@ export default function SimulatorPage() {
 
   const [score, setScore] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [history, setHistory] = useState<SimulationRecord[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSavedId, setLastSavedId] = useState<string | null>(null);
+
+  const fetchHistory = useCallback(async () => {
+    try {
+      const res = await fetch("/api/simulator");
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch history:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
+
+  const saveSimulation = async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/simulator", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inputs, result: score }),
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        setLastSavedId(saved.id);
+        await fetchHistory();
+      }
+    } catch (error) {
+      console.error("Failed to save simulation:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const restoreInputs = (record: SimulationRecord) => {
+    try {
+      const parsed = JSON.parse(record.inputs) as SimulatorInputs;
+      setInputs(parsed);
+    } catch (error) {
+      console.error("Failed to restore inputs:", error);
+    }
+  };
 
   useEffect(() => {
     setIsAnimating(true);
@@ -319,6 +378,23 @@ export default function SimulatorPage() {
                 <p className="mt-4 text-center text-sm text-muted-foreground">
                   {scoreLevel.description}
                 </p>
+                <Button
+                  onClick={saveSimulation}
+                  disabled={isSaving}
+                  className="mt-4 w-full"
+                >
+                  {isSaving ? (
+                    <>
+                      <RotateCcw className="mr-2 h-4 w-4 animate-spin" />
+                      保存中...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      結果を保存
+                    </>
+                  )}
+                </Button>
               </div>
 
               {/* Score Factors */}
@@ -432,6 +508,75 @@ export default function SimulatorPage() {
               </p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Simulation History */}
+      <Card className="glass">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <History className="h-5 w-5 text-primary" />
+            計算履歴
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {history.length === 0 ? (
+            <p className="text-center text-sm text-muted-foreground py-8">
+              まだシミュレーション履歴がありません。上の「結果を保存」ボタンで記録しましょう。
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {history.map((record) => {
+                const parsedInputs = (() => {
+                  try {
+                    return JSON.parse(record.inputs) as SimulatorInputs;
+                  } catch {
+                    return null;
+                  }
+                })();
+                const recordLevel = getScoreLevel(record.result);
+                return (
+                  <button
+                    key={record.id}
+                    onClick={() => restoreInputs(record)}
+                    className="w-full rounded-lg bg-muted/50 p-4 text-left transition-colors hover:bg-muted/80"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={cn("text-2xl font-bold", recordLevel.color)}>
+                          {record.result.toFixed(2)}
+                        </div>
+                        <Badge variant="outline" className={recordLevel.color}>
+                          {recordLevel.label}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        {new Date(record.createdAt).toLocaleDateString("ja-JP", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
+                    </div>
+                    {parsedInputs && (
+                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                        <span>フォロワー: {parsedInputs.followers.toLocaleString()}</span>
+                        <span>フォロー: {parsedInputs.following.toLocaleString()}</span>
+                        <span>いいね: {parsedInputs.avgLikes}</span>
+                        <span>リプライ: {parsedInputs.avgReplies}</span>
+                      </div>
+                    )}
+                    <div className="mt-2 flex items-center gap-1 text-xs text-primary">
+                      <RotateCcw className="h-3 w-3" />
+                      クリックで入力値を復元
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
