@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   GitBranch,
   Users,
@@ -10,6 +11,9 @@ import {
   Zap,
   Clock,
   AlertCircle,
+  MessageSquare,
+  ThumbsUp,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,32 +53,24 @@ const quickActions = [
 
 const stats = [
   {
-    title: "学習進捗",
-    value: "68%",
-    change: "+12%",
-    changeType: "positive" as const,
-    icon: TrendingUp,
-  },
-  {
     title: "シミュレーション回数",
-    value: "24",
-    change: "今週",
-    changeType: "neutral" as const,
+    key: "simulationCount" as const,
     icon: Users,
   },
   {
-    title: "AI質問回数",
-    value: "47/50",
-    change: "月間リミット",
-    changeType: "neutral" as const,
-    icon: Search,
+    title: "投稿数",
+    key: "postCount" as const,
+    icon: FileText,
   },
   {
-    title: "最終アクセス",
-    value: "2時間前",
-    change: "アクティブ",
-    changeType: "positive" as const,
-    icon: Clock,
+    title: "コメント数",
+    key: "commentCount" as const,
+    icon: MessageSquare,
+  },
+  {
+    title: "受け取った投票数",
+    key: "receivedVotes" as const,
+    icon: ThumbsUp,
   },
 ];
 
@@ -107,7 +103,34 @@ const learningProgress = [
   { name: "Trust & Safety", progress: 20 },
 ];
 
+interface UserStats {
+  simulationCount: number;
+  postCount: number;
+  commentCount: number;
+  receivedVotes: number;
+}
+
 export default function DashboardPage() {
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch("/api/users/me/stats");
+        if (res.ok) {
+          const data = await res.json();
+          setUserStats(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
   return (
     <div className="p-6 lg:p-8 space-y-8">
       {/* Header */}
@@ -137,20 +160,15 @@ export default function DashboardPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <stat.icon className="h-5 w-5 text-primary" />
                 </div>
-                <span
-                  className={`text-xs font-medium ${
-                    stat.changeType === "positive"
-                      ? "text-[#00ba7c]"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  {stat.change}
-                </span>
               </div>
               <div className="mt-4">
-                <p className="text-2xl font-bold text-foreground">
-                  {stat.value}
-                </p>
+                {isLoading ? (
+                  <div className="h-8 w-16 animate-pulse rounded bg-muted" />
+                ) : (
+                  <p className="text-2xl font-bold text-foreground">
+                    {userStats ? userStats[stat.key] : "—"}
+                  </p>
+                )}
                 <p className="text-sm text-muted-foreground">{stat.title}</p>
               </div>
             </CardContent>
