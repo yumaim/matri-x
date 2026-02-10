@@ -3,6 +3,7 @@
 import React from "react"
 
 import { useState, useEffect, useCallback } from "react";
+import { OnboardingProvider } from "@/components/onboarding";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -378,7 +379,9 @@ export default function DashboardLayout({
           collapsed ? "lg:pl-[72px]" : "lg:pl-64"
         )}
       >
-        {children}
+        <OnboardingProvider>
+          {children}
+        </OnboardingProvider>
       </main>
     </div>
   );

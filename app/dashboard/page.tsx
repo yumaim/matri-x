@@ -226,7 +226,7 @@ export default function DashboardPage() {
         </div>
         {progressData && (
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 px-4 py-2">
+            <div data-tour="level-badge" className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 px-4 py-2">
               <Star className="h-5 w-5 text-yellow-500" />
               <span className="text-sm font-bold text-foreground">Lv.{progressData.level}</span>
               <span className="text-xs text-muted-foreground">{progressData.totalXp} XP</span>
@@ -265,7 +265,7 @@ export default function DashboardPage() {
         </Card>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div data-tour="stats-cards" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { title: "投稿数", value: progressData.stats.postCount, icon: FileText, color: "text-primary" },
           { title: "コメント数", value: progressData.stats.commentCount, icon: MessageSquare, color: "text-accent" },
@@ -295,7 +295,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div>
+      <div data-tour="quick-actions">
         <h2 className="mb-4 text-lg font-semibold text-foreground">
           クイックアクション
         </h2>
@@ -336,7 +336,7 @@ export default function DashboardPage() {
       {/* Two Column Layout */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Learning Progress with Gamification */}
-        <Card className="glass">
+        <Card data-tour="learning-progress" className="glass">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Flame className="h-5 w-5 text-orange-500" />
