@@ -143,7 +143,7 @@ export default function NewPostPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-4xl mx-auto overflow-x-hidden">
       {/* Back button */}
       <Link
         href="/dashboard/forum"

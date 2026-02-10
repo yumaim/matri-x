@@ -396,7 +396,7 @@ export default function PostDetailPage() {
   const isAuthor = currentUser?.id === post.author?.id;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 overflow-x-hidden">
       {/* Back button */}
       <Link
         href="/dashboard/forum"
