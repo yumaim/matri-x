@@ -27,6 +27,7 @@ import {
   MessageSquare,
   ThumbsUp,
   Info,
+  Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -194,6 +195,7 @@ const navigation = [
   { name: "パイプライン探索", href: "/dashboard/explore", icon: GitBranch },
   { name: "TweepCredシミュレーター", href: "/dashboard/simulator", icon: Users },
   { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3 },
+  { name: "アナリティクス", href: "/dashboard/analytics", icon: Activity },
   { name: "Deep AI検索", href: "/dashboard/deepwiki", icon: Search },
   { name: "フォーラム", href: "/dashboard/forum", icon: MessageCircle },
   { name: "ランキング", href: "/dashboard/ranking", icon: Trophy },
@@ -213,9 +215,11 @@ function SidebarContent({
   pathname: string;
 }) {
   const [userName, setUserName] = useState("ユーザー");
+  const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
     fetch("/api/users/me").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.name) setUserName(d.name);
+      if (d?.id) setUserId(d.id);
     }).catch(() => {});
   }, []);
   const userInitial = userName[0]?.toUpperCase() ?? "U";
@@ -299,9 +303,19 @@ function SidebarContent({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              設定
+            {userId && (
+              <DropdownMenuItem asChild>
+                <Link href={`/dashboard/users/${userId}`}>
+                  <User className="mr-2 h-4 w-4" />
+                  マイページ
+                </Link>
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/settings">
+                <Settings className="mr-2 h-4 w-4" />
+                設定
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive" onClick={() => signOut({ callbackUrl: "/" })}>
