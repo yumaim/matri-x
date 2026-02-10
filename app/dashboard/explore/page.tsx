@@ -460,6 +460,10 @@ export default function ExplorePage() {
       {/* ─── Node Graph Pipeline ─────────────────────────────────────── */}
       <style>{`
         @keyframes nodeFadeIn {
+          from { opacity: 0; transform: translateX(-24px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes nodeFadeInMobile {
           from { opacity: 0; transform: translateY(24px); }
           to { opacity: 1; transform: translateY(0); }
         }
@@ -473,6 +477,10 @@ export default function ExplorePage() {
         .node-graph-node {
           opacity: 0;
           animation: nodeFadeIn 0.6s ease-out forwards;
+        }
+        .node-graph-node-mobile {
+          opacity: 0;
+          animation: nodeFadeInMobile 0.6s ease-out forwards;
         }
         .node-graph-edge {
           stroke-dasharray: 8 6;
@@ -494,132 +502,132 @@ export default function ExplorePage() {
           </p>
         </CardHeader>
         <CardContent className="pt-4">
-          {/* ── Desktop: Node Graph ── */}
+          {/* ── Desktop: Left-to-Right Node Graph ── */}
           <div className="hidden md:block relative">
             {/* SVG Connections Layer */}
             <svg
               className="absolute inset-0 w-full h-full pointer-events-none"
-              viewBox="0 0 1000 680"
+              viewBox="0 0 1200 500"
               preserveAspectRatio="xMidYMid meet"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <defs>
-                <linearGradient id="grad-blue-indigo" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-blue-indigo" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#6366f1" stopOpacity="0.7" />
                 </linearGradient>
-                <linearGradient id="grad-purple-indigo" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-purple-indigo" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#a855f7" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#6366f1" stopOpacity="0.7" />
                 </linearGradient>
-                <linearGradient id="grad-cyan-indigo" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-cyan-indigo" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#6366f1" stopOpacity="0.7" />
                 </linearGradient>
-                <linearGradient id="grad-pink-indigo" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-pink-indigo" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#ec4899" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#6366f1" stopOpacity="0.7" />
                 </linearGradient>
-                <linearGradient id="grad-indigo-violet" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-indigo-violet" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#6366f1" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.7" />
                 </linearGradient>
-                <linearGradient id="grad-violet-green" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-violet-green" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#22c55e" stopOpacity="0.7" />
                 </linearGradient>
-                <linearGradient id="grad-violet-teal" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-violet-teal" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#14b8a6" stopOpacity="0.7" />
                 </linearGradient>
-                <linearGradient id="grad-violet-emerald" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-violet-emerald" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#10b981" stopOpacity="0.7" />
                 </linearGradient>
-                <linearGradient id="grad-green-amber" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-green-amber" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#22c55e" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.7" />
                 </linearGradient>
-                <linearGradient id="grad-teal-amber" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-teal-amber" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#14b8a6" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.7" />
                 </linearGradient>
-                <linearGradient id="grad-emerald-amber" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grad-emerald-amber" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#10b981" stopOpacity="0.7" />
                   <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.7" />
                 </linearGradient>
               </defs>
 
               {/* Level 1 → Level 2 (4 sources converge to pool) */}
-              <path d="M 162 95 C 162 145, 500 115, 500 165" stroke="url(#grad-blue-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '0.8s' }} />
-              <path d="M 387 95 C 387 140, 500 120, 500 165" stroke="url(#grad-purple-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '0.9s' }} />
-              <path d="M 612 95 C 612 140, 500 120, 500 165" stroke="url(#grad-cyan-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.0s' }} />
-              <path d="M 837 95 C 837 145, 500 115, 500 165" stroke="url(#grad-pink-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.1s' }} />
+              <path d="M 195 75 C 280 75, 320 190, 390 190" stroke="url(#grad-blue-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '0.8s' }} />
+              <path d="M 195 185 C 280 185, 320 200, 390 200" stroke="url(#grad-purple-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '0.9s' }} />
+              <path d="M 195 300 C 280 300, 320 210, 390 210" stroke="url(#grad-cyan-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.0s' }} />
+              <path d="M 195 410 C 280 410, 320 220, 390 220" stroke="url(#grad-pink-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.1s' }} />
 
               {/* Level 2 → Level 3 (pool to scorer) */}
-              <path d="M 500 225 C 500 260, 500 270, 500 295" stroke="url(#grad-indigo-violet)" strokeWidth="3" className="node-graph-edge-slow" style={{ animationDelay: '1.4s' }} />
+              <path d="M 530 210 C 580 210, 600 250, 640 250" stroke="url(#grad-indigo-violet)" strokeWidth="3" className="node-graph-edge-slow" style={{ animationDelay: '1.4s' }} />
 
               {/* Level 3 → Level 4 (scorer fans out to 3 filters) */}
-              <path d="M 500 395 C 500 440, 225 420, 225 465" stroke="url(#grad-violet-green)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.8s' }} />
-              <path d="M 500 395 C 500 430, 500 435, 500 465" stroke="url(#grad-violet-teal)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.9s' }} />
-              <path d="M 500 395 C 500 440, 775 420, 775 465" stroke="url(#grad-violet-emerald)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.0s' }} />
+              <path d="M 810 230 C 870 230, 870 145, 910 145" stroke="url(#grad-violet-green)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.8s' }} />
+              <path d="M 810 250 C 870 250, 870 250, 910 250" stroke="url(#grad-violet-teal)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.9s' }} />
+              <path d="M 810 270 C 870 270, 870 355, 910 355" stroke="url(#grad-violet-emerald)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.0s' }} />
 
               {/* Level 4 → Level 5 (3 filters converge to timeline) */}
-              <path d="M 225 525 C 225 570, 500 550, 500 585" stroke="url(#grad-green-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.3s' }} />
-              <path d="M 500 525 C 500 555, 500 560, 500 585" stroke="url(#grad-teal-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.4s' }} />
-              <path d="M 775 525 C 775 570, 500 550, 500 585" stroke="url(#grad-emerald-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.5s' }} />
+              <path d="M 1010 145 C 1060 145, 1060 230, 1100 230" stroke="url(#grad-green-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.3s' }} />
+              <path d="M 1010 250 C 1060 250, 1060 250, 1100 250" stroke="url(#grad-teal-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.4s' }} />
+              <path d="M 1010 355 C 1060 355, 1060 270, 1100 270" stroke="url(#grad-emerald-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.5s' }} />
             </svg>
 
             {/* Nodes Layer */}
-            <div className="relative" style={{ aspectRatio: '1000/680' }}>
+            <div className="relative" style={{ aspectRatio: '1200/500' }}>
 
-              {/* ── Level 1: Sources (4 nodes) ── */}
-              <div className="absolute inset-x-0 top-0 flex justify-between gap-3 px-2" style={{ height: '13.5%' }}>
+              {/* ── Column 1: Sources (4 nodes, stacked vertically on the left) ── */}
+              <div className="absolute flex flex-col justify-between gap-2" style={{ left: '0%', top: '4%', bottom: '4%', width: '16%' }}>
                 {/* Earlybird */}
-                <div className="node-graph-node flex-1 rounded-xl border border-blue-500/30 bg-blue-500/10 backdrop-blur-sm p-3 flex items-center gap-3" style={{ animationDelay: '0.1s' }}>
-                  <span className="text-2xl shrink-0">📥</span>
+                <div className="node-graph-node flex-1 rounded-xl border border-blue-500/30 bg-blue-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2" style={{ animationDelay: '0.1s' }}>
+                  <span className="text-xl shrink-0">📥</span>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-blue-400 truncate">フォロー中の投稿</div>
+                    <div className="text-xs font-semibold text-blue-400 truncate">フォロー中の投稿</div>
                     <div className="text-[10px] text-blue-300/70 truncate">Earlybird</div>
-                    <div className="text-lg font-bold text-blue-300 tabular-nums">600<span className="text-xs font-normal ml-0.5">件</span></div>
+                    <div className="text-base font-bold text-blue-300 tabular-nums">600<span className="text-[10px] font-normal ml-0.5">件</span></div>
                   </div>
                 </div>
                 {/* UTEG */}
-                <div className="node-graph-node flex-1 rounded-xl border border-purple-500/30 bg-purple-500/10 backdrop-blur-sm p-3 flex items-center gap-3" style={{ animationDelay: '0.2s' }}>
-                  <span className="text-2xl shrink-0">📥</span>
+                <div className="node-graph-node flex-1 rounded-xl border border-purple-500/30 bg-purple-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2" style={{ animationDelay: '0.2s' }}>
+                  <span className="text-xl shrink-0">📥</span>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-purple-400 truncate">似た人が見ている投稿</div>
+                    <div className="text-xs font-semibold text-purple-400 truncate">似た人が見ている投稿</div>
                     <div className="text-[10px] text-purple-300/70 truncate">UTEG</div>
-                    <div className="text-lg font-bold text-purple-300 tabular-nums">300<span className="text-xs font-normal ml-0.5">件</span></div>
+                    <div className="text-base font-bold text-purple-300 tabular-nums">300<span className="text-[10px] font-normal ml-0.5">件</span></div>
                   </div>
                 </div>
                 {/* CrMixer */}
-                <div className="node-graph-node flex-1 rounded-xl border border-cyan-500/30 bg-cyan-500/10 backdrop-blur-sm p-3 flex items-center gap-3" style={{ animationDelay: '0.3s' }}>
-                  <span className="text-2xl shrink-0">📥</span>
+                <div className="node-graph-node flex-1 rounded-xl border border-cyan-500/30 bg-cyan-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2" style={{ animationDelay: '0.3s' }}>
+                  <span className="text-xl shrink-0">📥</span>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-cyan-400 truncate">興味が近い人のおすすめ</div>
+                    <div className="text-xs font-semibold text-cyan-400 truncate">興味が近い人のおすすめ</div>
                     <div className="text-[10px] text-cyan-300/70 truncate">CrMixer</div>
-                    <div className="text-lg font-bold text-cyan-300 tabular-nums">400<span className="text-xs font-normal ml-0.5">件</span></div>
+                    <div className="text-base font-bold text-cyan-300 tabular-nums">400<span className="text-[10px] font-normal ml-0.5">件</span></div>
                   </div>
                 </div>
                 {/* FRS */}
-                <div className="node-graph-node flex-1 rounded-xl border border-pink-500/30 bg-pink-500/10 backdrop-blur-sm p-3 flex items-center gap-3" style={{ animationDelay: '0.4s' }}>
-                  <span className="text-2xl shrink-0">📥</span>
+                <div className="node-graph-node flex-1 rounded-xl border border-pink-500/30 bg-pink-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2" style={{ animationDelay: '0.4s' }}>
+                  <span className="text-xl shrink-0">📥</span>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-pink-400 truncate">注目アカウントの投稿</div>
+                    <div className="text-xs font-semibold text-pink-400 truncate">注目アカウントの投稿</div>
                     <div className="text-[10px] text-pink-300/70 truncate">FRS</div>
-                    <div className="text-lg font-bold text-pink-300 tabular-nums">100<span className="text-xs font-normal ml-0.5">件</span></div>
+                    <div className="text-base font-bold text-pink-300 tabular-nums">100<span className="text-[10px] font-normal ml-0.5">件</span></div>
                   </div>
                 </div>
               </div>
 
-              {/* ── Level 2: Candidate Pool (1 node, centered) ── */}
-              <div className="absolute left-1/2 -translate-x-1/2 node-graph-node" style={{ top: '24%', width: '40%', animationDelay: '0.6s' }}>
+              {/* ── Column 2: Candidate Pool (1 node, vertically centered) ── */}
+              <div className="absolute top-1/2 -translate-y-1/2 node-graph-node" style={{ left: '22%', width: '16%', animationDelay: '0.6s' }}>
                 <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-sm p-4 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">🔄</span>
-                    <div className="text-base font-semibold text-indigo-400">候補プール</div>
+                    <div className="text-sm font-semibold text-indigo-400">候補プール</div>
                   </div>
                   <div className="text-2xl font-bold text-indigo-300 tabular-nums mt-1">
                     ~1,400<span className="text-sm font-normal ml-1">件</span>
@@ -627,8 +635,8 @@ export default function ExplorePage() {
                 </div>
               </div>
 
-              {/* ── Level 3: Heavy Ranker (1 large node, centered) ── */}
-              <div className="absolute left-1/2 -translate-x-1/2 node-graph-node" style={{ top: '43%', width: '52%', animationDelay: '1.0s' }}>
+              {/* ── Column 3: Heavy Ranker (1 large node, vertically centered) ── */}
+              <div className="absolute top-1/2 -translate-y-1/2 node-graph-node" style={{ left: '42%', width: '22%', animationDelay: '1.0s' }}>
                 <div className="rounded-xl border-2 border-violet-500/40 bg-violet-500/10 backdrop-blur-sm p-5 text-center shadow-lg shadow-violet-500/5">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-3xl">🧠</span>
@@ -646,37 +654,37 @@ export default function ExplorePage() {
                 </div>
               </div>
 
-              {/* ── Level 4: Filters (3 nodes) ── */}
-              <div className="absolute inset-x-0 flex justify-between gap-4 px-8" style={{ top: '68%', height: '10%' }}>
+              {/* ── Column 4: Filters (3 nodes, stacked vertically) ── */}
+              <div className="absolute flex flex-col justify-between gap-3" style={{ left: '68%', top: '10%', bottom: '10%', width: '14%' }}>
                 {/* Safety */}
-                <div className="node-graph-node flex-1 rounded-xl border border-green-500/30 bg-green-500/10 backdrop-blur-sm p-3 text-center" style={{ animationDelay: '1.4s' }}>
+                <div className="node-graph-node flex-1 rounded-xl border border-green-500/30 bg-green-500/10 backdrop-blur-sm p-3 flex flex-col items-center justify-center text-center" style={{ animationDelay: '1.4s' }}>
                   <span className="text-xl">🛡️</span>
-                  <div className="text-sm font-semibold text-green-400 mt-1">安全性チェック</div>
+                  <div className="text-xs font-semibold text-green-400 mt-1">安全性チェック</div>
                 </div>
                 {/* Diversity */}
-                <div className="node-graph-node flex-1 rounded-xl border border-teal-500/30 bg-teal-500/10 backdrop-blur-sm p-3 text-center" style={{ animationDelay: '1.5s' }}>
+                <div className="node-graph-node flex-1 rounded-xl border border-teal-500/30 bg-teal-500/10 backdrop-blur-sm p-3 flex flex-col items-center justify-center text-center" style={{ animationDelay: '1.5s' }}>
                   <span className="text-xl">👥</span>
-                  <div className="text-sm font-semibold text-teal-400 mt-1">著者多様性</div>
+                  <div className="text-xs font-semibold text-teal-400 mt-1">著者多様性</div>
                 </div>
                 {/* Balance */}
-                <div className="node-graph-node flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-sm p-3 text-center" style={{ animationDelay: '1.6s' }}>
+                <div className="node-graph-node flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-sm p-3 flex flex-col items-center justify-center text-center" style={{ animationDelay: '1.6s' }}>
                   <span className="text-xl">⚖️</span>
-                  <div className="text-sm font-semibold text-emerald-400 mt-1">コンテンツバランス</div>
+                  <div className="text-xs font-semibold text-emerald-400 mt-1">コンテンツバランス</div>
                 </div>
               </div>
 
-              {/* ── Level 5: Timeline Output (1 node, centered) ── */}
-              <div className="absolute left-1/2 -translate-x-1/2 node-graph-node" style={{ top: '86%', width: '44%', animationDelay: '1.8s' }}>
+              {/* ── Column 5: Timeline Output (1 node, vertically centered, right edge) ── */}
+              <div className="absolute top-1/2 -translate-y-1/2 node-graph-node" style={{ left: '85%', width: '14.5%', animationDelay: '1.8s' }}>
                 <div className="rounded-xl border-2 border-amber-500/30 bg-amber-500/10 backdrop-blur-sm p-4 text-center shadow-lg shadow-amber-500/5">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">📱</span>
-                    <div className="text-base font-semibold text-amber-400">あなたのタイムライン</div>
+                    <div className="text-sm font-semibold text-amber-400">あなたのタイムライン</div>
                   </div>
                   <div className="text-2xl font-bold text-amber-300 tabular-nums mt-1">
                     50<span className="text-sm font-normal ml-1">件</span>
                   </div>
                   <div className="text-xs text-amber-300/60 mt-1">
-                    広告・おすすめユーザーと組み合わせて完成
+                    広告・おすすめと組み合わせて完成
                   </div>
                 </div>
               </div>
@@ -687,7 +695,7 @@ export default function ExplorePage() {
           <div className="md:hidden space-y-0">
             {/* Level 1 */}
             <div className="space-y-2">
-              <div className="node-graph-node rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.1s' }}>
+              <div className="node-graph-node-mobile rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.1s' }}>
                 <span className="text-xl">📥</span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-blue-400 truncate">フォロー中の投稿</div>
@@ -695,7 +703,7 @@ export default function ExplorePage() {
                 </div>
                 <div className="text-lg font-bold text-blue-300 tabular-nums shrink-0">600<span className="text-xs font-normal">件</span></div>
               </div>
-              <div className="node-graph-node rounded-xl border border-purple-500/30 bg-purple-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.2s' }}>
+              <div className="node-graph-node-mobile rounded-xl border border-purple-500/30 bg-purple-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.2s' }}>
                 <span className="text-xl">📥</span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-purple-400 truncate">似た人が見ている投稿</div>
@@ -703,7 +711,7 @@ export default function ExplorePage() {
                 </div>
                 <div className="text-lg font-bold text-purple-300 tabular-nums shrink-0">300<span className="text-xs font-normal">件</span></div>
               </div>
-              <div className="node-graph-node rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.3s' }}>
+              <div className="node-graph-node-mobile rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.3s' }}>
                 <span className="text-xl">📥</span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-cyan-400 truncate">興味が近い人のおすすめ</div>
@@ -711,7 +719,7 @@ export default function ExplorePage() {
                 </div>
                 <div className="text-lg font-bold text-cyan-300 tabular-nums shrink-0">400<span className="text-xs font-normal">件</span></div>
               </div>
-              <div className="node-graph-node rounded-xl border border-pink-500/30 bg-pink-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.4s' }}>
+              <div className="node-graph-node-mobile rounded-xl border border-pink-500/30 bg-pink-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.4s' }}>
                 <span className="text-xl">📥</span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-pink-400 truncate">注目アカウントの投稿</div>
@@ -727,7 +735,7 @@ export default function ExplorePage() {
             </div>
 
             {/* Level 2 */}
-            <div className="node-graph-node rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-3 text-center" style={{ animationDelay: '0.6s' }}>
+            <div className="node-graph-node-mobile rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-3 text-center" style={{ animationDelay: '0.6s' }}>
               <span className="text-xl">🔄</span>
               <span className="text-sm font-semibold text-indigo-400 ml-2">候補プール</span>
               <span className="text-lg font-bold text-indigo-300 tabular-nums ml-2">~1,400件</span>
@@ -738,7 +746,7 @@ export default function ExplorePage() {
             </div>
 
             {/* Level 3 */}
-            <div className="node-graph-node rounded-xl border-2 border-violet-500/40 bg-violet-500/10 p-4 text-center" style={{ animationDelay: '1.0s' }}>
+            <div className="node-graph-node-mobile rounded-xl border-2 border-violet-500/40 bg-violet-500/10 p-4 text-center" style={{ animationDelay: '1.0s' }}>
               <div className="flex items-center justify-center gap-2">
                 <span className="text-2xl">🧠</span>
                 <div className="text-base font-bold text-violet-400">AIスコアリング</div>
@@ -754,15 +762,15 @@ export default function ExplorePage() {
 
             {/* Level 4 */}
             <div className="space-y-2">
-              <div className="node-graph-node rounded-xl border border-green-500/30 bg-green-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.4s' }}>
+              <div className="node-graph-node-mobile rounded-xl border border-green-500/30 bg-green-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.4s' }}>
                 <span className="text-lg">🛡️</span>
                 <span className="text-sm font-semibold text-green-400">安全性チェック</span>
               </div>
-              <div className="node-graph-node rounded-xl border border-teal-500/30 bg-teal-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.5s' }}>
+              <div className="node-graph-node-mobile rounded-xl border border-teal-500/30 bg-teal-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.5s' }}>
                 <span className="text-lg">👥</span>
                 <span className="text-sm font-semibold text-teal-400">著者多様性</span>
               </div>
-              <div className="node-graph-node rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.6s' }}>
+              <div className="node-graph-node-mobile rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.6s' }}>
                 <span className="text-lg">⚖️</span>
                 <span className="text-sm font-semibold text-emerald-400">コンテンツバランス</span>
               </div>
@@ -773,7 +781,7 @@ export default function ExplorePage() {
             </div>
 
             {/* Level 5 */}
-            <div className="node-graph-node rounded-xl border-2 border-amber-500/30 bg-amber-500/10 p-4 text-center" style={{ animationDelay: '1.8s' }}>
+            <div className="node-graph-node-mobile rounded-xl border-2 border-amber-500/30 bg-amber-500/10 p-4 text-center" style={{ animationDelay: '1.8s' }}>
               <div className="flex items-center justify-center gap-2">
                 <span className="text-xl">📱</span>
                 <span className="text-base font-semibold text-amber-400">あなたのタイムライン</span>
