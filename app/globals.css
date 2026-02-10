@@ -135,3 +135,12 @@
 .driver-popover.matri-x-tour .driver-popover-arrow-side-bottom .driver-popover-arrow {
   border-color: hsl(var(--border));
 }
+
+/* Hide scrollbar but allow scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

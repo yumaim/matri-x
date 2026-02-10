@@ -190,11 +190,11 @@ export default function EngagementPage() {
       </div>
 
       <Tabs defaultValue="weights" className="space-y-6">
-        <TabsList className="glass">
-          <TabsTrigger value="weights">重み付け</TabsTrigger>
-          <TabsTrigger value="negative">ネガティブシグナル</TabsTrigger>
-          <TabsTrigger value="velocity">加速度</TabsTrigger>
-          <TabsTrigger value="media">メディアブースト</TabsTrigger>
+        <TabsList className="glass w-full overflow-x-auto flex justify-start sm:justify-center no-scrollbar">
+          <TabsTrigger value="weights" className="shrink-0">重み付け</TabsTrigger>
+          <TabsTrigger value="negative" className="shrink-0">ネガティブシグナル</TabsTrigger>
+          <TabsTrigger value="velocity" className="shrink-0">加速度</TabsTrigger>
+          <TabsTrigger value="media" className="shrink-0">メディアブースト</TabsTrigger>
           <TabsTrigger value="tips">最適化Tips</TabsTrigger>
         </TabsList>
 
