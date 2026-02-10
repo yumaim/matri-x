@@ -117,7 +117,7 @@ const SHORT_NAMES: Record<string, string> = {
 };
 
 const chartData = engagementWeights.map((item) => ({
-  name: `${SHORT_NAMES[item.action] ?? item.action} ${item.weight} ×`,
+  name: `${SHORT_NAMES[item.action] ?? item.action} ×${item.weight}`,
   weight: item.weight,
   fill: item.color,
 }));
@@ -262,7 +262,7 @@ export default function EngagementPage() {
                           className="text-lg font-bold"
                           style={{ color: item.color }}
                         >
-                          {item.weight} ×
+                          ×{item.weight}
                         </span>
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">
@@ -363,7 +363,7 @@ export default function EngagementPage() {
                             className="text-2xl font-bold"
                             style={{ color: item.color }}
                           >
-                            {item.weight} ×
+                            ×{item.weight}
                           </span>
                         </div>
                         <p className="mt-2 text-sm text-muted-foreground">

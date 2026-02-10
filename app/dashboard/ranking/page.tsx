@@ -422,12 +422,12 @@ export default function RankingPage() {
             </CardHeader>
             <CardContent>
               <Tabs value={postTab} onValueChange={setPostTab}>
-                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-4">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-4 h-auto">
                   {POST_TABS.map((tab) => (
                     <TabsTrigger
                       key={tab.id}
                       value={tab.id}
-                      className="text-xs sm:text-sm gap-1"
+                      className="text-[11px] sm:text-sm gap-1 px-1 py-1.5 sm:px-3 sm:py-2"
                     >
                       <tab.icon className="h-3.5 w-3.5 hidden sm:block" />
                       {tab.label}

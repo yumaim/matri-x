@@ -226,6 +226,27 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Header with Level */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
+            ダッシュボード
+          </h1>
+          <p className="mt-1 text-muted-foreground">
+            Xアルゴリズムの学習を続けましょう
+          </p>
+        </div>
+        {progressData && (
+          <div className="flex items-center gap-3">
+            <div data-tour="level-badge" className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 px-4 py-2">
+              <Star className="h-5 w-5 text-yellow-500" />
+              <span className="text-sm font-bold text-foreground">Lv.{progressData.level}</span>
+              <span className="text-xs text-muted-foreground">{progressData.totalXp} XP</span>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Activity Graph */}
       {activityData.length > 0 && (
         <Card className="glass overflow-hidden">
@@ -272,27 +293,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       )}
-
-      {/* Header with Level */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
-            ダッシュボード
-          </h1>
-          <p className="mt-1 text-muted-foreground">
-            Xアルゴリズムの学習を続けましょう
-          </p>
-        </div>
-        {progressData && (
-          <div className="flex items-center gap-3">
-            <div data-tour="level-badge" className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 px-4 py-2">
-              <Star className="h-5 w-5 text-yellow-500" />
-              <span className="text-sm font-bold text-foreground">Lv.{progressData.level}</span>
-              <span className="text-xs text-muted-foreground">{progressData.totalXp} XP</span>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* XP Progress Bar */}
       <Card className="glass border-primary/20">
