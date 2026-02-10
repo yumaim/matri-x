@@ -1,8 +1,6 @@
-"use client";
-
-import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { LPHeader } from "@/components/lp/lp-header";
+import { TypewriterText } from "@/components/lp/typewriter-text";
 import {
   Zap,
   ArrowRight,
@@ -21,8 +19,30 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { Metadata } from "next";
 
-// navigation moved to components/lp/lp-header.tsx
+export const metadata: Metadata = {
+  title: "Matri-X | X(Twitter)アルゴリズム解析プラットフォーム",
+  description:
+    "Xの推薦アルゴリズムをソースコードレベルで解析。6,000+特徴量、パイプライン可視化、エンゲージメント重み付け分析。",
+  alternates: {
+    canonical: "https://matri-x.jp",
+  },
+  openGraph: {
+    title: "Matri-X | X(Twitter)アルゴリズム解析プラットフォーム",
+    description:
+      "Xの推薦アルゴリズムをソースコードレベルで解析。6,000+特徴量、パイプライン可視化、検証コミュニティ。",
+    type: "website",
+    siteName: "Matri-X",
+    url: "https://matri-x.jp",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Matri-X | X(Twitter)アルゴリズム解析プラットフォーム",
+    description:
+      "Xの推薦アルゴリズムをソースコードレベルで解析するプラットフォーム",
+  },
+};
 
 const stats = [
   { value: "6,000+", label: "分析対象の特徴量" },
@@ -135,53 +155,36 @@ const pricingPlans = [
   },
 ];
 
-// Header extracted to components/lp/lp-header.tsx for render isolation
-
-const heroLines = [
-  "\"いいね\"を追う運用、まだ続けますか？",
-  "リプライの重みは、いいねの150倍",
-  "Xのソースコードは、嘘をつかない",
-  "根拠のない提案に、クライアントは気づく",
-  "アルゴリズムを読んだ人だけが勝つ時代",
+const pipelineSteps = [
+  {
+    step: "01",
+    title: "候補取得",
+    desc: "あなたのタイムラインに表示する候補を約1,400件収集します",
+    color: "bg-primary",
+    tags: ["フォロー中 50%", "フォロー外 50%"],
+  },
+  {
+    step: "02",
+    title: "ランキング",
+    desc: "AIが「あなたが反応しそうな投稿」を予測してスコアをつけます",
+    color: "bg-accent",
+    tags: ["約1,000件に絞込"],
+  },
+  {
+    step: "03",
+    title: "フィルタリング",
+    desc: "安全でない投稿や、同じ人の投稿が連続しないように調整します",
+    color: "bg-[#00ba7c]",
+    tags: ["約700件に絞込"],
+  },
+  {
+    step: "04",
+    title: "配信",
+    desc: "広告やおすすめユーザーと組み合わせて、タイムラインが完成します",
+    color: "bg-orange-500",
+    tags: ["最終50件を表示"],
+  },
 ];
-
-function TypewriterText() {
-  const [lineIndex, setLineIndex] = useState(0);
-  const [charIndex, setCharIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [displayText, setDisplayText] = useState("");
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    const currentLine = heroLines[lineIndex];
-
-    if (!isDeleting && charIndex <= currentLine.length) {
-      timerRef.current = setTimeout(() => {
-        setDisplayText(currentLine.slice(0, charIndex));
-        setCharIndex((c) => c + 1);
-      }, 100);
-    } else if (!isDeleting && charIndex > currentLine.length) {
-      timerRef.current = setTimeout(() => setIsDeleting(true), 3500);
-    } else if (isDeleting && charIndex > 0) {
-      timerRef.current = setTimeout(() => {
-        setCharIndex((c) => c - 1);
-        setDisplayText(currentLine.slice(0, charIndex - 1));
-      }, 50);
-    } else if (isDeleting && charIndex === 0) {
-      setIsDeleting(false);
-      setLineIndex((i) => (i + 1) % heroLines.length);
-    }
-
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [charIndex, isDeleting, lineIndex]);
-
-  return (
-    <span className="text-gradient">
-      {displayText}
-      <span className="animate-pulse text-primary">|</span>
-    </span>
-  );
-}
 
 function HeroSection() {
   return (
@@ -194,13 +197,15 @@ function HeroSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-2 backdrop-blur-sm">
-            <Sparkles className="h-4 w-4 text-primary" />
+            <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
             <span className="text-sm text-muted-foreground">
               Xアルゴリズム完全解析
             </span>
           </div>
 
-          <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl h-[4.5rem] sm:h-[6rem] md:h-[7.5rem] lg:h-[9rem] overflow-hidden">
+          <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl min-h-[4.5rem] sm:min-h-[6rem] md:min-h-[7.5rem] lg:min-h-[9rem]">
+            {/* SSR-visible text for SEO crawlers */}
+            <span className="sr-only">Xのソースコードは、嘘をつかない — Matri-X アルゴリズム解析</span>
             <TypewriterText />
           </h1>
 
@@ -210,8 +215,18 @@ function HeroSection() {
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button asChild size="lg" className="glow-primary group"><Link href="/register">今すぐ無料で始める<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link></Button>
-            <Button asChild size="lg" variant="outline" className="group bg-transparent"><Link href="#features"><Play className="mr-2 h-4 w-4" />アルゴリズムを覗く</Link></Button>
+            <Button asChild size="lg" className="glow-primary group">
+              <Link href="/register">
+                今すぐ無料で始める
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="group bg-transparent">
+              <Link href="#features">
+                <Play className="mr-2 h-4 w-4" aria-hidden="true" />
+                アルゴリズムを覗く
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -234,44 +249,15 @@ function HeroSection() {
         <div className="mx-auto mt-20 max-w-5xl">
           <div className="glass rounded-3xl p-8">
             <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-foreground">
+              <h2 className="text-lg font-semibold text-foreground">
                 推薦パイプライン概要
-              </h3>
+              </h2>
               <span className="rounded-full bg-primary/20 px-3 py-1 text-xs text-primary">
                 ライブプレビュー
               </span>
             </div>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-              {[
-                {
-                  step: "01",
-                  title: "候補取得",
-                  desc: "あなたのタイムラインに表示する候補を約1,400件収集します",
-                  color: "bg-primary",
-                  tags: ["フォロー中 50%", "フォロー外 50%"],
-                },
-                {
-                  step: "02",
-                  title: "ランキング",
-                  desc: "AIが「あなたが反応しそうな投稿」を予測してスコアをつけます",
-                  color: "bg-accent",
-                  tags: ["約1,000件に絞込"],
-                },
-                {
-                  step: "03",
-                  title: "フィルタリング",
-                  desc: "安全でない投稿や、同じ人の投稿が連続しないように調整します",
-                  color: "bg-[#00ba7c]",
-                  tags: ["約700件に絞込"],
-                },
-                {
-                  step: "04",
-                  title: "配信",
-                  desc: "広告やおすすめユーザーと組み合わせて、タイムラインが完成します",
-                  color: "bg-orange-500",
-                  tags: ["最終50件を表示"],
-                },
-              ].map((item, index) => (
+              {pipelineSteps.map((item, index) => (
                 <div key={item.step} className="relative flex">
                   <div className="rounded-xl bg-muted/50 p-5 transition-all hover:bg-muted flex-1 flex flex-col">
                     <div
@@ -279,9 +265,9 @@ function HeroSection() {
                     >
                       {item.step}
                     </div>
-                    <h4 className="font-semibold text-foreground">
+                    <h3 className="font-semibold text-foreground">
                       {item.title}
-                    </h4>
+                    </h3>
                     <p className="mt-1 text-xs text-muted-foreground flex-1">
                       {item.desc}
                     </p>
@@ -295,7 +281,7 @@ function HeroSection() {
                   </div>
                   {index < 3 && (
                     <div className="absolute top-1/2 -right-3 hidden w-6 -translate-y-1/2 md:flex items-center justify-center">
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                     </div>
                   )}
                 </div>
@@ -328,7 +314,7 @@ function FeaturesSection() {
               className="glass group rounded-2xl p-6 transition-all hover:glow-primary"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
-                <feature.icon className="h-6 w-6 text-primary" />
+                <feature.icon className="h-6 w-6 text-primary" aria-hidden="true" />
               </div>
               <h3 className="mt-4 font-semibold text-foreground">
                 {feature.title}
@@ -358,39 +344,47 @@ function EngagementSection() {
         </div>
 
         <div className="mx-auto mt-16 grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {engagementWeights.map((item) => (
-            <div
-              key={item.action}
-              className="glass rounded-2xl p-6 transition-all hover:scale-105"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-foreground font-medium">
-                  {item.action}
-                </span>
-                <span
-                  className={`${item.color} rounded-full px-3 py-1 text-sm font-bold text-white`}
-                >
-                  {item.weight} ×
-                </span>
-              </div>
-              <div className="mt-4 h-2 w-full rounded-full bg-muted">
+          {engagementWeights.map((item) => {
+            const pct = Math.max(5, Math.min(100, (Math.abs(parseFloat(item.weight)) / 75) * 100));
+            return (
+              <div
+                key={item.action}
+                className="glass rounded-2xl p-6 transition-all md:hover:scale-105"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-foreground font-medium text-sm sm:text-base">
+                    {item.action}
+                  </span>
+                  <span
+                    className={`${item.color} rounded-full px-3 py-1 text-sm font-bold text-white shrink-0`}
+                  >
+                    {item.weight} ×
+                  </span>
+                </div>
                 <div
-                  className={`h-2 rounded-full ${item.color}`}
-                  style={{
-                    width: `${Math.max(5, Math.min(100, (Math.abs(parseFloat(item.weight)) / 75) * 100))}%`,
-                  }}
-                />
+                  className="mt-4 h-2 w-full rounded-full bg-muted"
+                  role="meter"
+                  aria-label={`${item.action}の重み: ${item.weight}倍`}
+                  aria-valuenow={Math.abs(parseFloat(item.weight))}
+                  aria-valuemin={0}
+                  aria-valuemax={75}
+                >
+                  <div
+                    className={`h-2 rounded-full ${item.color} transition-all duration-500`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mx-auto mt-12 max-w-2xl">
           <div className="glass rounded-2xl p-6 border-l-4 border-orange-500">
-            <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <RefreshCw className="h-5 w-5 text-orange-500" />
+            <h3 className="font-semibold text-foreground flex items-center gap-2">
+              <RefreshCw className="h-5 w-5 text-orange-500" aria-hidden="true" />
               90日ルール
-            </h4>
+            </h3>
             <p className="mt-2 text-sm text-muted-foreground">
               90日以上非アクティブなアカウントからのエンゲージメントは、
               スコア計算から除外されます。継続的な活動が重要です。
@@ -450,7 +444,7 @@ function PricingSection() {
                     key={feature}
                     className="flex items-center gap-2 text-sm text-foreground"
                   >
-                    <Check className="h-4 w-4 text-primary" />
+                    <Check className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
                     {feature}
                   </li>
                 ))}
@@ -460,7 +454,9 @@ function PricingSection() {
                   {plan.cta}
                 </Button>
               ) : (
-                <Button asChild className={`mt-8 w-full ${plan.popular ? "glow-primary" : ""}`} variant={plan.popular ? "default" : "outline"}><Link href="/register">{plan.cta}</Link></Button>
+                <Button asChild className={`mt-8 w-full ${plan.popular ? "glow-primary" : ""}`} variant={plan.popular ? "default" : "outline"}>
+                  <Link href="/register">{plan.cta}</Link>
+                </Button>
               )}
             </div>
           ))}
@@ -481,7 +477,12 @@ function CTASection() {
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Xアルゴリズムを理解し、あなたのコンテンツ戦略を最適化しましょう。
           </p>
-          <Button asChild size="lg" className="mt-8 glow-primary group"><Link href="/register">今すぐ無料で始める<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link></Button>
+          <Button asChild size="lg" className="mt-8 glow-primary group">
+            <Link href="/register">
+              今すぐ無料で始める
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
@@ -496,36 +497,39 @@ function Footer() {
           <div className="flex items-center gap-2">
             <span className="text-lg font-bold text-gradient">Matri-X</span>
           </div>
-          <div className="flex items-center gap-6">
-            <Link
-              href="/terms"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              利用規約
-            </Link>
-            <Link
-              href="/privacy"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              プライバシー
-            </Link>
-            <Link
-              href="https://tally.so/r/wA6o1z"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              お問い合わせ
-            </Link>
-          </div>
+          <nav aria-label="フッターナビゲーション">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Link
+                href="/terms"
+                className="inline-flex items-center justify-center rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                利用規約
+              </Link>
+              <Link
+                href="/privacy"
+                className="inline-flex items-center justify-center rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                プライバシー
+              </Link>
+              <Link
+                href="https://tally.so/r/wA6o1z"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                お問い合わせ
+              </Link>
+            </div>
+          </nav>
           <div className="flex items-center gap-4">
             <Link
               href="https://x.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground"
+              className="inline-flex items-center justify-center h-10 w-10 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              aria-label="X (Twitter) 公式アカウント"
             >
-              <Twitter className="h-5 w-5" />
+              <Twitter className="h-5 w-5" aria-hidden="true" />
             </Link>
           </div>
         </div>
