@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { requireAuth, handleApiError } from "@/lib/api-helpers";
+import { requirePlan, handleApiError } from "@/lib/api-helpers";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { knowledgeBase, KnowledgeEntry } from "@/lib/knowledge/x-algorithm";
 import { z } from "zod";
 
@@ -147,7 +148,9 @@ function formatResponse(query: string, entries: KnowledgeEntry[]) {
 
 export async function POST(request: Request) {
   try {
-    await requireAuth();
+    const session = await requirePlan("STANDARD");
+    const rl = checkRateLimit(`dw:${session.user.id}`, 30, 60000);
+    if (!rl.allowed) { return NextResponse.json({ error: "リクエスト制限を超えました" }, { status: 429 }); }
 
     const body = await request.json();
     const parsed = chatSchema.safeParse(body);

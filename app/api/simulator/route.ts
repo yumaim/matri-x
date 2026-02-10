@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { requireAuth, handleApiError } from "@/lib/api-helpers";
+import { requireAuth, requirePlan, handleApiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const simulationSchema = z.object({
@@ -10,7 +11,11 @@ const simulationSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const session = await requireAuth();
+    const session = await requirePlan("STANDARD");
+    const rl = checkRateLimit(`sim:${session.user.id}`, 30, 60000);
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "リクエスト制限を超えました" }, { status: 429 });
+    }
 
     const body = await request.json();
     const parsed = simulationSchema.safeParse(body);
@@ -38,7 +43,7 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const session = await requireAuth();
+    const session = await requirePlan("STANDARD");
 
     const simulations = await prisma.simulation.findMany({
       where: { userId: session.user.id },

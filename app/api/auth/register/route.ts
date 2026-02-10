@@ -33,9 +33,10 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
+      // Return same message as success to prevent user enumeration (H-4)
       return NextResponse.json(
-        { error: "このメールアドレスは既に登録されています" },
-        { status: 409 }
+        { error: "アカウントの作成に問題が発生しました。別のメールアドレスをお試しください。" },
+        { status: 400 }
       );
     }
 

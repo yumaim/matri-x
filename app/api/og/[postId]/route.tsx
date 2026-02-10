@@ -1,8 +1,9 @@
 import { ImageResponse } from "next/og";
 import { prisma } from "@/lib/db";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { NextRequest } from "next/server";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 const CATEGORY_LABELS: Record<string, string> = {
   ALGORITHM: "アルゴリズム解説",
@@ -27,9 +28,16 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ postId: string }> }
 ) {
+  // Rate limit: 60 requests per minute per IP
+  const ip = request.headers.get("x-real-ip") || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const rl = checkRateLimit(`og:${ip}`, 60, 60000);
+  if (!rl.allowed) {
+    return new Response("Too Many Requests", { status: 429 });
+  }
+
   const { postId } = await params;
 
   const post = await prisma.forumPost.findUnique({

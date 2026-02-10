@@ -92,31 +92,93 @@ function timeAgo(dateStr: string): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function renderMarkdown(content: string): any {
-  // Simple markdown-ish rendering: bold, italic, code, links, headings, lists
+function renderMarkdown(content: string): React.ReactNode[] {
   const lines = content.split("\n");
   const elements: React.ReactNode[] = [];
+  let inCodeBlock = false;
+  let codeLines: string[] = [];
+  let codeKey = 0;
+
+  const processInline = (text: string): React.ReactNode => {
+    // Bold, italic, inline code, links
+    const parts: React.ReactNode[] = [];
+    let remaining = text;
+    let key = 0;
+
+    while (remaining.length > 0) {
+      // Inline code
+      const codeMatch = remaining.match(/^(.*?)`([^`]+)`(.*)$/);
+      if (codeMatch) {
+        if (codeMatch[1]) parts.push(codeMatch[1]);
+        parts.push(<code key={`c${key++}`} className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-primary">{codeMatch[2]}</code>);
+        remaining = codeMatch[3];
+        continue;
+      }
+      // Bold
+      const boldMatch = remaining.match(/^(.*?)\*\*(.+?)\*\*(.*)$/);
+      if (boldMatch) {
+        if (boldMatch[1]) parts.push(boldMatch[1]);
+        parts.push(<strong key={`b${key++}`} className="font-semibold text-foreground">{boldMatch[2]}</strong>);
+        remaining = boldMatch[3];
+        continue;
+      }
+      // Link
+      const linkMatch = remaining.match(/^(.*?)\[([^\]]+)\]\(([^)]+)\)(.*)$/);
+      if (linkMatch) {
+        if (linkMatch[1]) parts.push(linkMatch[1]);
+        parts.push(<a key={`l${key++}`} href={linkMatch[3]} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80">{linkMatch[2]}</a>);
+        remaining = linkMatch[4];
+        continue;
+      }
+      parts.push(remaining);
+      break;
+    }
+    return parts.length === 1 ? parts[0] : <>{parts}</>;
+  };
 
   lines.forEach((line, i) => {
-    let processed: React.ReactNode = line;
+    // Code block toggle
+    if (line.startsWith("```")) {
+      if (inCodeBlock) {
+        elements.push(
+          <pre key={`code-${codeKey++}`} className="bg-muted/50 rounded-lg p-4 font-mono text-xs my-3 overflow-x-auto">
+            <code>{codeLines.join("\n")}</code>
+          </pre>
+        );
+        codeLines = [];
+        inCodeBlock = false;
+      } else {
+        inCodeBlock = true;
+      }
+      return;
+    }
+
+    if (inCodeBlock) {
+      codeLines.push(line);
+      return;
+    }
 
     // Headings
     if (line.startsWith("### ")) {
-      elements.push(<h4 key={i} className="font-semibold text-foreground mt-4 mb-2">{line.slice(4)}</h4>);
+      elements.push(<h4 key={i} className="font-semibold text-foreground mt-4 mb-2">{processInline(line.slice(4))}</h4>);
       return;
     }
     if (line.startsWith("## ")) {
-      elements.push(<h3 key={i} className="font-bold text-lg text-foreground mt-6 mb-2">{line.slice(3)}</h3>);
+      elements.push(<h3 key={i} className="font-bold text-lg text-foreground mt-6 mb-2">{processInline(line.slice(3))}</h3>);
       return;
     }
     if (line.startsWith("# ")) {
-      elements.push(<h2 key={i} className="font-bold text-xl text-foreground mt-6 mb-3">{line.slice(2)}</h2>);
+      elements.push(<h2 key={i} className="font-bold text-xl text-foreground mt-6 mb-3">{processInline(line.slice(2))}</h2>);
       return;
     }
 
-    // Code blocks (inline)
-    if (line.startsWith("```")) {
-      elements.push(<div key={i} className="bg-muted/50 rounded p-3 font-mono text-xs my-2" />);
+    // Blockquote
+    if (line.startsWith("> ")) {
+      elements.push(
+        <blockquote key={i} className="border-l-4 border-primary/30 pl-4 my-2 text-muted-foreground italic">
+          {processInline(line.slice(2))}
+        </blockquote>
+      );
       return;
     }
 
@@ -124,7 +186,18 @@ function renderMarkdown(content: string): any {
     if (line.match(/^[-*] /)) {
       elements.push(
         <li key={i} className="ml-4 list-disc text-foreground/90">
-          {line.slice(2)}
+          {processInline(line.slice(2))}
+        </li>
+      );
+      return;
+    }
+
+    // Numbered list
+    if (line.match(/^\d+\. /)) {
+      const text = line.replace(/^\d+\. /, "");
+      elements.push(
+        <li key={i} className="ml-4 list-decimal text-foreground/90">
+          {processInline(text)}
         </li>
       );
       return;
@@ -138,10 +211,19 @@ function renderMarkdown(content: string): any {
 
     elements.push(
       <p key={i} className="text-foreground/90 leading-relaxed">
-        {processed}
+        {processInline(line)}
       </p>
     );
   });
+
+  // Close any unclosed code block
+  if (inCodeBlock && codeLines.length > 0) {
+    elements.push(
+      <pre key={`code-${codeKey}`} className="bg-muted/50 rounded-lg p-4 font-mono text-xs my-3 overflow-x-auto">
+        <code>{codeLines.join("\n")}</code>
+      </pre>
+    );
+  }
 
   return elements;
 }

@@ -173,10 +173,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = createPostSchema.parse(body);
 
+    // Sanitize user content (H-7)
+    const { sanitizeContent } = await import("@/lib/sanitize");
+
     const post = await prisma.forumPost.create({
       data: {
-        title: data.title,
-        content: data.content,
+        title: sanitizeContent(data.title),
+        content: sanitizeContent(data.content),
         category: data.category,
         tags: JSON.stringify(data.tags),
         status: data.status,

@@ -143,9 +143,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
+    // Sanitize user content (H-7)
+    const { sanitizeContent } = await import("@/lib/sanitize");
+
     const comment = await prisma.comment.create({
       data: {
-        content: data.content,
+        content: sanitizeContent(data.content),
         authorId: session.user.id,
         postId: id,
         parentId: data.parentId ?? null,

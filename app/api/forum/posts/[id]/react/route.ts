@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { requireAuth, handleApiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
@@ -10,6 +11,8 @@ export async function POST(
 ) {
   try {
     const session = await requireAuth();
+    const rl = checkRateLimit(`react:${session.user.id}`, 60, 60000);
+    if (!rl.allowed) { return NextResponse.json({ error: "リクエスト制限を超えました" }, { status: 429 }); }
     const { id: postId } = await params;
     const { type } = await request.json();
 

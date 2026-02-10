@@ -1,554 +1,250 @@
-# UXデザイン評価 — matri-x
+# UI/UX デザイン評価レポート
 
-**レビュー日**: 2026-02-10
-**レビュアー**: シニアUXデザイナー (AI)
-**比較基準**: ClickUp / Notion / Linear / Figma
+## スコア: 62/100
 
----
-
-## 総合スコア: 62/100
-
-| カテゴリ | スコア |
-|---|---|
-| 情報アーキテクチャ | 14/20 |
-| インタラクションデザイン | 12/20 |
-| ビジュアルデザイン | 15/20 |
-| レスポンシブデザイン | 11/20 |
-| アクセシビリティ + マイクロインタラクション | 10/20 |
+> 評価者: UI/UXデザイナー（プロ視点）  
+> 評価日: 2026-02-10  
+> 対象: matri-x — X(旧Twitter)アルゴリズム解析プラットフォーム  
+> 技術スタック: Next.js 16 / TypeScript / TailwindCSS / shadcn/ui
 
 ---
 
-## 情報アーキテクチャ: 14/20
+### カテゴリ別スコア
 
-### 良い点
-- サイドバーナビゲーションの構造は論理的。8つの主要機能＋2つのユーティリティ（プロフィール/設定）の分類は明確
-- ダッシュボードの「クイックアクション」がユーザーの次のステップを誘導
-- オンボーディングツアー（driver.js）で初回ユーザーの迷子を防止
-
-### 致命的問題
-
-1. **ランディングページとダッシュボードの情報構造が二重化**
-   - `app/page.tsx` L260-330: ランディングページにエンゲージメント重み付けのデータが丸ごとある
-   - `app/dashboard/engagement/page.tsx`: 同じデータがダッシュボード内にも存在
-   - `app/dashboard/explore/page.tsx` L85-120: explore内にも重複した `engagementWeights` 配列
-   - **影響**: 「この情報はどこが正しいの？」というユーザー混乱。ClickUpなら情報のSingle Source of Truthを徹底する
-
-2. **「有料」バッジの導線が壊れている**
-   - `app/dashboard/page.tsx` L37-38: `paid: true` バッジがクイックアクションカードにあるが、リンク先は普通に `/dashboard/simulator` と `/dashboard/deepwiki`
-   - `components/plan-gate.tsx` L30-35: 遷移した後に「開発中」のゲートが表示される
-   - **影響**: ユーザーは「有料って書いてあるけどクリックしたら開発中？」と混乱。Notionなら無料プランでも中身がチラ見えする（blurではなく）、または最初からクリックを防ぐ
-
-3. **フォーラムサイドバーがデスクトップのみ**
-   - `app/dashboard/forum/page.tsx` L222: `className="hidden lg:block"` でモバイルでは完全に消える
-   - プロフィールプレビュー、コミュニティ統計、トレンドタグ、ガイドラインがモバイルでアクセス不可
-   - **影響**: モバイルユーザーはフォーラムのコンテキスト情報を全く見られない
-
-4. **フッターリンクが全てデッドリンク**
-   - `app/page.tsx` L380-400: 利用規約 → `#`、プライバシー → `#`、お問い合わせ → `#`
-   - `app/(auth)/register/page.tsx` L157-164: 利用規約 → `/terms`、プライバシー → `/privacy` だが、これらのページは存在しない
-   - **影響**: 信頼性の致命的な毀損。B2Bターゲットは必ず利用規約を確認する
+| カテゴリ | スコア | 評価 |
+|---------|-------|------|
+| 情報アーキテクチャ | 14/20 | サイドバー構造は良好だが、ページ間導線・パンくず・コンテンツ階層に改善余地 |
+| インタラクションデザイン | 13/20 | 基本的なフィードバックは実装済みだが、エラーハンドリング・バリデーション・マイクロインタラクションが不十分 |
+| ビジュアルデザイン | 14/20 | ダークテーマの統一感はあるが、glass/glow の多用による視覚的ノイズ、タイポグラフィの一貫性に問題 |
+| レスポンシブ / モバイル | 11/20 | 基本的なブレークポイントは設定されているが、モバイルUXが明確に二級市民扱い |
+| アクセシビリティ / UX品質 | 10/20 | aria属性の欠如、キーボードナビゲーション不備、スケルトンの不統一が目立つ |
 
 ---
 
-## インタラクションデザイン: 12/20
+### 致命的な問題（修正必須）
 
-### 良い点
-- フォームの送信中ローディング表示（Loader2 + テキスト変更）は全般的に適切
-- VoteButton の楽観的更新（Optimistic UI）は良好。エラー時のリバートも実装済み
-- ブックマーク操作も楽観的更新でレスポンシブ
+1. **LPのモバイルメニューにfocusトラップがない**  
+   `mobileMenuOpen`で表示されるオーバーレイメニューは`div`ベースで実装され、`role="dialog"`、`aria-modal`、フォーカストラップが一切ない。スクリーンリーダーユーザーはメニューの外にフォーカスが逃げる。また`onKeyDown`で`Escape`を検知しているが、バックドロップの`div`にはtabIndexが設定されていないため実際にはキーボードイベントが発火しない。
 
-### 致命的問題
+2. **パイプライン探索ページのSVGノードグラフがモバイルで機能しない**  
+   デスクトップ版SVGは`viewBox="0 0 1200 500"`でaspect-ratioを`1200/500`に固定しているが、375px幅のスマホでは各ノードのテキストが潰れて判読不能。モバイル版（`md:hidden`）はSVGエッジが省略されており、パイプラインの「接続」という核心的な概念が伝わらない。
 
-5. **ログアウト機能が未実装**
-   - `app/dashboard/layout.tsx` L202-205: ドロップダウンの「ログアウト」メニュー項目に `onClick` ハンドラがない
-   - `signOut` をインポートしていない
-   - **影響**: ユーザーがログアウトできない。セキュリティ上も問題
+3. **`plan-gate.tsx`のblur overlayがコンテンツアクセスを完全に阻害しつつ、代替アクションがない**  
+   `pointer-events-none`と`blur-[2px]`でコンテンツを隠すが、ユーザーに「何ができるか」のプレビューも「いつ使えるか」の具体的な情報も提供しない。Coming Soonの`disabled`ボタンだけでは、有料コンバージョンの導線として致命的に弱い。メールアドレス登録（ウェイトリスト）すらない。
 
-6. **モバイルメニューのロック問題（ランディングページ）**
-   - `app/page.tsx` L115-127: モバイルメニューが開いている時、背景の `<div>` に `onClick` はあるが、`role` も `tabIndex` もない
-   - ESCキーでの閉じは `onKeyDown` で実装されているが、`<div>` にフォーカスが当たらないので実質機能しない
-   - **影響**: キーボードユーザーはモバイルメニューを閉じられない
+4. **フォーラム投稿詳細ページの`renderMarkdown`が脆弱**  
+   独自実装の簡易Markdownパーサーがコードブロック（` ``` `）を空の`div`としてレンダリングし、中身を一切表示しない。インラインの太字・イタリック・リンクも未対応で、ユーザーがMarkdownで書いた投稿が意図通りに表示されない。
 
-7. **パスワードバリデーションの不整合**
-   - `app/(auth)/register/page.tsx` L148: `minLength={8}` のHTML制約のみ、リアルタイムバリデーションなし
-   - `app/dashboard/settings/page.tsx` L33-37: JS側で `英字+数字` チェックあるが、登録ページにはない
-   - **影響**: 登録時に弱いパスワードが通り、設定ページで変更しようとすると突然厳しい規則が適用される
-
-8. **コメント削除が見た目だけ**
-   - `components/forum/comment-section.tsx` L85: 「削除」DropdownMenuItemに `onClick` がない
-   - **影響**: ユーザーは自分のコメントを削除できない
-
-9. **フォーラム検索のEnterキー依存**
-   - `app/dashboard/forum/page.tsx` L143-145: 検索ボタンが存在しない。`onKeyDown` でEnterを検出する方式のみ
-   - 検索入力フィールドに虫眼鏡アイコンはあるがクリック不可
-   - **影響**: モバイルユーザーやアクセシビリティユーザーにとって検索のトリガーが不明確
-
-10. **確認ダイアログなしのブックマーク解除**
-    - `app/dashboard/forum/[id]/page.tsx` L132-148: ブックマーク解除に確認なし
-    - 問題は小さいが、Linearでは重要なアクションには必ずフィードバックがある
-
-11. **トレンドタグがクリックしても何も起きない**
-    - `app/dashboard/forum/page.tsx` L309-322: `cursor-pointer` クラスがあるが `onClick` がない
-    - **影響**: ユーザーはタグをクリックして絞り込みできると期待するが、何も起きない
-
-12. **「更新通知を設定」ボタンが機能しない**
-    - `app/dashboard/updates/page.tsx` L173-176: ボタンに `onClick` がない
-    - **影響**: 期待を裏切るUI
+5. **`useSearchParams`をSuspenseなしで使用（login/page.tsx）**  
+   Next.js 14+では`useSearchParams()`はSuspense boundaryが必要。これがないとビルド時に警告が出るだけでなく、CSR時にサーバーとクライアントのHTML不一致（hydration mismatch）を引き起こす可能性がある。
 
 ---
 
-## ビジュアルデザイン: 15/20
+### 重要な改善点（優先度高）
 
-### 良い点
-- ダークモードのカラーパレットは洗練されている。`--primary: 204 89% 53%`（ツイッターブルー系）、`--accent: 258 100% 67%`（パープル）のコンビネーションはX関連プロダクトとして適切
-- `text-gradient` (blue → purple → green) のグラデーションテキストはブランドアイデンティティとして一貫性がある
-- `glass` ユーティリティ（backdrop-blur + border）はモダンでプレミアム感がある
-- パイプラインノードグラフ（explore）のアニメーションは教育的で印象的
+1. **LPのTypewriterTextが不安定なタイマー制御**  
+   `useEffect`の依存配列に`[charIndex, isDeleting, lineIndex]`を入れており、Strict Modeで2回レンダリングされた場合にタイマーが重複する可能性がある。また、タイピング中にページ遷移すると`setDisplayText`が呼ばれ続けるメモリリークの危険。`useRef`でタイマーIDを持っているが、クリーンアップのタイミングが甘い。
 
-### 問題点
+2. **ダッシュボードのデスクトップヘッダーに通知ベルがない**  
+   `NotificationBell`コンポーネントはモバイルヘッダーにのみ配置されている。デスクトップではサイドバーのみが表示されるが、通知へのアクセス手段がない。デスクトップユーザーは通知を確認できない。
 
-13. **ダークモード「のみ」— ライトモード切替不可**
-    - `app/globals.css`: `:root` に直接ダーク系の値を設定。`darkMode: ['class']` がtailwind設定にあるが、トグルUIがない
-    - `styles/globals.css`: `.dark` セレクタ内の値があるが、これは別ファイルで競合の可能性
-    - `components/theme-provider.tsx`: ファイルは存在するがどこからもインポートされていない（`app/layout.tsx` で使用していない）
-    - **影響**: WCAG的に、ダークモード固定はユーザーの選択肢を奪う。B2Bユーザーの中にはオフィスの明るい環境で使う人も多い
+3. **全ページにおける`overflow-x-hidden`の濫用**  
+   複数のダッシュボードページに`overflow-x-hidden`がハードコードされている。これは横スクロールバグの根本原因を隠蔽しているだけで、タブレットの横持ちや特定のブレークポイントでコンテンツが切れる可能性がある。
 
-14. **コントラスト比の問題**
-    - `--muted-foreground: 0 0% 60%` → `hsl(0 0% 60%)` = `#999999`
-    - `--background: 0 0% 0%` → `#000000`
-    - コントラスト比: 5.9:1 → WCAG AA (4.5:1) はクリアだが、AAA (7:1) には未達
-    - より深刻: `text-muted-foreground/60` のような opacity をかけた場合 → `rgba(153,153,153,0.6)` ≒ 実質 `#666666` on `#000000` → コントラスト比 3.95:1 → **WCAG AA違反**
-    - 該当箇所: `components/forum/post-card.tsx` L86 `text-muted-foreground/60`
+4. **プロフィールページのアバターがBase64 dataURLをDBに保存**  
+   `reader.readAsDataURL(file)`でBase64エンコードし、そのままAPIに送信している。2MBの画像をBase64にすると約2.7MBになり、DBにそのまま保存するとパフォーマンスに深刻な影響。CDNアップロードに変更すべき。
 
-15. **`styles/globals.css` と `app/globals.css` の二重定義**
-    - `styles/globals.css`: ライトモード＋ダークモードの完全なCSS変数セット
-    - `app/globals.css`: ダークモードのみのCSS変数セット（こちらが実際に使われている）
-    - **影響**: メンテナンス時の混乱。どちらが正なのか不明
+5. **設定ページのアカウント削除がサインアウトのみ**  
+   `handleDeleteAccount`が`signOut`を呼ぶだけでデータ削除をしない。ユーザーに「すべてのデータが完全に削除されます」と表示しながら実際には何も削除しないのは、GDPR/個人情報保護の観点で重大な問題。
 
-16. **タイポグラフィの階層が弱い**
-    - ダッシュボードのページタイトル: `text-2xl font-bold sm:text-3xl` — 全ページ共通パターンだが、ページ間の視覚的差別化が不足
-    - カードのタイトル: `text-lg` が多用されすぎて、どのカードが重要か瞬時に判断しづらい
-    - Notion/Linearでは見出しに微妙なウェイトやサイズの差を付けてスキャンしやすくしている
+6. **フォーラムのカテゴリタブが水平スクロール可能だが、スクロール可能であることが視覚的に示されない**  
+   `overflow-x-auto`でスクロール可能にしているが、スクロールバーが隠されている（`scrollbar-hide`）。右端にフェードグラデーションやスクロールインジケーターがないため、ユーザーはカテゴリの存在に気づかない。
 
-17. **空白の不統一**
-    - `app/dashboard/page.tsx`: `p-6 lg:p-8` 
-    - `app/dashboard/forum/page.tsx`: `p-4 sm:p-6 lg:p-8`
-    - `app/dashboard/ranking/page.tsx`: `container mx-auto max-w-6xl py-6 px-4`
-    - `app/dashboard/profile/page.tsx`: `p-6 max-w-3xl mx-auto`
-    - **影響**: ページ間でパディングが微妙に異なり、遷移時に「揺れ」を感じる。デザインシステムとして統一すべき
+7. **更新履歴ページの統計値がハードコード**  
+   `156`コミット、`23`新機能、`8`破壊的変更、`3日前`最終更新がすべてハードコードされており、APIから取得していない。ユーザーの信頼を損なう。
+
+8. **ランキングページの統計カードが全て`—`表示**  
+   登録ユーザー数、検証レポート数、コメント数が「—」のままでAPIから取得されていない。MVPとはいえ、0でも実数値を表示すべき。
 
 ---
 
-## レスポンシブデザイン: 11/20
+### 推奨改善点（あれば嬉しい）
 
-### 良い点
-- ダッシュボードレイアウトのサイドバーはモバイルでSheet（ドロワー）に変換される — 基本的なレスポンシブは対応
-- フォーラムのカテゴリタブは `overflow-x-auto` で横スクロール対応
+1. **ダークモード/ライトモード切り替えの不在**  
+   現在ダークモードのみ。SaaSプロダクトとしては、ライトモード対応は期待される基本機能。
 
-### 致命的問題
+2. **LPの料金セクション「人気プラン」が¥0のFreeプラン**  
+   有料プランがComing Soonの状態で、Freeプランに「人気プラン」バッジをつけるのは、プライシング心理学の観点で逆効果。ユーザーに「有料プランは買う価値がない」というメッセージを送ってしまう。
 
-18. **パイプラインノードグラフがモバイルで読みにくい**
-    - `app/dashboard/explore/page.tsx` L370+: デスクトップ版は `hidden md:block` でSVG+absolute positioningを使用
-    - モバイル版は垂直スタックに変換されるが、SVGコネクタが `width="2" height="24"` の細い線のみ
-    - ステージ間の関係性がモバイルではほぼ失われる
-    - **影響**: メイン機能の一つであるパイプライン可視化がモバイルで価値が半減
+3. **探索ページのパイプラインアニメーション再生/リセットのUX**  
+   「再生」ボタンが小さく目立たない。初回訪問時に自動再生するか、大きなCTAとして配置することで、このページの核心的な価値をすぐに伝えるべき。
 
-19. **エンゲージメント分析のチャートがモバイルではみ出す可能性**
-    - `app/dashboard/engagement/page.tsx` L120: `ChartContainer` に `className="h-[350px] w-full overflow-hidden"` があるが、`YAxis width={120}` がモバイルの狭い画面で文字切れする可能性
-    - `overflow-hidden` で切れた部分が見えなくなる
-    - **影響**: 375px幅では棒グラフのラベルが読めない可能性が高い
+4. **フォーラムサイドバーのプロフィールカードのタブ（自分の投稿/ブックマーク）が、クリックしてもフィルタリングに連動しない**  
+   ボタンは`/dashboard/forum?filter=my`にリンクしているが、メインのフォーラムページ側でクエリパラメータ`filter`を読み取るロジックがない。
 
-20. **DeepWiki AIチャットのレイアウト問題**
-    - `app/dashboard/deepwiki/page.tsx` L107: `flex h-[calc(100vh-64px)]` — モバイルヘッダー(64px)を考慮しているが、サイドバーの「おすすめの質問」がモバイルではチャット下に配置
-    - チャット入力が画面下部に固定されていないので、メッセージが増えるとスクロールが必要
-    - **影響**: モバイルでAIチャットの使い勝手が大幅に低下
+5. **Deep AI検索（deepwiki）のチャット履歴がリロードで消える**  
+   `useState`でメッセージを保持しているため、ページ遷移やリロードで全会話が消失。セッションストレージまたはAPIでの永続化を推奨。
 
-21. **ランディングページのStatsカードが375pxで窮屈**
-    - `app/page.tsx` L172: `grid-cols-2 gap-8` — 375pxでは2列表示で各カードが約160px幅
-    - `text-3xl font-bold` の数値（"6,000+"）と `text-sm` のラベルが窮屈
-    - gap-8(32px) は375pxでは大きすぎる
-    - **影響**: iPhone SEで統計カードがぎゅうぎゅう
+6. **フォーラム投稿詳細の「編集」ボタンがクリックしても何も起きない**  
+   `DropdownMenuItem`の「編集」にonClickハンドラーがなく、遷移先もない。
 
-22. **プロフィールページのアバター+テキストが横並び固定**
-    - `app/dashboard/profile/page.tsx` L106: `flex items-center gap-6` — モバイルでも横並び
-    - `h-20 w-20` のアバターが375px幅で結構な面積を占める
-    - **影響**: 小さい画面でプロフィール情報が窮屈。`flex-col sm:flex-row` にすべき
+7. **LPのフッターに利用規約・プライバシーが「準備中」のspanで表示**  
+   リンクではなくただのテキストで、クリック不可。SaaSの公開サイトとして、法的ページの不在は信頼性を大きく損なう。
 
-23. **ランキングページのTabsTriggerが4列グリッド**
-    - `app/dashboard/ranking/page.tsx` L320: `grid grid-cols-4` — 375pxでは各タブが約80px幅
-    - テキスト「アクティブ議論」(7文字) は確実にはみ出す
-    - **影響**: タブのテキストが切れるか、異常に小さいフォントになる
+8. **パイプライン探索ページのインラインCSS（`<style>`タグ）が大量**  
+   コンポーネント内に約80行のCSS keyframesが`<style>`タグで直接記述されている。TailwindCSS + CSS Modulesの活用で分離すべき。
+
+9. **シミュレーターのスコアゲージにアクセシブルな代替テキストがない**  
+   SVGの円形ゲージに`role`や`aria-label`がなく、スクリーンリーダーではスコア値が伝わらない。
+
+10. **全ダッシュボードページにパンくずリストがない**  
+    ダッシュボードの深い階層（フォーラム → 投稿詳細 → コメント）でユーザーが現在位置を把握しづらい。`ArrowLeft`のバックリンクはあるが、中間ナビゲーションがない。
+
+11. **NotFoundページが最小限すぎる**  
+    404ページに検索機能、人気ページへのリンク、最近訪問したページの提案がない。「ホームに戻る」ボタンのみ。
+
+12. **ランキングページに広告枠プレースホルダーがある**  
+    ユーザーが0人の段階で「広告を掲載しませんか？」は不適切。プロダクトの未熟さを露呈する。
 
 ---
 
-## アクセシビリティ + マイクロインタラクション: 10/20
+### 各ページ別コメント
 
-### マイクロインタラクション（良い点）
-- パイプラインの再生アニメーション（play/reset）はエデュケーショナルで効果的
-- ツイープクレドスコアのゲージアニメーション（SVG circle transition）は滑らか
-- 新アチーブメントのトースト表示（slide-in-from-right + auto-dismiss 5秒）は適切
-- タイプライターエフェクト（ランディングページ）はブランド体験に貢献
+#### LP (app/page.tsx)
+- **良い点**: TypewriterTextの演出は効果的。パイプライン概要の4ステップ視覚化は価値を素早く伝える。
+- **問題点**: 
+  - ヒーローの`min-h-screen`がファーストビューでCTAをfold下に押し出す可能性（特に短いモニター）
+  - `heroLines`の文言が攻撃的（「まだ続けますか？」「嘘をつかない」）。コンバージョン最適化の観点では、恐怖訴求よりベネフィット訴求の方が効果的
+  - Twitterアイコン（`<Twitter />`）のリンク先が`https://x.com`でブランドのアカウントではない
+  - エンゲージメント重み付けセクションの`hover:scale-105`がモバイルタッチで不自然な挙動
 
-### 致命的問題
+#### ログイン (app/(auth)/login/page.tsx)
+- **良い点**: Google認証ボタンの配置が適切。パスワード表示切り替えがある。
+- **問題点**:
+  - 「パスワードを忘れた」リンクがない（SaaS必須機能）
+  - 成功メッセージに`AlertCircle`アイコン（通常は警告に使う）を使用しており、視覚的に矛盾
 
-24. **`<html lang="ja">` だけでアクセシビリティ対応は不十分**
-    - `app/layout.tsx` L37: `lang="ja"` は設定されているが、以下が全面的に欠如:
-    - **aria-label**: ナビゲーションランドマーク (`<nav>`, `<aside>`, `<main>`) に一つも `aria-label` がない
-    - **aria-live**: 動的コンテンツ更新（通知カウント、スコア計算結果、投票スコア変更）に `aria-live` がない
-    - **skip navigation**: ページ冒頭のスキップリンクがない
+#### 登録 (app/(auth)/register/page.tsx)
+- **良い点**: 任意フィールドの明示。自動ログイン（登録後即座にdashboardへ）
+- **問題点**:
+  - パスワード強度インジケーターがない
+  - 利用規約・プライバシーポリシーのリンク先（`/terms`, `/privacy`）が存在しないページ
 
-25. **フォーカス管理の不在**
-    - `app/page.tsx` L115: モバイルメニューオープン時、フォーカスがメニュー内に閉じ込められない（フォーカストラップなし）
-    - `app/dashboard/forum/[id]/page.tsx`: ダイアログ（Dialog）コンポーネントはRadix UIベースなのでフォーカストラップはあるが、独自実装のモバイルメニューにはない
-    - **影響**: キーボードユーザーがモバイルメニュー外にフォーカスが漏れる
+#### 認証レイアウト (app/(auth)/layout.tsx)
+- **良い点**: 左右分割のブランディング+フォームレイアウトは現代的
+- **問題点**: 
+  - 左パネルの統計（500+検証レポート、50+アルゴリズム解説）がハードコードで検証不可
+  - `metadata`の`title`が「ログイン」固定で、登録ページでも「ログイン | Matri-X」と表示される
 
-26. **ボタンのaria-label欠如**
-    - `app/dashboard/layout.tsx` L254: モバイルヘッダーの `<Avatar>` — クリッカブルに見えるが `<button>` でもリンクでもない。意味のないインタラクティブ要素
-    - `components/forum/vote-button.tsx`: ThumbsUp/ThumbsDown ボタンに `aria-label` がない。スクリーンリーダーは「ボタン」としか読み上げない
-    - `app/page.tsx` L107: ハンバーガーメニューボタンに `aria-label="メニューを開く"` がない
+#### ダッシュボード (app/dashboard/page.tsx)
+- **良い点**: ゲーミフィケーション（XP、レベル、アチーブメント）は継続利用を促す良い設計。学習進捗の可視化。
+- **問題点**:
+  - `DEFAULT_PROGRESS`のアチーブメント16個が全てインラインで定義されており、コードの可読性が著しく低い
+  - 新アチーブメントのトーストが5秒で自動消失。ユーザーが見逃す可能性。閉じるボタンもない
+  - `data-tour`属性があるがオンボーディングツアーの実装が不明（OnboardingProviderに依存）
 
-27. **色のみの情報伝達**
-    - `app/dashboard/simulator/page.tsx` L171-175: TweepCredスコアのレベル表示が色のみで差別化
-    - 「低」= 赤、「普通」= オレンジ、「良好」= 黄色、「優秀」= 緑、「最高」= 青
-    - テキストラベルは付いているが、ゲージのSVG circle は色だけ
-    - **影響**: 色覚障害ユーザーにはゲージの変化が分かりにくい
+#### ダッシュボードレイアウト (app/dashboard/layout.tsx)
+- **良い点**: コラプス可能なサイドバー、Sheet利用のモバイルメニュー、NotificationBellの30秒ポーリング
+- **問題点**:
+  - サイドバーのユーザー名取得が毎レンダリングで`/api/users/me`をfetch（SWRやReact Queryでキャッシュすべき）
+  - DropdownMenuの「設定」クリックがページ遷移しない（`Link`でラップされていない）
+  - コラプス状態がlocalStorageに保存されず、ページ遷移のたびにリセット
 
-28. **トーストが自動消去のみ（アチーブメント）**
-    - `app/dashboard/page.tsx` L75: `setTimeout(() => setShowNewAchievement(false), 5000)`
-    - 閉じるボタンがない
-    - `aria-live="polite"` がないのでスクリーンリーダーに通知されない
-    - **影響**: ユーザーは5秒以内に読めなければ情報を逃す
+#### パイプライン探索 (app/dashboard/explore/page.tsx)
+- **良い点**: ノードグラフのアニメーションは視覚的にインパクトがある。SimClustersのベン図・波及アニメーションは教育的価値が高い。
+- **問題点**:
+  - ファイルが1400行超で巨大。コンポーネント分割が必要
+  - `expandedStage`の使用箇所はあるが、UIからステージを展開するトリガーがない（`_setExpandedStage`でセッター名がプライベート的）
+  - インラインCSS keyframesが約100行
+  - `funnelStages`データ配列が使われているが、実際のUIレンダリングではハードコードされたノードに置き換わっている（データと表示の乖離）
 
-29. **ページ遷移アニメーションの不在**
-    - Next.js App Routerのデフォルトのページ遷移（フルリロード感）がそのまま
-    - Notion/LinearのSPA的な滑らかな遷移がない
-    - `loading.tsx` ファイルが全ページで欠如 → ナビゲーション時の真っ白画面
+#### エンゲージメント分析 (app/dashboard/engagement/page.tsx)
+- **良い点**: 5つのタブ（重み付け/ネガティブ/加速度/メディア/Tips）に整理された情報設計。rechartsチャートの活用。
+- **問題点**:
+  - `SHORT_NAMES`マッピングがハードコードで、engagementWeightsのactionと同期が保証されていない
+  - チャートのX軸`domain={[0, 100]}`で`allowDataOverflow`を使用しているが、75.0の最大値に対して100は冗長
+  - ソースコード出典セクションのリンクが正しいが、「2023年のオープンソース時点の数値」であることの注意書きが弱い
 
-30. **スケルトンスクリーンの適用が不完全**
-    - フォーラム一覧（`forum/page.tsx` L190-209）: スケルトンあり ✓
-    - ダッシュボード（`page.tsx`）: 統計カードのみアニメーションあり、学習進捗・アチーブメントにはなし ✗
-    - ランキング（`ranking/page.tsx`）: スケルトンあり ✓
-    - プロフィール（`profile/page.tsx`）: Loader2スピナーのみ（スケルトンではない） ✗
-    - **影響**: ローディング体験が不均一。Linearでは全ページでスケルトンが統一されている
+#### フォーラム (app/dashboard/forum/page.tsx)
+- **良い点**: カテゴリフィルタ、ソート、ブックマーク、ページネーション（もっと見る）の実装。サイドバーのプロフィールカードはXライクで親しみやすい。
+- **問題点**:
+  - `profileTab`状態があるがサイドバー内のタブ切り替えのみで、メインコンテンツのフィルタリングに連動しない
+  - 検証レポートテンプレートが`font-mono`のテキストで表示されており、コピーボタンがない
+  - `useTransition`の`isPending`がLoad Moreボタンの状態管理に使われているが、既存の投稿リストにスピナーが表示されない
 
----
+#### フォーラム投稿詳細 (app/dashboard/forum/[id]/page.tsx)
+- **良い点**: 投票、ブックマーク、リアクション、エビデンス追加、X共有の多機能な投稿ページ。
+- **問題点**:
+  - `renderMarkdown`の独自実装が壊れている（コードブロック、インラインコード、リンク、画像が未対応）。`react-markdown`を使うべき
+  - `// eslint-disable-next-line @typescript-eslint/no-explicit-any`が4箇所。型安全性の欠如
+  - URLコピー成功時のフィードバックがない（トーストやボタンテキスト変更が必要）
+  - 「編集」ボタンのonClickが未実装
 
-## 🚨 致命的なUX問題（今すぐ修正）
+#### シミュレーター (app/dashboard/simulator/page.tsx)
+- **良い点**: リアルタイムスコア計算、円形ゲージのビジュアル、履歴保存と復元機能。
+- **問題点**:
+  - `PlanGate`でSTANDARDプラン以上に制限されているが、プレビューが曖昧
+  - スライダーの`max={1825}`（5年）に対して数値入力がないため微調整が困難
+  - `calculateTweepCred`関数が独自の近似計算であることの注意書きが弱い
 
-### 1. ログアウト不能
-- **ファイル**: `app/dashboard/layout.tsx` L202-205
-- **問題**: DropdownMenuItemの「ログアウト」にonClickハンドラがない
-- **修正**: `import { signOut } from "next-auth/react"` して `onClick={() => signOut({ callbackUrl: "/" })}` を追加
+#### Deep AI検索 (app/dashboard/deepwiki/page.tsx)
+- **良い点**: チャットUIのデザインは洗練されている。おすすめ質問、関連質問、コードブロック表示。
+- **問題点**:
+  - `PlanGate`でSTANDARD以上に制限
+  - チャット履歴がstate管理のみでリロードで消失
+  - `ScrollArea`の`ref={scrollRef}`が`ScrollArea`コンポーネントの内部DOM構造に依存しており、自動スクロールが動作しない可能性
 
-### 2. フッターの利用規約/プライバシーがデッドリンク
-- **ファイル**: `app/page.tsx` L380-400, `app/(auth)/register/page.tsx` L157-164
-- **問題**: B2B SaaSとして信頼性を致命的に損なう
-- **修正**: 最低限のページを作成するか、リンクを削除
+#### ランキング (app/dashboard/ranking/page.tsx)
+- **良い点**: 投稿ランキング4タブ + ユーザーランキングのレイアウト。
+- **問題点**:
+  - 統計カード3つが全て「—」表示
+  - 広告枠プレースホルダーがプロダクト未熟段階で不適切
+  - verifiedタブが50件取得→クライアントフィルタリングで非効率
 
-### 3. ThemeProviderが未接続
-- **ファイル**: `app/layout.tsx` L37-40
-- **問題**: `components/theme-provider.tsx` が存在するが使用されていない。`<html>` に `className="dark"` もない
-- **根本原因**: `app/globals.css` で `:root` にダーク値を直接設定しているため動作しているが、設計として壊れている
+#### 更新履歴 (app/dashboard/updates/page.tsx)
+- **良い点**: タイムライン形式の更新履歴デザインは視覚的に魅力的。フィルタリング・検索機能。
+- **問題点**:
+  - 全データがハードコード（APIからの取得ではない）
+  - 「更新通知を設定」ボタンがクリックしても何も起きない
+  - 統計値もハードコード
 
-### 4. ランディングページのモバイルメニューにフォーカストラップがない
-- **ファイル**: `app/page.tsx` L110-145
-- **問題**: メニューを開いた時にフォーカスが閉じ込められない。アクセシビリティ違反
-- **修正**: `Sheet` コンポーネント（Radix UI）をダッシュボードと同じく使うか、`focus-trap-react` を導入
+#### プロフィール (app/dashboard/profile/page.tsx)
+- **良い点**: アバターアップロードのホバーUI、文字数カウンター、保存成功フィードバック。
+- **問題点**:
+  - Base64画像の直接DB保存
+  - メールアドレス変更不可の理由が不明確
+  - フォームのバリデーションがない（URL形式のチェック、XHandle形式のチェック等）
 
-### 5. `styles/globals.css` と `app/globals.css` のCSS変数競合
-- **ファイル**: `styles/globals.css` 全体, `app/globals.css` 全体
-- **問題**: 2つのファイルが同じCSS変数を異なる値で定義。`body` のスタイルも両方で定義。`styles/globals.css` はどこからインポートされているのか不明
-- **修正**: 使用していない方を削除
+#### 設定 (app/dashboard/settings/page.tsx)
+- **良い点**: パスワード変更フォームのクライアントバリデーション、AlertDialogによる削除確認。
+- **問題点**:
+  - アカウント削除が実際にはサインアウトのみ
+  - プランのアップグレードボタンが`disabled`のまま放置
 
----
+#### 404 (app/not-found.tsx)
+- **良い点**: `text-gradient`を活用したブランド一貫性。
+- **問題点**: 最小限すぎる。検索やサジェストがない。
 
-## ⚠️ 重要な改善点（優先度高）
+#### PlanGate (components/plan-gate.tsx)
+- **良い点**: ブラーオーバーレイで有料機能のプレビューを提供する発想。
+- **問題点**: 「開発中」表記はプランゲートの本来の役割と矛盾。ウェイトリスト登録がない。
 
-### 6. 全ページに `loading.tsx` を追加
-- Next.js App Routerの `loading.tsx` がどのルートにも存在しない
-- ページ遷移時に真っ白な画面が表示される
-- `app/dashboard/loading.tsx`, `app/dashboard/forum/loading.tsx` 等にスケルトンUIを配置
-
-### 7. パスワードバリデーションの統一
-- **ファイル**: `app/(auth)/register/page.tsx`, `app/dashboard/settings/page.tsx`, `lib/validations/auth.ts`
-- `lib/validations/auth.ts` に共通バリデーションロジックがあるが、UIで活用されていない
-- リアルタイムバリデーション（パスワード強度インジケーター）を追加すべき
-
-### 8. 検索UIの改善
-- **ファイル**: `app/dashboard/forum/page.tsx` L139-148
-- 検索アイコンをクリック可能にする（ボタン化）
-- `debounce` で自動検索を実装（Enterキー不要に）
-- 検索結果0件時の提案機能を追加
-
-### 9. NotificationBellのデスクトップ対応
-- **ファイル**: `app/dashboard/layout.tsx` L247
-- 通知ベルはモバイルヘッダーにのみ存在（`lg:hidden` の中）
-- デスクトップのサイドバーには通知ベルがない
-- **修正**: サイドバー上部またはメインコンテンツヘッダーにも配置
-
-### 10. エラーハンドリングの統一
-- API呼び出しの失敗時:
-  - 一部は `console.error` で無視（`forum/page.tsx` L136）
-  - 一部はエラーメッセージ表示（`login/page.tsx` L49）
-  - 一部は `/* ignore */`（`dashboard/layout.tsx` L76）
-- Sonner（toast）が `components/ui/sonner.tsx` にあるが、実際の使用箇所がない
-- **修正**: 全API呼び出しに統一したエラー通知（toast）を導入
-
-### 11. ユーザー表示名がハードコード
-- **ファイル**: `app/dashboard/layout.tsx` L197-198
-- サイドバーのユーザー名が `"Demo User"` / `"Pro Plan"` にハードコード
-- 実際のユーザーデータを取得していない
-- **影響**: 実ユーザーが自分のアカウントとして認識できない
-
----
-
-## 💡 プロレベルの提案（差別化）
-
-### 12. コマンドパレット（⌘K）の導入
-- Notion/Linear級のUXにはコマンドパレットが必須
-- `components/ui/command.tsx` が既に存在するが、使用されていない
-- グローバル検索、ページ遷移、クイックアクションを一箇所に集約
-
-### 13. Breadcrumbの追加
-- `components/ui/breadcrumb.tsx` が存在するが未使用
-- 特にフォーラムの階層（フォーラム → カテゴリ → 投稿詳細）で必須
-- 現在は「フォーラムに戻る」ボタンのみで、中間ナビゲーションがない
-
-### 14. キーボードショートカット
-- `n` → 新規投稿
-- `s` → 検索フォーカス
-- `j/k` → 投稿間のナビゲーション
-- `?` → ショートカット一覧表示
-- Linear/GitHub級のキーボードファーストUX
-
-### 15. ダッシュボードのカスタマイズ
-- ウィジェットの並び替え、表示/非表示の切替
-- 「学習進捗を非表示にする」等の設定
-- Notion/ClickUpのダッシュボードカスタマイズ機能
-
-### 16. リアルタイムUI更新
-- フォーラムの投票やコメントをWebSocket/Server-Sent Eventsで即座に反映
-- 「他のユーザーがこの投稿を見ています」インジケーター
-- Figma的なプレゼンス表示
-
-### 17. エンゲージメント計算のインタラクティブ化
-- 「あなたの投稿のエンゲージメント」をリアルタイムで計算するインタラクティブカリキュレーター
-- 「リプライ5件 + いいね20件 + リポスト3件 = スコアXX」のようなビジュアル計算
-
-### 18. ページ遷移アニメーション
-- `framer-motion` の `AnimatePresence` を使ったスムーズなページ遷移
-- カード要素のstaggered animation
-- Notion/Linearの滑らかな遷移体験
+#### コメントセクション (components/forum/comment-section.tsx)
+- **良い点**: ネスト返信（depth 3まで）、投票、削除の完全実装。
+- **問題点**:
+  - 未ログインユーザーへの「ログインしてコメント」的な導線がない（`currentUserId`がないと入力欄が表示されないだけ）
+  - コメント削除の確認が`confirm()`（ブラウザネイティブダイアログ）で、他のUIと不整合
 
 ---
 
-## 📱 モバイル専用の問題
+### 総評
 
-### 19. パイプラインノードグラフのモバイル体験
-- **ファイル**: `app/dashboard/explore/page.tsx` L520-610
-- 垂直スタックに変換されるが、各ステージ間のSVGコネクタが `height="24"` の短い線のみ
-- デスクトップのSVGパスによる美しい曲線接続がモバイルでは完全に失われる
-- **提案**: スワイプ可能なカルーセル形式、またはステッパーUI
+matri-xは**コンセプトとコンテンツが非常に強い**プロダクトです。Xアルゴリズムの解析という明確な価値提案があり、パイプラインのノードグラフアニメーション、SimClustersのベン図、エンゲージメント重み付けの可視化など、教育的コンテンツの質は高い。
 
-### 20. フォーラムカテゴリタブのスクロール
-- **ファイル**: `app/dashboard/forum/page.tsx` L176
-- `scrollbar-hide` クラスでスクロールバーを非表示にしているが、ユーザーはスクロール可能であることに気づかない
-- **修正**: 端にフェードグラデーションを追加して「まだ続きがある」ことを視覚的に示す
+しかし、**SaaSプロダクトとしての完成度は不十分**です。以下の3つが主要な弱点です：
 
-### 21. Deep AI検索のサイドバー
-- **ファイル**: `app/dashboard/deepwiki/page.tsx` L108
-- `lg:flex-row` でモバイルでは「おすすめの質問」がチャットの下に配置
-- チャット使用中に提案質問にアクセスするには大量にスクロールする必要がある
-- **修正**: モバイルでは折りたたみ可能なパネルにするか、チャット入力上にピル状のサジェスチョンチップを配置
+1. **未完成機能の露出**: Coming Soonボタン、ハードコードされた統計値、未実装のボタン（編集、更新通知設定）が多く、ユーザーに「まだ使えない」という印象を与える
+2. **アクセシビリティの不在**: aria属性、キーボードナビゲーション、スクリーンリーダー対応がほぼゼロ。WCAG 2.1 AA基準を満たせていない
+3. **モバイル体験の軽視**: レスポンシブ対応はされているが、モバイルファーストの設計ではない。特にパイプライン探索のノードグラフはモバイルで壊れている
 
-### 22. ランキングページの統計カードが375pxで窮屈
-- **ファイル**: `app/dashboard/ranking/page.tsx` L362-387
-- `sm:grid-cols-3` のカードが375px（sm未満）では1列だが、内部のコンテンツ（`text-3xl font-bold`）がパディング`p-5`と合わせると圧迫感
-- 値が「—」（ダッシュ）なので現状問題ないが、実数値が入ると問題
-
-### 23. タッチターゲットサイズの問題箇所
-- `components/forum/vote-button.tsx` L77: `h-7 w-7`（28px）→ 44px未満
-- `components/forum/post-card.tsx` L180: `h-7 w-7`（28px）ブックマークボタン → 44px未満
-- `app/dashboard/layout.tsx` L232: サイドバー折りたたみボタン `h-6 w-6`（24px）→ 44px未満
-- **WCAG 2.5.5**: 最低44×44pxのターゲットサイズが推奨
-
----
-
-## 🎨 具体的なCSS/コード修正案
-
-### 修正1: ログアウト機能の実装
-**ファイル**: `app/dashboard/layout.tsx` L1, L202-205
-```tsx
-// L1: import追加
-import { signOut } from "next-auth/react";
-
-// L202-205: onClickハンドラ追加
-<DropdownMenuItem 
-  className="text-destructive"
-  onClick={() => signOut({ callbackUrl: "/" })}
->
-  <LogOut className="mr-2 h-4 w-4" />
-  ログアウト
-</DropdownMenuItem>
-```
-
-### 修正2: aria-labelの追加
-**ファイル**: `app/dashboard/layout.tsx`
-```tsx
-// L220: <aside> に aria-label追加
-<aside
-  aria-label="メインナビゲーション"
-  className={cn(...)}
->
-
-// L241: <header> に aria-label追加  
-<header 
-  aria-label="モバイルヘッダー"
-  className="fixed top-0 ..."
->
-
-// L253: ハンバーガーボタン
-<Button variant="ghost" size="icon" aria-label="メニューを開く">
-```
-
-### 修正3: VoteButtonのaria-label
-**ファイル**: `components/forum/vote-button.tsx` L71, L93
-```tsx
-// L71
-<Button aria-label="賛成" ...>
-
-// L93
-<Button aria-label="反対" ...>
-```
-
-### 修正4: タッチターゲットサイズの修正
-**ファイル**: `components/forum/vote-button.tsx` L70, L92
-```tsx
-// smサイズでも最低44pxを確保
-const btnSize = size === "sm" ? "h-7 w-7 min-h-[44px] min-w-[44px]" : "h-9 w-9";
-```
-
-### 修正5: ページパディングの統一
-**ファイル**: 全ダッシュボードページ
-```tsx
-// 共通パターンを使用:
-<div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
-```
-現在の不統一:
-- `dashboard/page.tsx`: `p-6 lg:p-8 space-y-8`
-- `dashboard/forum/page.tsx`: `p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6`
-- `dashboard/ranking/page.tsx`: `container mx-auto max-w-6xl space-y-8 py-6 px-4`
-- `dashboard/profile/page.tsx`: `p-6 max-w-3xl mx-auto space-y-6`
-
-### 修正6: loading.tsxの追加例
-**ファイル**: `app/dashboard/loading.tsx`（新規作成）
-```tsx
-import { Skeleton } from "@/components/ui/skeleton";
-
-export default function DashboardLoading() {
-  return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-      <div className="space-y-2">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-4 w-72" />
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[1,2,3,4].map(i => (
-          <Skeleton key={i} className="h-32 rounded-xl" />
-        ))}
-      </div>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Skeleton className="h-64 rounded-xl" />
-        <Skeleton className="h-64 rounded-xl" />
-      </div>
-    </div>
-  );
-}
-```
-
-### 修正7: コントラスト比の修正
-**ファイル**: `app/globals.css` L11
-```css
-/* 変更前 */
---muted-foreground: 0 0% 60%;
-
-/* 変更後 — WCAG AAA (7:1) をクリア */
---muted-foreground: 0 0% 68%;
-```
-
-### 修正8: ダッシュボードのユーザー名取得
-**ファイル**: `app/dashboard/layout.tsx`
-```tsx
-// SidebarContentでセッションからユーザー名を取得
-// 現在の "Demo User" / "Pro Plan" をセッションデータに置換
-
-// useEffect でセッション取得
-const [user, setUser] = useState({ name: "", plan: "" });
-useEffect(() => {
-  fetch("/api/users/me")
-    .then(r => r.json())
-    .then(data => setUser({ name: data.name ?? "ユーザー", plan: data.plan ?? "Free" }))
-    .catch(() => {});
-}, []);
-```
-
-### 修正9: トレンドタグのクリックイベント追加
-**ファイル**: `app/dashboard/forum/page.tsx` L309-322
-```tsx
-{["Heavy Ranker", "リプライ重み", ...].map((tag) => (
-  <Badge
-    key={tag}
-    variant="secondary"
-    className="cursor-pointer hover:bg-primary/20 transition-colors text-xs"
-    onClick={() => {
-      setSearchInput(tag);
-      setSearchQuery(tag);
-    }}
-  >
-    #{tag}
-  </Badge>
-))}
-```
-
-### 修正10: フォーラムサイドバーのモバイル表示
-**ファイル**: `app/dashboard/forum/page.tsx` L222
-```tsx
-// 変更前
-<div className="hidden lg:block space-y-6">
-
-// 変更後 — モバイルでは折りたたみ可能なセクションとして表示
-<div className="lg:block space-y-6">
-  {/* モバイルでは Collapsible でラップ */}
-  <Collapsible className="lg:hidden">
-    <CollapsibleTrigger asChild>
-      <Button variant="outline" className="w-full gap-2 mb-4">
-        コミュニティ情報
-        <ChevronDown className="h-4 w-4" />
-      </Button>
-    </CollapsibleTrigger>
-    <CollapsibleContent>
-      {/* サイドバーコンテンツ */}
-    </CollapsibleContent>
-  </Collapsible>
-  {/* デスクトップでは通常表示 */}
-  <div className="hidden lg:block space-y-6">
-    {/* サイドバーコンテンツ */}
-  </div>
-</div>
-```
-
----
-
-## 総評
-
-matri-xは**コンテンツの質が非常に高い**プロダクトです。Xアルゴリズムの知識体系、パイプライン可視化、エンゲージメント重み付けの解説は専門性が光ります。ビジュアルデザインも洗練されたダークテーマで、ターゲットユーザー（SNSマーケター）に刺さるものがあります。
-
-しかし、**UXの基本的な品質管理が行き届いていない**点が足を引っ張っています。ログアウト不能、デッドリンク、ハードコードされたユーザー名、未接続のThemeProvider — これらは個々には小さな問題ですが、累積するとユーザーの信頼を確実に失います。
-
-**ClickUp/Notion級のUXに到達するために最も重要な3つのアクション:**
-
-1. **基本的なインタラクションバグの全修正**（ログアウト、デッドリンク、未実装ハンドラ）— 1日で完了可能
-2. **loading.tsx + エラーハンドリングの統一** — ユーザーの「不安な空白時間」を排除
-3. **アクセシビリティの底上げ**（aria-label、フォーカス管理、タッチターゲット）— 2-3日
-
-これらを修正すれば、スコアは **62 → 78** に向上すると推定します。その上でコマンドパレットやページ遷移アニメーションを追加すれば、**85+** を狙えます。
+62点という評価は、**MVPとしては合格ラインだが、有料SaaSとしてはまだ早い**というレベルです。コンテンツの質を活かしつつ、上記の致命的な問題を優先的に修正することで、75-80点まで引き上げることが可能です。
