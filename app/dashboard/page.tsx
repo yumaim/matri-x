@@ -226,6 +226,53 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Activity Graph */}
+      {activityData.length > 0 && (
+        <Card className="glass overflow-hidden">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                アクティビティ
+              </CardTitle>
+              <Link href="/dashboard/analytics">
+                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-primary">
+                  詳細を見る <ArrowRight className="ml-1 h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                posts: { label: "投稿", color: "hsl(var(--primary))" },
+                comments: { label: "コメント", color: "hsl(var(--accent))" },
+              }}
+              className="h-[200px] w-full"
+            >
+              <AreaChart data={activityData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="dashPosts" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="dashComments" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Area type="monotone" dataKey="posts" stroke="hsl(var(--primary))" fill="url(#dashPosts)" strokeWidth={2} />
+                <Area type="monotone" dataKey="comments" stroke="hsl(var(--accent))" fill="url(#dashComments)" strokeWidth={2} />
+              </AreaChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Header with Level */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -305,53 +352,6 @@ export default function DashboardPage() {
           </Card>
         ))}
       </div>
-
-      {/* Activity Graph */}
-      {activityData.length > 0 && (
-        <Card className="glass overflow-hidden">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                アクティビティ
-              </CardTitle>
-              <Link href="/dashboard/analytics">
-                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-primary">
-                  詳細を見る <ArrowRight className="ml-1 h-3 w-3" />
-                </Button>
-              </Link>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                posts: { label: "投稿", color: "hsl(var(--primary))" },
-                comments: { label: "コメント", color: "hsl(var(--accent))" },
-              }}
-              className="h-[200px] w-full"
-            >
-              <AreaChart data={activityData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="dashPosts" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="dashComments" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Area type="monotone" dataKey="posts" stroke="hsl(var(--primary))" fill="url(#dashPosts)" strokeWidth={2} />
-                <Area type="monotone" dataKey="comments" stroke="hsl(var(--accent))" fill="url(#dashComments)" strokeWidth={2} />
-              </AreaChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Quick Actions */}
       <div data-tour="quick-actions">

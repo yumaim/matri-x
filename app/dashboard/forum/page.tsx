@@ -355,7 +355,14 @@ export default function ForumPage() {
                 </AvatarFallback>
               </Avatar>
               <div className="mt-2">
-                <div className="font-semibold text-foreground text-sm">{myUser?.name ?? "匿名"}</div>
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold text-foreground text-sm">{myUser?.name ?? "匿名"}</div>
+                  <Link href="/dashboard/profile">
+                    <Button variant="outline" size="sm" className="text-[10px] h-6 px-2">
+                      編集
+                    </Button>
+                  </Link>
+                </div>
                 {myUser?.community && (
                   <div className="text-xs text-muted-foreground">@{myUser.community}</div>
                 )}
@@ -416,11 +423,6 @@ export default function ForumPage() {
                     </Button>
                   </Link>
                 )}
-                <Link href="/dashboard/profile">
-                  <Button variant="ghost" size="sm" className="w-full text-xs gap-1.5 justify-start text-muted-foreground">
-                    プロフィールを編集
-                  </Button>
-                </Link>
               </div>
               {/* New Post */}
               <Link href="/dashboard/forum/new" className="block mt-3">
