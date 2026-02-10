@@ -187,7 +187,7 @@ function Header() {
             onClick={() => setMobileMenuOpen(false)}
             onKeyDown={(e) => e.key === "Escape" && setMobileMenuOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-card border-l border-border p-6 z-50">
+          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-background border-l border-border p-6 z-50">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
@@ -293,7 +293,7 @@ function HeroSection() {
             </span>
           </div>
 
-          <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl min-h-[4.5rem] sm:min-h-[7rem] lg:min-h-[9rem]">
+          <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl h-[6rem] sm:h-[7.5rem] lg:h-[9rem] overflow-hidden">
             <TypewriterText />
           </h1>
 

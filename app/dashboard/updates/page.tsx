@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   GitCommit,
   GitBranch,
@@ -23,6 +23,35 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+function useInView(ref: React.RefObject<HTMLElement | null>, options?: IntersectionObserverInit) {
+  const [isInView, setIsInView] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsInView(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.1, ...options });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [ref, options]);
+  return isInView;
+}
+
+function TimelineItem({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref);
+  return (
+    <div
+      ref={ref}
+      className={`relative transition-all duration-500 ease-out ${isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+    >
+      {children}
+    </div>
+  );
+}
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -376,7 +405,7 @@ export default function UpdatesPage() {
                 const isExpanded = expandedId === update.id;
 
                 return (
-                  <div key={update.id} className="relative">
+                  <TimelineItem key={update.id}>
                     {/* Timeline Dot */}
                     <div className={cn(
                       "absolute -left-[31px] flex h-5 w-5 items-center justify-center rounded-full border-2 border-background",
@@ -447,14 +476,14 @@ export default function UpdatesPage() {
                                   <h4 className="text-sm font-medium text-foreground mb-2">
                                     変更ファイル:
                                   </h4>
-                                  <div className="flex flex-wrap gap-2">
+                                  <div className="flex flex-wrap gap-2 overflow-hidden">
                                     {update.files.map((file) => (
                                       <Badge
                                         key={file}
                                         variant="outline"
-                                        className="font-mono text-xs bg-muted/50"
+                                        className="font-mono text-xs bg-muted/50 max-w-[200px] sm:max-w-[300px] truncate"
                                       >
-                                        <FileCode className="h-3 w-3 mr-1" />
+                                        <FileCode className="h-3 w-3 mr-1 shrink-0" />
                                         {file}
                                       </Badge>
                                     ))}
@@ -485,7 +514,7 @@ export default function UpdatesPage() {
                         </div>
                       </CardContent>
                     </Card>
-                  </div>
+                  </TimelineItem>
                 );
               })}
             </div>

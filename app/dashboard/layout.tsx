@@ -371,11 +371,13 @@ export default function DashboardLayout({
         </div>
         <div className="flex items-center gap-2">
           <NotificationBell />
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary/20 text-primary text-sm">
-              MX
-            </AvatarFallback>
-          </Avatar>
+          <Link href="/dashboard/profile">
+            <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+              <AvatarFallback className="bg-primary/20 text-primary text-sm">
+                MX
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         </div>
       </header>
 
