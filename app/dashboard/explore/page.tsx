@@ -457,398 +457,330 @@ export default function ExplorePage() {
         </p>
       </div>
 
-      {/* ─── Funnel Bar ───────────────────────────────────────────────── */}
+      {/* ─── Node Graph Pipeline ─────────────────────────────────────── */}
+      <style>{`
+        @keyframes nodeFadeIn {
+          from { opacity: 0; transform: translateY(24px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes dashFlow {
+          to { stroke-dashoffset: -40; }
+        }
+        @keyframes pulseGlow {
+          0%, 100% { filter: drop-shadow(0 0 4px currentColor); }
+          50% { filter: drop-shadow(0 0 12px currentColor); }
+        }
+        .node-graph-node {
+          opacity: 0;
+          animation: nodeFadeIn 0.6s ease-out forwards;
+        }
+        .node-graph-edge {
+          stroke-dasharray: 8 6;
+          animation: dashFlow 1.2s linear infinite;
+        }
+        .node-graph-edge-slow {
+          stroke-dasharray: 12 8;
+          animation: dashFlow 2s linear infinite;
+        }
+      `}</style>
       <Card className="glass overflow-hidden">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg">データの流れ（ファネル）</CardTitle>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Network className="h-5 w-5 text-primary" />
+            パイプライン ノードグラフ
+          </CardTitle>
           <p className="text-sm text-muted-foreground">
-            1,400件の候補から最終的に50件があなたのタイムラインに届きます
+            1,400件の候補が5段階のノードを経て50件のタイムラインに変わります
           </p>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {funnelStages.map((stage, idx) => {
-            const widthPct = (stage.count / maxCount) * 100;
-            const isActive = isStageActive(stage.id);
-            const isDone = isStageDone(stage.id);
-            const displayCount = displayCounts[idx];
-            const showCount =
-              animationPhase === "idle"
-                ? stage.count
-                : animationPhase === "complete"
-                  ? stage.count
-                  : isDone
-                    ? stage.count
-                    : isActive
-                      ? displayCount
-                      : 0;
+        <CardContent className="pt-4">
+          {/* ── Desktop: Node Graph ── */}
+          <div className="hidden md:block relative">
+            {/* SVG Connections Layer */}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              viewBox="0 0 1000 680"
+              preserveAspectRatio="xMidYMid meet"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="grad-blue-indigo" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.7" />
+                </linearGradient>
+                <linearGradient id="grad-purple-indigo" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#a855f7" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.7" />
+                </linearGradient>
+                <linearGradient id="grad-cyan-indigo" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.7" />
+                </linearGradient>
+                <linearGradient id="grad-pink-indigo" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ec4899" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.7" />
+                </linearGradient>
+                <linearGradient id="grad-indigo-violet" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.7" />
+                </linearGradient>
+                <linearGradient id="grad-violet-green" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#22c55e" stopOpacity="0.7" />
+                </linearGradient>
+                <linearGradient id="grad-violet-teal" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#14b8a6" stopOpacity="0.7" />
+                </linearGradient>
+                <linearGradient id="grad-violet-emerald" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity="0.7" />
+                </linearGradient>
+                <linearGradient id="grad-green-amber" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.7" />
+                </linearGradient>
+                <linearGradient id="grad-teal-amber" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#14b8a6" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.7" />
+                </linearGradient>
+                <linearGradient id="grad-emerald-amber" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.7" />
+                </linearGradient>
+              </defs>
 
-            return (
-              <div key={stage.id} className="flex items-center gap-4">
-                <div className="w-28 shrink-0 flex items-center gap-2">
-                  <span className="text-lg">{stage.emoji}</span>
-                  <span
-                    className={cn(
-                      "text-sm font-medium transition-colors",
-                      isActive
-                        ? stage.textColor
-                        : isDone
-                          ? "text-foreground"
-                          : "text-muted-foreground"
-                    )}
-                  >
-                    {stage.stage}
-                  </span>
-                </div>
-                <div className="flex-1 relative">
-                  <div className="h-8 w-full rounded-lg bg-muted/50 overflow-hidden">
-                    <div
-                      className={cn(
-                        "h-full rounded-lg transition-all duration-300",
-                        isActive || isDone || animationPhase === "idle" || animationPhase === "complete"
-                          ? stage.color
-                          : "bg-muted",
-                        isActive && "animate-pulse"
-                      )}
-                      style={{
-                        width:
-                          animationPhase === "idle" || animationPhase === "complete"
-                            ? `${widthPct}%`
-                            : isDone
-                              ? `${widthPct}%`
-                              : isActive
-                                ? `${(displayCount / maxCount) * 100}%`
-                                : "0%",
-                        opacity:
-                          animationPhase === "idle" || animationPhase === "complete"
-                            ? 0.7
-                            : isDone
-                              ? 0.5
-                              : isActive
-                                ? 0.9
-                                : 0.2,
-                      }}
-                    />
+              {/* Level 1 → Level 2 (4 sources converge to pool) */}
+              <path d="M 162 95 C 162 145, 500 115, 500 165" stroke="url(#grad-blue-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '0.8s' }} />
+              <path d="M 387 95 C 387 140, 500 120, 500 165" stroke="url(#grad-purple-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '0.9s' }} />
+              <path d="M 612 95 C 612 140, 500 120, 500 165" stroke="url(#grad-cyan-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.0s' }} />
+              <path d="M 837 95 C 837 145, 500 115, 500 165" stroke="url(#grad-pink-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.1s' }} />
+
+              {/* Level 2 → Level 3 (pool to scorer) */}
+              <path d="M 500 225 C 500 260, 500 270, 500 295" stroke="url(#grad-indigo-violet)" strokeWidth="3" className="node-graph-edge-slow" style={{ animationDelay: '1.4s' }} />
+
+              {/* Level 3 → Level 4 (scorer fans out to 3 filters) */}
+              <path d="M 500 395 C 500 440, 225 420, 225 465" stroke="url(#grad-violet-green)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.8s' }} />
+              <path d="M 500 395 C 500 430, 500 435, 500 465" stroke="url(#grad-violet-teal)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.9s' }} />
+              <path d="M 500 395 C 500 440, 775 420, 775 465" stroke="url(#grad-violet-emerald)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.0s' }} />
+
+              {/* Level 4 → Level 5 (3 filters converge to timeline) */}
+              <path d="M 225 525 C 225 570, 500 550, 500 585" stroke="url(#grad-green-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.3s' }} />
+              <path d="M 500 525 C 500 555, 500 560, 500 585" stroke="url(#grad-teal-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.4s' }} />
+              <path d="M 775 525 C 775 570, 500 550, 500 585" stroke="url(#grad-emerald-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.5s' }} />
+            </svg>
+
+            {/* Nodes Layer */}
+            <div className="relative" style={{ aspectRatio: '1000/680' }}>
+
+              {/* ── Level 1: Sources (4 nodes) ── */}
+              <div className="absolute inset-x-0 top-0 flex justify-between gap-3 px-2" style={{ height: '13.5%' }}>
+                {/* Earlybird */}
+                <div className="node-graph-node flex-1 rounded-xl border border-blue-500/30 bg-blue-500/10 backdrop-blur-sm p-3 flex items-center gap-3" style={{ animationDelay: '0.1s' }}>
+                  <span className="text-2xl shrink-0">📥</span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-blue-400 truncate">フォロー中の投稿</div>
+                    <div className="text-[10px] text-blue-300/70 truncate">Earlybird</div>
+                    <div className="text-lg font-bold text-blue-300 tabular-nums">600<span className="text-xs font-normal ml-0.5">件</span></div>
                   </div>
                 </div>
-                <div className="w-20 shrink-0 text-right">
-                  <span
-                    className={cn(
-                      "text-sm font-bold tabular-nums transition-colors",
-                      isActive ? stage.textColor : "text-muted-foreground"
-                    )}
-                  >
-                    {showCount > 0
-                      ? showCount.toLocaleString() + "件"
-                      : "—"}
-                  </span>
+                {/* UTEG */}
+                <div className="node-graph-node flex-1 rounded-xl border border-purple-500/30 bg-purple-500/10 backdrop-blur-sm p-3 flex items-center gap-3" style={{ animationDelay: '0.2s' }}>
+                  <span className="text-2xl shrink-0">📥</span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-purple-400 truncate">似た人が見ている投稿</div>
+                    <div className="text-[10px] text-purple-300/70 truncate">UTEG</div>
+                    <div className="text-lg font-bold text-purple-300 tabular-nums">300<span className="text-xs font-normal ml-0.5">件</span></div>
+                  </div>
+                </div>
+                {/* CrMixer */}
+                <div className="node-graph-node flex-1 rounded-xl border border-cyan-500/30 bg-cyan-500/10 backdrop-blur-sm p-3 flex items-center gap-3" style={{ animationDelay: '0.3s' }}>
+                  <span className="text-2xl shrink-0">📥</span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-cyan-400 truncate">興味が近い人のおすすめ</div>
+                    <div className="text-[10px] text-cyan-300/70 truncate">CrMixer</div>
+                    <div className="text-lg font-bold text-cyan-300 tabular-nums">400<span className="text-xs font-normal ml-0.5">件</span></div>
+                  </div>
+                </div>
+                {/* FRS */}
+                <div className="node-graph-node flex-1 rounded-xl border border-pink-500/30 bg-pink-500/10 backdrop-blur-sm p-3 flex items-center gap-3" style={{ animationDelay: '0.4s' }}>
+                  <span className="text-2xl shrink-0">📥</span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-pink-400 truncate">注目アカウントの投稿</div>
+                    <div className="text-[10px] text-pink-300/70 truncate">FRS</div>
+                    <div className="text-lg font-bold text-pink-300 tabular-nums">100<span className="text-xs font-normal ml-0.5">件</span></div>
+                  </div>
                 </div>
               </div>
-            );
-          })}
-        </CardContent>
-      </Card>
 
-      {/* ─── Workflow Animation ───────────────────────────────────────── */}
-      <Card className="glass overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-lg">
-              ワークフロー アニメーション
-            </CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              再生ボタンを押すと、データが左から右に流れていく様子が見えます
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={resetAnimation}
-              disabled={animationPhase === "idle"}
-              className="bg-transparent"
-            >
-              <RotateCcw className="h-4 w-4 mr-1" />
-              リセット
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                if (isPlaying) {
-                  setIsPlaying(false);
-                  isPlayingRef.current = false;
-                } else {
-                  runAnimation();
-                }
-              }}
-              className="glow-primary"
-            >
-              {isPlaying ? (
-                <>
-                  <Pause className="h-4 w-4 mr-1" />
-                  一時停止
-                </>
-              ) : (
-                <>
-                  <Play className="h-4 w-4 mr-1" />
-                  再生
-                </>
-              )}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Overall Progress */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">進行状況</span>
-              <span className="text-primary font-medium">
-                {Math.round(overallProgress)}%
-              </span>
-            </div>
-            <Progress value={overallProgress} className="h-2" />
-          </div>
-
-          {/* Workflow Nodes */}
-          <div className="relative">
-            {/* Desktop: horizontal layout */}
-            <div className="hidden lg:flex items-stretch gap-0">
-              {funnelStages.map((stage, idx) => {
-                const isActive = isStageActive(stage.id);
-                const isDone = isStageDone(stage.id);
-                const displayCount = displayCounts[idx];
-                const showCount =
-                  animationPhase === "idle"
-                    ? stage.count
-                    : animationPhase === "complete"
-                      ? stage.count
-                      : isDone
-                        ? stage.count
-                        : isActive
-                          ? displayCount
-                          : 0;
-
-                return (
-                  <div key={stage.id} className="flex items-stretch flex-1">
-                    {/* Node Card */}
-                    <button
-                      onClick={() => toggleExpanded(stage.id)}
-                      className={cn(
-                        "flex-1 rounded-xl border-2 p-5 transition-all duration-500 text-left",
-                        isActive
-                          ? `${stage.borderColor} ${stage.bgActive} shadow-lg scale-[1.02]`
-                          : isDone
-                            ? `${stage.borderColor}/50 ${stage.bgDone}`
-                            : "border-border bg-muted/30",
-                        "hover:shadow-md"
-                      )}
-                    >
-                      {/* Header */}
-                      <div className="flex items-center gap-2 mb-3">
-                        <div
-                          className={cn(
-                            "flex h-10 w-10 items-center justify-center rounded-lg transition-colors duration-300",
-                            isActive || isDone
-                              ? `${stage.color} text-white`
-                              : "bg-muted text-muted-foreground"
-                          )}
-                        >
-                          <stage.icon className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <span className="font-semibold text-sm block">
-                            {stage.emoji} {stage.stage}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {stage.subtitle}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Count */}
-                      <div
-                        className={cn(
-                          "text-2xl font-bold tabular-nums mb-3 transition-colors",
-                          isActive
-                            ? stage.textColor
-                            : isDone
-                              ? "text-foreground"
-                              : "text-muted-foreground"
-                        )}
-                      >
-                        {showCount > 0
-                          ? showCount.toLocaleString() + "件"
-                          : "—"}
-                      </div>
-
-                      {/* Items list */}
-                      <ul className="space-y-1">
-                        {stage.items.map((item, i) => (
-                          <li
-                            key={i}
-                            className={cn(
-                              "text-xs flex items-start gap-1.5 transition-colors",
-                              isActive || isDone
-                                ? "text-foreground/80"
-                                : "text-muted-foreground/60"
-                            )}
-                          >
-                            <span className="mt-0.5">•</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      {/* Expand indicator */}
-                      <div className="mt-3 flex items-center justify-center">
-                        {expandedStage === stage.id ? (
-                          <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
-                    </button>
-
-                    {/* Arrow connector */}
-                    {idx < funnelStages.length - 1 && (
-                      <div className="flex flex-col items-center justify-center px-2 shrink-0">
-                        <div
-                          className={cn(
-                            "flex flex-col items-center gap-1 transition-all duration-500",
-                            isDone || isActive
-                              ? "opacity-100"
-                              : "opacity-30"
-                          )}
-                        >
-                          <ArrowRight
-                            className={cn(
-                              "h-5 w-5 transition-colors",
-                              isDone
-                                ? stage.textColor
-                                : "text-muted-foreground"
-                            )}
-                          />
-                          <span className="text-[10px] text-muted-foreground font-medium tabular-nums whitespace-nowrap">
-                            {isDone
-                              ? `→ ${funnelStages[idx + 1].count.toLocaleString()}`
-                              : ""}
-                          </span>
-                        </div>
-                      </div>
-                    )}
+              {/* ── Level 2: Candidate Pool (1 node, centered) ── */}
+              <div className="absolute left-1/2 -translate-x-1/2 node-graph-node" style={{ top: '24%', width: '40%', animationDelay: '0.6s' }}>
+                <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-sm p-4 text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-2xl">🔄</span>
+                    <div className="text-base font-semibold text-indigo-400">候補プール</div>
                   </div>
-                );
-              })}
-            </div>
-
-            {/* Mobile: vertical layout */}
-            <div className="lg:hidden space-y-3">
-              {funnelStages.map((stage, idx) => {
-                const isActive = isStageActive(stage.id);
-                const isDone = isStageDone(stage.id);
-                const displayCount = displayCounts[idx];
-                const showCount =
-                  animationPhase === "idle"
-                    ? stage.count
-                    : animationPhase === "complete"
-                      ? stage.count
-                      : isDone
-                        ? stage.count
-                        : isActive
-                          ? displayCount
-                          : 0;
-
-                return (
-                  <div key={stage.id}>
-                    <button
-                      onClick={() => toggleExpanded(stage.id)}
-                      className={cn(
-                        "w-full rounded-xl border-2 p-4 transition-all duration-500 text-left",
-                        isActive
-                          ? `${stage.borderColor} ${stage.bgActive} shadow-lg`
-                          : isDone
-                            ? `${stage.borderColor}/50 ${stage.bgDone}`
-                            : "border-border bg-muted/30"
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={cn(
-                              "flex h-10 w-10 items-center justify-center rounded-lg transition-colors",
-                              isActive || isDone
-                                ? `${stage.color} text-white`
-                                : "bg-muted text-muted-foreground"
-                            )}
-                          >
-                            <stage.icon className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <span className="font-semibold text-sm">
-                              {stage.emoji} {stage.stage}
-                            </span>
-                            <span className="text-xs text-muted-foreground block">
-                              {stage.subtitle}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={cn(
-                              "text-xl font-bold tabular-nums",
-                              isActive
-                                ? stage.textColor
-                                : isDone
-                                  ? "text-foreground"
-                                  : "text-muted-foreground"
-                            )}
-                          >
-                            {showCount > 0
-                              ? showCount.toLocaleString() + "件"
-                              : "—"}
-                          </span>
-                          {expandedStage === stage.id ? (
-                            <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </div>
-                      </div>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {stage.items.map((item, i) => (
-                          <Badge key={i} variant="secondary" className="text-[10px]">
-                            {item}
-                          </Badge>
-                        ))}
-                      </div>
-                    </button>
-
-                    {/* Vertical arrow */}
-                    {idx < funnelStages.length - 1 && (
-                      <div className="flex justify-center py-1">
-                        <ChevronRight
-                          className={cn(
-                            "h-5 w-5 rotate-90 transition-colors",
-                            isDone
-                              ? stage.textColor
-                              : "text-muted-foreground/30"
-                          )}
-                        />
-                      </div>
-                    )}
+                  <div className="text-2xl font-bold text-indigo-300 tabular-nums mt-1">
+                    ~1,400<span className="text-sm font-normal ml-1">件</span>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Animation Legend */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4 border-t border-border">
-            {funnelStages.map((stage) => (
-              <div key={stage.id} className="flex items-center gap-2 text-xs">
-                <div className={cn("h-3 w-3 rounded", stage.color)} />
-                <span className="text-muted-foreground">{stage.stage}</span>
+                </div>
               </div>
-            ))}
+
+              {/* ── Level 3: Heavy Ranker (1 large node, centered) ── */}
+              <div className="absolute left-1/2 -translate-x-1/2 node-graph-node" style={{ top: '43%', width: '52%', animationDelay: '1.0s' }}>
+                <div className="rounded-xl border-2 border-violet-500/40 bg-violet-500/10 backdrop-blur-sm p-5 text-center shadow-lg shadow-violet-500/5">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-3xl">🧠</span>
+                    <div>
+                      <div className="text-lg font-bold text-violet-400">AIスコアリング</div>
+                      <div className="text-xs text-violet-300/70">Heavy Ranker</div>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-violet-300 tabular-nums mt-2">
+                    ~1,000<span className="text-sm font-normal ml-1">件に選別</span>
+                  </div>
+                  <div className="mt-2 text-xs text-violet-300/60 border-t border-violet-500/20 pt-2">
+                    約6,000の特徴量で各投稿をスコアリング
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Level 4: Filters (3 nodes) ── */}
+              <div className="absolute inset-x-0 flex justify-between gap-4 px-8" style={{ top: '68%', height: '10%' }}>
+                {/* Safety */}
+                <div className="node-graph-node flex-1 rounded-xl border border-green-500/30 bg-green-500/10 backdrop-blur-sm p-3 text-center" style={{ animationDelay: '1.4s' }}>
+                  <span className="text-xl">🛡️</span>
+                  <div className="text-sm font-semibold text-green-400 mt-1">安全性チェック</div>
+                </div>
+                {/* Diversity */}
+                <div className="node-graph-node flex-1 rounded-xl border border-teal-500/30 bg-teal-500/10 backdrop-blur-sm p-3 text-center" style={{ animationDelay: '1.5s' }}>
+                  <span className="text-xl">👥</span>
+                  <div className="text-sm font-semibold text-teal-400 mt-1">著者多様性</div>
+                </div>
+                {/* Balance */}
+                <div className="node-graph-node flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-sm p-3 text-center" style={{ animationDelay: '1.6s' }}>
+                  <span className="text-xl">⚖️</span>
+                  <div className="text-sm font-semibold text-emerald-400 mt-1">コンテンツバランス</div>
+                </div>
+              </div>
+
+              {/* ── Level 5: Timeline Output (1 node, centered) ── */}
+              <div className="absolute left-1/2 -translate-x-1/2 node-graph-node" style={{ top: '86%', width: '44%', animationDelay: '1.8s' }}>
+                <div className="rounded-xl border-2 border-amber-500/30 bg-amber-500/10 backdrop-blur-sm p-4 text-center shadow-lg shadow-amber-500/5">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-2xl">📱</span>
+                    <div className="text-base font-semibold text-amber-400">あなたのタイムライン</div>
+                  </div>
+                  <div className="text-2xl font-bold text-amber-300 tabular-nums mt-1">
+                    50<span className="text-sm font-normal ml-1">件</span>
+                  </div>
+                  <div className="text-xs text-amber-300/60 mt-1">
+                    広告・おすすめユーザーと組み合わせて完成
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Mobile: Vertical Node Graph ── */}
+          <div className="md:hidden space-y-0">
+            {/* Level 1 */}
+            <div className="space-y-2">
+              <div className="node-graph-node rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.1s' }}>
+                <span className="text-xl">📥</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-blue-400 truncate">フォロー中の投稿</div>
+                  <div className="text-[10px] text-blue-300/70">Earlybird</div>
+                </div>
+                <div className="text-lg font-bold text-blue-300 tabular-nums shrink-0">600<span className="text-xs font-normal">件</span></div>
+              </div>
+              <div className="node-graph-node rounded-xl border border-purple-500/30 bg-purple-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.2s' }}>
+                <span className="text-xl">📥</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-purple-400 truncate">似た人が見ている投稿</div>
+                  <div className="text-[10px] text-purple-300/70">UTEG</div>
+                </div>
+                <div className="text-lg font-bold text-purple-300 tabular-nums shrink-0">300<span className="text-xs font-normal">件</span></div>
+              </div>
+              <div className="node-graph-node rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.3s' }}>
+                <span className="text-xl">📥</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-cyan-400 truncate">興味が近い人のおすすめ</div>
+                  <div className="text-[10px] text-cyan-300/70">CrMixer</div>
+                </div>
+                <div className="text-lg font-bold text-cyan-300 tabular-nums shrink-0">400<span className="text-xs font-normal">件</span></div>
+              </div>
+              <div className="node-graph-node rounded-xl border border-pink-500/30 bg-pink-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.4s' }}>
+                <span className="text-xl">📥</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-pink-400 truncate">注目アカウントの投稿</div>
+                  <div className="text-[10px] text-pink-300/70">FRS</div>
+                </div>
+                <div className="text-lg font-bold text-pink-300 tabular-nums shrink-0">100<span className="text-xs font-normal">件</span></div>
+              </div>
+            </div>
+
+            {/* Connector */}
+            <div className="flex justify-center py-1">
+              <svg width="2" height="24" className="overflow-visible"><line x1="1" y1="0" x2="1" y2="24" stroke="#6366f1" strokeWidth="2" className="node-graph-edge" /></svg>
+            </div>
+
+            {/* Level 2 */}
+            <div className="node-graph-node rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-3 text-center" style={{ animationDelay: '0.6s' }}>
+              <span className="text-xl">🔄</span>
+              <span className="text-sm font-semibold text-indigo-400 ml-2">候補プール</span>
+              <span className="text-lg font-bold text-indigo-300 tabular-nums ml-2">~1,400件</span>
+            </div>
+
+            <div className="flex justify-center py-1">
+              <svg width="2" height="24" className="overflow-visible"><line x1="1" y1="0" x2="1" y2="24" stroke="#8b5cf6" strokeWidth="2" className="node-graph-edge" /></svg>
+            </div>
+
+            {/* Level 3 */}
+            <div className="node-graph-node rounded-xl border-2 border-violet-500/40 bg-violet-500/10 p-4 text-center" style={{ animationDelay: '1.0s' }}>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-2xl">🧠</span>
+                <div className="text-base font-bold text-violet-400">AIスコアリング</div>
+              </div>
+              <div className="text-xs text-violet-300/70">Heavy Ranker</div>
+              <div className="text-lg font-bold text-violet-300 tabular-nums mt-1">~1,000件に選別</div>
+              <div className="text-xs text-violet-300/60 mt-1 border-t border-violet-500/20 pt-1">約6,000の特徴量で各投稿をスコアリング</div>
+            </div>
+
+            <div className="flex justify-center py-1">
+              <svg width="2" height="24" className="overflow-visible"><line x1="1" y1="0" x2="1" y2="24" stroke="#8b5cf6" strokeWidth="2" className="node-graph-edge" /></svg>
+            </div>
+
+            {/* Level 4 */}
+            <div className="space-y-2">
+              <div className="node-graph-node rounded-xl border border-green-500/30 bg-green-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.4s' }}>
+                <span className="text-lg">🛡️</span>
+                <span className="text-sm font-semibold text-green-400">安全性チェック</span>
+              </div>
+              <div className="node-graph-node rounded-xl border border-teal-500/30 bg-teal-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.5s' }}>
+                <span className="text-lg">👥</span>
+                <span className="text-sm font-semibold text-teal-400">著者多様性</span>
+              </div>
+              <div className="node-graph-node rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.6s' }}>
+                <span className="text-lg">⚖️</span>
+                <span className="text-sm font-semibold text-emerald-400">コンテンツバランス</span>
+              </div>
+            </div>
+
+            <div className="flex justify-center py-1">
+              <svg width="2" height="24" className="overflow-visible"><line x1="1" y1="0" x2="1" y2="24" stroke="#f59e0b" strokeWidth="2" className="node-graph-edge" /></svg>
+            </div>
+
+            {/* Level 5 */}
+            <div className="node-graph-node rounded-xl border-2 border-amber-500/30 bg-amber-500/10 p-4 text-center" style={{ animationDelay: '1.8s' }}>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-xl">📱</span>
+                <span className="text-base font-semibold text-amber-400">あなたのタイムライン</span>
+              </div>
+              <div className="text-xl font-bold text-amber-300 tabular-nums mt-1">50件</div>
+              <div className="text-xs text-amber-300/60 mt-1">広告・おすすめユーザーと組み合わせて完成</div>
+            </div>
           </div>
         </CardContent>
       </Card>
