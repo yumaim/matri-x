@@ -20,12 +20,15 @@ import {
   Flame,
   Target,
   Lock,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Area, AreaChart, XAxis, YAxis, CartesianGrid } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 const quickActions = [
   {
@@ -166,6 +169,7 @@ export default function DashboardPage() {
   const [progressData, setProgressData] = useState<ProgressData>(DEFAULT_PROGRESS);
   const [isLoading, setIsLoading] = useState(true);
   const [showNewAchievement, setShowNewAchievement] = useState(false);
+  const [activityData, setActivityData] = useState<Array<{ date: string; posts: number; comments: number }>>([]);
 
   useEffect(() => {
     async function fetchProgress() {
@@ -186,6 +190,14 @@ export default function DashboardPage() {
       }
     }
     fetchProgress();
+
+    // Fetch activity data for graph
+    fetch("/api/analytics?period=30d")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.dailyActivity) setActivityData(d.dailyActivity);
+      })
+      .catch(() => {});
   }, []);
 
   const xpProgress = progressData
@@ -332,6 +344,53 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
+      {/* Activity Graph */}
+      {activityData.length > 0 && (
+        <Card className="glass overflow-hidden">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                アクティビティ
+              </CardTitle>
+              <Link href="/dashboard/analytics">
+                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-primary">
+                  詳細を見る <ArrowRight className="ml-1 h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                posts: { label: "投稿", color: "hsl(var(--primary))" },
+                comments: { label: "コメント", color: "hsl(var(--accent))" },
+              }}
+              className="h-[200px] w-full"
+            >
+              <AreaChart data={activityData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="dashPosts" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="dashComments" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Area type="monotone" dataKey="posts" stroke="hsl(var(--primary))" fill="url(#dashPosts)" strokeWidth={2} />
+                <Area type="monotone" dataKey="comments" stroke="hsl(var(--accent))" fill="url(#dashComments)" strokeWidth={2} />
+              </AreaChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Two Column Layout */}
       <div className="grid gap-6 lg:grid-cols-2">

@@ -337,6 +337,13 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [myUserId, setMyUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/users/me").then(r => r.ok ? r.json() : null).then(d => {
+      if (d?.id) setMyUserId(d.id);
+    }).catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -385,7 +392,7 @@ export default function DashboardLayout({
         </div>
         <div className="flex items-center gap-2">
           <NotificationBell />
-          <Link href="/dashboard/profile">
+          <Link href={myUserId ? `/dashboard/users/${myUserId}` : "/dashboard/profile"}>
             <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
               <AvatarFallback className="bg-primary/20 text-primary text-sm">
                 MX
