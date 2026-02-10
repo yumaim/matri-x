@@ -290,26 +290,30 @@ function HeroSection() {
                 {
                   step: "01",
                   title: "候補取得",
-                  desc: "フォロー中・Out-of-Networkから候補を収集",
+                  desc: "Earlybird(600件) + UTEG(300件) + CrMixer(400件) + FRS(100件) = 約1,500ツイート",
                   color: "bg-primary",
+                  detail: "In-Network ~50% / Out-of-Network ~50%",
                 },
                 {
                   step: "02",
                   title: "ランキング",
-                  desc: "TweepCred・エンゲージメント予測でスコアリング",
+                  desc: "Heavy Ranker（MaskNet）が~6,000特徴量でスコアリング。10種のEG確率を予測",
                   color: "bg-accent",
+                  detail: "reply×著者返信 = 75.0 / いいね = 0.5",
                 },
                 {
                   step: "03",
                   title: "フィルタリング",
-                  desc: "Trust & Safety、多様性フィルター適用",
+                  desc: "Trust & Safety + Author Diversity + Content Balance + Feedback Fatigue",
                   color: "bg-[#00ba7c]",
+                  detail: "ブロック/ミュート/NSFW除外",
                 },
                 {
                   step: "04",
                   title: "配信",
-                  desc: "最適化されたタイムラインを表示",
+                  desc: "広告・WTF・会話モジュールとミックスしてタイムラインに表示",
                   color: "bg-orange-500",
+                  detail: "最終50件を返却",
                 },
               ].map((item, index) => (
                 <div key={item.step} className="relative">
@@ -324,6 +328,9 @@ function HeroSection() {
                     </h4>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {item.desc}
+                    </p>
+                    <p className="mt-2 text-[10px] font-mono text-primary/70">
+                      {item.detail}
                     </p>
                   </div>
                   {index < 3 && (
