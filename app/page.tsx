@@ -102,7 +102,7 @@ const pricingPlans = [
     comingSoon: false,
   },
   {
-    name: "Standard",
+    name: "Pro",
     price: "—",
     period: "",
     description: "より深い分析機能を準備中",
@@ -118,12 +118,12 @@ const pricingPlans = [
     comingSoon: true,
   },
   {
-    name: "Pro",
+    name: "Enterprise",
     price: "—",
     period: "",
     description: "チーム・代理店向けの高度な分析",
     features: [
-      "Standard全機能",
+      "Pro全機能",
       "API アクセス",
       "チーム共有機能",
       "カスタムレポート",
