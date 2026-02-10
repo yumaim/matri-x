@@ -156,13 +156,14 @@ function Header() {
             </Link>
           </div>
           <div className="flex lg:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
+              type="button"
+              className="inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent active:bg-accent/80 transition-colors touch-manipulation"
               onClick={() => setMobileMenuOpen(true)}
+              aria-label="メニューを開く"
             >
               <Menu className="h-6 w-6" />
-            </Button>
+            </button>
           </div>
           <div className="hidden lg:flex lg:gap-x-8">
             {navigation.map((item) => (
