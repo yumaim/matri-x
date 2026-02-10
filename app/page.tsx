@@ -185,13 +185,13 @@ function TypewriterText() {
 
 function HeroSection() {
   return (
-    <section className="relative min-h-screen overflow-hidden pt-32 pb-20">
+    <section className="relative min-h-screen overflow-hidden pt-24 sm:pt-32 pb-16 sm:pb-20">
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-primary/20 blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-accent/20 blur-[120px]" />
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-2 backdrop-blur-sm">
             <Sparkles className="h-4 w-4 text-primary" />
@@ -200,7 +200,7 @@ function HeroSection() {
             </span>
           </div>
 
-          <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl h-[6rem] sm:h-[7.5rem] lg:h-[9rem] overflow-hidden">
+          <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl h-[4.5rem] sm:h-[6rem] md:h-[7.5rem] lg:h-[9rem] overflow-hidden">
             <TypewriterText />
           </h1>
 
@@ -215,13 +215,13 @@ function HeroSection() {
           </div>
         </div>
 
-        <div className="mx-auto mt-20 grid max-w-4xl grid-cols-2 gap-8 lg:grid-cols-4">
+        <div className="mx-auto mt-12 sm:mt-20 grid max-w-4xl grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-4">
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="glass rounded-2xl p-6 text-center transition-all hover:glow-primary"
+              className="glass rounded-2xl p-4 sm:p-6 text-center transition-all hover:glow-primary"
             >
-              <div className="text-3xl font-bold text-gradient">
+              <div className="text-2xl sm:text-3xl font-bold text-gradient">
                 {stat.value}
               </div>
               <div className="mt-2 text-sm text-muted-foreground">
@@ -311,7 +311,7 @@ function HeroSection() {
 function FeaturesSection() {
   return (
     <section id="features" className="py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             <span className="text-gradient">8つの主要機能</span>
@@ -347,7 +347,7 @@ function FeaturesSection() {
 function EngagementSection() {
   return (
     <section id="engagement" className="py-24 bg-muted/30">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             <span className="text-gradient">エンゲージメント重み付け</span>
@@ -405,7 +405,7 @@ function EngagementSection() {
 function PricingSection() {
   return (
     <section id="pricing" className="py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             <span className="text-gradient">料金プラン</span>
@@ -473,8 +473,8 @@ function PricingSection() {
 function CTASection() {
   return (
     <section className="py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="glass rounded-3xl p-12 text-center glow-primary">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="glass rounded-3xl p-6 sm:p-12 text-center glow-primary">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             <span className="text-gradient">今すぐ始めましょう</span>
           </h2>
@@ -491,7 +491,7 @@ function CTASection() {
 function Footer() {
   return (
     <footer className="border-t border-border py-12">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">

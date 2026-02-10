@@ -94,7 +94,7 @@ export default function ProfilePage() {
   const initials = (name || profile?.email || "?").slice(0, 2).toUpperCase();
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-3xl mx-auto space-y-6 overflow-x-hidden">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">プロフィール</h1>
         <p className="text-muted-foreground">あなたのプロフィール情報を管理します</p>

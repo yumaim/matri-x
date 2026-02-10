@@ -273,13 +273,13 @@ export default function DashboardPage() {
           { title: "検証レポート", value: progressData.stats.verifiedPosts, icon: Target, color: "text-orange-500" },
         ].map((stat) => (
           <Card key={stat.title} className="glass">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <stat.icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
               </div>
-              <div className="mt-4">
+              <div className="mt-3 sm:mt-4">
                 {isLoading ? (
                   <div className="h-8 w-16 animate-pulse rounded bg-muted" />
                 ) : (

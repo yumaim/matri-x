@@ -358,7 +358,7 @@ export default function DashboardLayout({
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
+            <SheetContent side="left" className="w-64 p-0" aria-label="ナビゲーションメニュー">
               <div className="flex h-full flex-col" onClick={() => setMobileMenuOpen(false)}>
                 <SidebarContent collapsed={false} pathname={pathname} />
               </div>

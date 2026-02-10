@@ -131,7 +131,7 @@ function DeepWikiContent() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] flex-col p-6 lg:h-screen lg:p-8">
+    <div className="flex h-[calc(100vh-64px)] flex-col p-4 sm:p-6 lg:h-screen lg:p-8 overflow-x-hidden">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground sm:text-3xl">

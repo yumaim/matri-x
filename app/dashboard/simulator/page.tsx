@@ -171,7 +171,7 @@ function SimulatorContent() {
   const scorePercentage = score * 100;
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 overflow-x-hidden">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground sm:text-3xl">

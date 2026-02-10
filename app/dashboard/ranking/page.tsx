@@ -396,7 +396,7 @@ export default function RankingPage() {
   }, [fetchUsers]);
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-8 py-6 px-4">
+    <div className="container mx-auto max-w-6xl space-y-6 sm:space-y-8 py-4 sm:py-6 px-4 overflow-x-hidden">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
@@ -422,7 +422,7 @@ export default function RankingPage() {
             </CardHeader>
             <CardContent>
               <Tabs value={postTab} onValueChange={setPostTab}>
-                <TabsList className="grid w-full grid-cols-4 mb-4">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-4">
                   {POST_TABS.map((tab) => (
                     <TabsTrigger
                       key={tab.id}

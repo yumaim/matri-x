@@ -272,7 +272,7 @@ export default function UpdatesPage() {
   }, {} as Record<string, Update[]>);
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 overflow-x-hidden">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -481,10 +481,10 @@ export default function UpdatesPage() {
                                       <Badge
                                         key={file}
                                         variant="outline"
-                                        className="font-mono text-xs bg-muted/50 max-w-[200px] sm:max-w-[300px] truncate"
+                                        className="font-mono text-xs bg-muted/50 max-w-full sm:max-w-[300px] truncate block"
                                       >
-                                        <FileCode className="h-3 w-3 mr-1 shrink-0" />
-                                        {file}
+                                        <FileCode className="h-3 w-3 mr-1 shrink-0 inline" />
+                                        <span className="truncate">{file}</span>
                                       </Badge>
                                     ))}
                                   </div>

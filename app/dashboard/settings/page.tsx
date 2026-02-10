@@ -78,7 +78,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-3xl mx-auto space-y-6 overflow-x-hidden">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">設定</h1>
         <p className="text-muted-foreground">アカウントとセキュリティの設定</p>

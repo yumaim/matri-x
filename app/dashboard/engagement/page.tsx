@@ -310,14 +310,14 @@ export default function EngagementPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={negativeChartConfig} className="h-[200px]">
-                  <BarChart data={negativeChartData} layout="vertical">
+                <ChartContainer config={negativeChartConfig} className="h-[200px]" style={{ maxWidth: "100%", overflow: "hidden" }}>
+                  <BarChart data={negativeChartData} layout="vertical" margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
                     <XAxis type="number" />
                     <YAxis
                       type="category"
                       dataKey="name"
-                      width={180}
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+                      width={100}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 9 }}
                     />
                     <ChartTooltip
                       content={<ChartTooltipContent />}

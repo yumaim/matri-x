@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Zap, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,59 @@ const navigation = [
 
 export function LPHeader() {
   const [open, setOpen] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+      // Focus the close button when panel opens
+      setTimeout(() => closeButtonRef.current?.focus(), 100);
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  // Focus trap
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!open) return;
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (e.key === "Tab" && panelRef.current) {
+        const focusable = panelRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    },
+    [open]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8 relative z-10">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-4 lg:px-8 relative z-10">
           <div className="flex lg:flex-1">
             <Link href="/" className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary glow-primary">
@@ -32,6 +80,8 @@ export function LPHeader() {
               className="inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent active:bg-accent/80 transition-colors"
               onClick={() => setOpen(true)}
               aria-label="メニューを開く"
+              aria-expanded={open}
+              aria-controls="mobile-menu"
             >
               <Menu className="h-6 w-6" />
             </button>
@@ -55,15 +105,17 @@ export function LPHeader() {
       </header>
 
       {open && (
-        <div className="fixed inset-0 z-[200] lg:hidden">
+        <div className="fixed inset-0 z-[200] lg:hidden" role="dialog" aria-modal="true" aria-label="ナビゲーションメニュー">
           <div
             className="absolute inset-0 bg-black/70"
             onClick={() => setOpen(false)}
-            onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
-            role="button"
-            tabIndex={0}
+            aria-hidden="true"
           />
-          <div className="absolute inset-y-0 right-0 w-full max-w-sm bg-background p-6 shadow-2xl border-l border-border">
+          <div
+            ref={panelRef}
+            id="mobile-menu"
+            className="absolute inset-y-0 right-0 w-full max-w-sm bg-background p-6 shadow-2xl border-l border-border"
+          >
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
@@ -72,6 +124,7 @@ export function LPHeader() {
                 <span className="text-xl font-bold text-gradient">Matri-X</span>
               </Link>
               <button
+                ref={closeButtonRef}
                 type="button"
                 className="inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent active:bg-accent/80 transition-colors"
                 onClick={() => setOpen(false)}
