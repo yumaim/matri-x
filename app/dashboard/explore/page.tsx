@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Database,
   TrendingUp,
@@ -42,26 +42,28 @@ const pipelineStages = [
     description: "フォロー中のアカウントとOut-of-Networkから候補ツイートを収集",
     details: [
       {
-        title: "In-Network Sources",
+        title: "In-Network Sources (Earlybird)",
         items: [
-          "フォロー中のアカウントのツイート",
+          "フォロー中のアカウントのツイート (最大600件)",
           "リストに登録したアカウント",
-          "過去にエンゲージしたアカウント",
+          "リプライ・拡張リプライ含む",
         ],
       },
       {
         title: "Out-of-Network Sources",
         items: [
-          "SimClustersによる類似興味ユーザー",
-          "フォロワーのフォロワー(2次ネットワーク)",
-          "トレンドトピック関連",
+          "UTEG (User-Tweet-Entity-Graph) — 300件",
+          "CrMixer (SimClusters ANN) — 400件",
+          "FRS (Follow Recommendation Service) — 100件",
         ],
       },
     ],
     metrics: [
-      { label: "In-Network比率", value: "50%" },
-      { label: "Out-of-Network比率", value: "50%" },
-      { label: "候補プール", value: "~1500件" },
+      { label: "Earlybird (In-Net)", value: "600件" },
+      { label: "UTEG", value: "300件" },
+      { label: "CrMixer", value: "400件" },
+      { label: "FRS", value: "100件" },
+      { label: "合計候補プール", value: "~1,400件" },
     ],
   },
   {
@@ -74,26 +76,27 @@ const pipelineStages = [
     description: "機械学習モデルとTweepCredスコアを使用してランキング",
     details: [
       {
-        title: "Heavy Ranker",
+        title: "Heavy Ranker (MaskNet)",
         items: [
-          "エンゲージメント予測モデル",
-          "ユーザー興味との関連度",
-          "コンテンツ品質スコア",
+          "Parallel MaskNet アーキテクチャ",
+          "~6,000特徴量を入力",
+          "10種のエンゲージメント確率を予測",
         ],
       },
       {
-        title: "TweepCred",
+        title: "TweepCred (PageRank)",
         items: [
-          "アカウント信頼度スコア",
-          "PageRankベースのアルゴリズム",
-          "フォロワー/フォロー比率考慮",
+          "PageRankベースの信用スコア (0-100)",
+          "フォロー/フォロワー比率でペナルティ調整",
+          "アカウント年齢・デバイス・安全ステータス考慮",
         ],
       },
     ],
     metrics: [
-      { label: "Heavy Rankerパス", value: "~1000件" },
-      { label: "TweepCred閾値", value: "0.4以上" },
-      { label: "ランキング時間", value: "<100ms" },
+      { label: "入力特徴量", value: "~6,000" },
+      { label: "リプ+著者返信", value: "75.0" },
+      { label: "いいね重み", value: "0.5" },
+      { label: "スパム報告", value: "-369" },
     ],
   },
   {
@@ -106,19 +109,19 @@ const pipelineStages = [
     description: "安全性、多様性、ユーザー設定に基づくフィルタリング",
     details: [
       {
-        title: "Safety Filters",
+        title: "Safety Filters (Visibility Filtering)",
         items: [
-          "スパム・悪意あるコンテンツ除去",
-          "センシティブコンテンツフラグ",
+          "SafetyLevel: Timeline, Profile等のsurface別ポリシー",
+          "SafetyLabel: スパム・NSFW・法令違反の検出",
           "ブロック/ミュートユーザー除外",
         ],
       },
       {
-        title: "Diversity Filters",
+        title: "Heuristic Filters",
         items: [
-          "同一著者の連続表示制限",
-          "トピック多様性の確保",
-          "フォーマット(画像/動画/テキスト)バランス",
+          "Author Diversity — 同一著者の連続表示制限",
+          "Content Balance — In/Out-of-Network比率調整",
+          "Feedback Fatigue — 同種フィードバックの抑制",
         ],
       },
     ],
@@ -138,37 +141,38 @@ const pipelineStages = [
     description: "最終的なタイムラインを構築してユーザーに配信",
     details: [
       {
-        title: "Timeline Mixing",
+        title: "Timeline Mixing (Home Mixer)",
         items: [
-          "広告の適切な配置",
-          "プロモートコンテンツ挿入",
-          "リアルタイムイベント優先",
+          "広告 (ForYouAdsCandidatePipeline)",
+          "おすすめユーザー (WhoToFollowCandidatePipeline)",
+          "会話モジュール (ConversationService)",
         ],
       },
       {
-        title: "Personalization",
+        title: "Personalization & Serving",
         items: [
-          "ユーザー設定の反映",
-          "時間帯による最適化",
-          "デバイス別の調整",
+          "ServerMaxResults: 50件/リクエスト",
+          "CachedScoredTweets: TTL 3分",
+          "リアルタイムイベント優先挿入",
         ],
       },
     ],
     metrics: [
-      { label: "表示件数", value: "~50件/回" },
-      { label: "更新頻度", value: "リアルタイム" },
-      { label: "レイテンシ", value: "<200ms" },
+      { label: "表示件数", value: "50件/回" },
+      { label: "キャッシュTTL", value: "3分" },
+      { label: "最小キャッシュ", value: "30件" },
     ],
   },
 ];
 
 const engagementWeights = [
-  { action: "リプライ + 著者リプライ", icon: MessageSquare, weight: "150x", color: "text-primary" },
-  { action: "いいね", icon: Heart, weight: "30x", color: "text-pink-500" },
-  { action: "リツイート", icon: Repeat2, weight: "20x", color: "text-[#00ba7c]" },
-  { action: "プロフィールクリック", icon: Users, weight: "12x", color: "text-accent" },
-  { action: "詳細表示", icon: Eye, weight: "11x", color: "text-orange-500" },
-  { action: "2分以上滞在", icon: Clock, weight: "+加点", color: "text-cyan-500" },
+  { action: "リプライ + 著者返信", icon: MessageSquare, weight: "75.0", color: "text-primary" },
+  { action: "リプライ", icon: MessageSquare, weight: "13.5", color: "text-primary" },
+  { action: "プロフィール→EG", icon: Users, weight: "12.0", color: "text-accent" },
+  { action: "会話クリック→EG", icon: Eye, weight: "11.0", color: "text-orange-500" },
+  { action: "2分以上滞在", icon: Clock, weight: "10.0", color: "text-cyan-500" },
+  { action: "リポスト", icon: Repeat2, weight: "1.0", color: "text-[#00ba7c]" },
+  { action: "いいね", icon: Heart, weight: "0.5", color: "text-pink-500" },
 ];
 
 const sourceTypes = [
@@ -211,6 +215,12 @@ export default function ExplorePage() {
   const [filteredTweets, setFilteredTweets] = useState<typeof sampleTweets>([]);
   const [rankedTweets, setRankedTweets] = useState<typeof sampleTweets>([]);
   const [finalTweets, setFinalTweets] = useState<typeof sampleTweets>([]);
+  
+  // Refs to avoid stale closures in animation useEffect
+  const rankedTweetsRef = useRef(rankedTweets);
+  const filteredTweetsRef = useRef(filteredTweets);
+  rankedTweetsRef.current = rankedTweets;
+  filteredTweetsRef.current = filteredTweets;
 
   const currentStage = pipelineStages.find((s) => s.id === activeStage);
 
@@ -273,7 +283,7 @@ export default function ExplorePage() {
     } else if (animationPhase === "filter") {
       setActiveStage("filter");
       // Filter out some tweets
-      const filtered = rankedTweets.filter((_, i) => i < 5);
+      const filtered = rankedTweetsRef.current.filter((_, i) => i < 5);
       
       let index = 0;
       const filterTweet = () => {
@@ -290,11 +300,12 @@ export default function ExplorePage() {
     } else if (animationPhase === "serve") {
       setActiveStage("serve");
       // Show final timeline
+      const toServe = filteredTweetsRef.current;
       let index = 0;
       const serveTweet = () => {
-        if (index < filteredTweets.length) {
-          setFinalTweets((prev) => [...prev, filteredTweets[index]]);
-          setProgress(75 + (index + 1) / filteredTweets.length * 25);
+        if (index < toServe.length) {
+          setFinalTweets((prev) => [...prev, toServe[index]]);
+          setProgress(75 + (index + 1) / toServe.length * 25);
           index++;
           timeout = setTimeout(serveTweet, 300);
         } else {
@@ -308,7 +319,7 @@ export default function ExplorePage() {
     }
 
     return () => clearTimeout(timeout);
-  }, [isPlaying, animationPhase, rankedTweets, filteredTweets]);
+  }, [isPlaying, animationPhase]);
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
