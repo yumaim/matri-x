@@ -15,6 +15,9 @@ import {
   AlertTriangle,
   CheckCircle,
   Info,
+  ExternalLink,
+  Zap,
+  Activity,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,58 +31,101 @@ import { cn } from "@/lib/utils";
 
 const engagementWeights = [
   {
-    action: "リプライ + 著者リプライ",
-    weight: 150,
+    action: "リプライ + 著者が返信",
+    weight: 75.0,
     icon: MessageSquare,
     color: "#1d9bf0",
-    description: "双方向のコミュニケーションが最も高く評価される",
+    description: "双方向会話が最も高く評価。リプライに著者が返信すると発動。いいねの150倍",
+  },
+  {
+    action: "リプライ",
+    weight: 13.5,
+    icon: MessageSquare,
+    color: "#1d9bf0",
+    description: "リプライ単体でもいいねの27倍の重み",
+  },
+  {
+    action: "プロフィール訪問→いいね/リプ",
+    weight: 12.0,
+    icon: Users,
+    color: "#7856ff",
+    description: "プロフィールを開いてからいいねやリプライした場合",
+  },
+  {
+    action: "会話クリック→リプ/いいね",
+    weight: 11.0,
+    icon: Eye,
+    color: "#ff7a00",
+    description: "会話スレッドに入ってからエンゲージした場合",
+  },
+  {
+    action: "会話クリック→2分以上滞在",
+    weight: 10.0,
+    icon: Clock,
+    color: "#ff7a00",
+    description: "会話スレッドに2分以上滞在。深い関心の指標",
+  },
+  {
+    action: "リポスト",
+    weight: 1.0,
+    icon: Repeat2,
+    color: "#00ba7c",
+    description: "リポスト（リツイート）。拡散シグナル",
   },
   {
     action: "いいね",
-    weight: 30,
+    weight: 0.5,
     icon: Heart,
     color: "#f91880",
-    description: "基本的なエンゲージメントシグナル",
+    description: "最も弱いポジティブシグナル。多くのSNSコンサルが過大評価",
   },
   {
-    action: "リツイート",
-    weight: 20,
-    icon: Repeat2,
-    color: "#00ba7c",
-    description: "コンテンツの拡散に貢献",
-  },
-  {
-    action: "プロフィールクリック",
-    weight: 12,
-    icon: Users,
+    action: "動画50%以上視聴",
+    weight: 0.005,
+    icon: Video,
     color: "#7856ff",
-    description: "ユーザーへの興味を示す",
+    description: "動画の50%以上を視聴。重みは極めて小さいが計測される",
+  },
+];
+
+const negativeWeights = [
+  {
+    action: "スパム報告",
+    weight: -369.0,
+    icon: AlertTriangle,
+    color: "#ff0000",
+    description: "最大ペナルティ。いいね738個分のマイナス。1件で壊滅的ダメージ",
   },
   {
-    action: "詳細表示",
-    weight: 11,
-    icon: Eye,
-    color: "#f97316",
-    description: "コンテンツへの関心を示す",
-  },
-  {
-    action: "2分以上滞在",
-    weight: 10,
-    icon: Clock,
-    color: "#06b6d4",
-    description: "深いエンゲージメントの証拠",
+    action: "興味なし / ミュート / ブロック",
+    weight: -74.0,
+    icon: AlertTriangle,
+    color: "#ff6600",
+    description: "「興味がない」表示、ミュート、ブロック。いいね148個分のマイナス",
   },
 ];
 
 const chartData = engagementWeights.map((item) => ({
-  name: item.action.replace(" + 著者リプライ", ""),
+  name: item.action,
   weight: item.weight,
+  fill: item.color,
+}));
+
+const negativeChartData = negativeWeights.map((item) => ({
+  name: item.action,
+  weight: Math.abs(item.weight),
   fill: item.color,
 }));
 
 const chartConfig = {
   weight: {
     label: "重み付け",
+  },
+};
+
+const negativeChartConfig = {
+  weight: {
+    label: "ペナルティ",
   },
 };
 
@@ -91,53 +137,30 @@ const mediaBoosts = [
   { type: "テキストのみ", icon: FileText, boost: 1.0, color: "bg-muted", textColor: "text-muted-foreground" },
 ];
 
-const negativeSignals = [
-  {
-    action: "ミュート",
-    impact: "-74x",
-    description: "ユーザーがあなたをミュートした場合",
-  },
-  {
-    action: "ブロック",
-    impact: "-100x",
-    description: "ユーザーがあなたをブロックした場合",
-  },
-  {
-    action: "スパム報告",
-    impact: "-200x",
-    description: "スパムとして報告された場合",
-  },
-  {
-    action: "フォロー解除後の非表示",
-    impact: "-50x",
-    description: "「この投稿を見せない」を選択された場合",
-  },
-];
-
 const tips = [
   {
     title: "リプライを促す質問で締めくくる",
-    description: "投稿の最後に質問を入れることで、リプライを促進",
+    description: "投稿の最後に質問を入れることで、リプライ(13.5x)を促進。著者が返信すれば75xに跳ね上がる",
     impact: "高",
   },
   {
-    title: "動画コンテンツを活用",
-    description: "3倍のブースト効果、最初の3秒が勝負",
+    title: "投稿後30分が勝負",
+    description: "リアルタイム特徴量の集計ウィンドウは30分。初速で全てが決まる",
     impact: "高",
   },
   {
-    title: "著者リプライに返信する",
-    description: "150xの重み付けを活かした双方向コミュニケーション",
+    title: "全てのリプライに返信する",
+    description: "75.0xの重み付けを活かした双方向コミュニケーション。いいね150個分",
     impact: "高",
   },
   {
-    title: "投稿時間を最適化",
-    description: "フォロワーのアクティブ時間帯に合わせる",
-    impact: "中",
+    title: "スパム報告を絶対に避ける",
+    description: "1件のスパム報告(-369.0)はいいね738個分を打ち消す。壊滅的ダメージ",
+    impact: "高",
   },
   {
     title: "スレッド形式を活用",
-    description: "滞在時間を増やし、エンゲージメントを促進",
+    description: "滞在時間(10.0x)と会話クリック(11.0x)を同時に獲得",
     impact: "中",
   },
 ];
@@ -148,18 +171,19 @@ export default function EngagementPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
-          エンゲージメント分析
+          エンゲージメント重み付け
         </h1>
         <p className="mt-1 text-muted-foreground">
-          各アクションの重み付けと最適化戦略を理解しましょう
+          Heavy Rankerの公式エンゲージメント重み付け — ソースコードから判明した実際の数値
         </p>
       </div>
 
       <Tabs defaultValue="weights" className="space-y-6">
         <TabsList className="glass">
           <TabsTrigger value="weights">重み付け</TabsTrigger>
-          <TabsTrigger value="media">メディアブースト</TabsTrigger>
           <TabsTrigger value="negative">ネガティブシグナル</TabsTrigger>
+          <TabsTrigger value="velocity">加速度</TabsTrigger>
+          <TabsTrigger value="media">メディアブースト</TabsTrigger>
           <TabsTrigger value="tips">最適化Tips</TabsTrigger>
         </TabsList>
 
@@ -175,14 +199,14 @@ export default function EngagementPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={chartConfig} className="h-[300px]">
+                <ChartContainer config={chartConfig} className="h-[350px]">
                   <BarChart data={chartData} layout="vertical">
                     <XAxis type="number" />
                     <YAxis
                       type="category"
                       dataKey="name"
-                      width={100}
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                      width={160}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
                     />
                     <ChartTooltip
                       content={<ChartTooltipContent />}
@@ -203,7 +227,7 @@ export default function EngagementPage() {
               <CardHeader>
                 <CardTitle className="text-lg">重み付け詳細</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 {engagementWeights.map((item) => (
                   <div
                     key={item.action}
@@ -249,12 +273,219 @@ export default function EngagementPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">
-                    リプライが最も重要
+                    リプライ + 著者返信が最も重要
                   </h3>
                   <p className="mt-2 text-muted-foreground">
-                    リプライと著者リプライの組み合わせは、いいねの5倍(150x vs 30x)の重み付けを持ちます。
-                    これは、Xが双方向のコミュニケーションを最も価値あるエンゲージメントと見なしていることを示しています。
-                    コンテンツ戦略では、リプライを促すような投稿を心がけましょう。
+                    リプライに著者が返信した場合の重み(75.0x)は、いいね(0.5x)の<span className="font-bold text-primary">150倍</span>です。
+                    リプライ単体(13.5x)でもいいねの27倍。一方、多くのSNSコンサルが重視する「いいね」は
+                    実質的に最も弱いシグナル(0.5x)に過ぎません。
+                    コンテンツ戦略では、リプライを促し、全てのリプライに返信することが最重要です。
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Negative Signals Tab */}
+        <TabsContent value="negative" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Negative Chart */}
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  ネガティブシグナル — ペナルティ規模
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={negativeChartConfig} className="h-[200px]">
+                  <BarChart data={negativeChartData} layout="vertical">
+                    <XAxis type="number" />
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      width={180}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+                    />
+                    <ChartTooltip
+                      content={<ChartTooltipContent />}
+                      cursor={{ fill: "hsl(var(--muted))" }}
+                    />
+                    <Bar dataKey="weight" radius={[0, 4, 4, 0]}>
+                      {negativeChartData.map((entry, index) => (
+                        <Cell key={`neg-cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+
+            {/* Negative Weight Details */}
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle className="text-lg">ネガティブシグナル詳細</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {negativeWeights.map((item) => (
+                  <div
+                    key={item.action}
+                    className="rounded-xl border border-destructive/30 bg-destructive/5 p-6"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+                        style={{ backgroundColor: `${item.color}20` }}
+                      >
+                        <item.icon
+                          className="h-5 w-5"
+                          style={{ color: item.color }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-foreground">
+                            {item.action}
+                          </h4>
+                          <span
+                            className="text-2xl font-bold"
+                            style={{ color: item.color }}
+                          >
+                            {item.weight}x
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Comparison */}
+          <Card className="glass border-orange-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0 text-orange-500" />
+                <div>
+                  <h4 className="font-semibold text-foreground">
+                    ペナルティの破壊力
+                  </h4>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    スパム報告1件(<span className="font-bold text-red-500">-369.0</span>)を取り消すには、
+                    いいね<span className="font-bold">738個</span>が必要。
+                    「興味なし」1件(<span className="font-bold text-orange-500">-74.0</span>)にはいいね<span className="font-bold">148個</span>。
+                    ネガティブシグナルはポジティブシグナルの数百倍のインパクトがあるため、
+                    スパム的な行動やフォロワーを不快にさせるコンテンツは絶対に避けてください。
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Velocity Tab */}
+        <TabsContent value="velocity" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* 30分ウィンドウ */}
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-yellow-500" />
+                  投稿後30分のリアルタイム集計
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="rounded-xl bg-yellow-500/10 border border-yellow-500/30 p-4">
+                  <h4 className="font-semibold text-foreground text-sm">author_aggregate real_time</h4>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Heavy Rankerは投稿後のエンゲージメントを<span className="font-bold text-yellow-500">リアルタイム集計ウィンドウ</span>で計測。
+                    この集計は直近のエンゲージメント速度を捉える特徴量として使われます。
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <div className="rounded-lg bg-muted/50 p-4">
+                    <h4 className="font-medium text-foreground text-sm">⏱️ 30分集計の仕組み</h4>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      投稿後30分間のエンゲージメント（リプライ、いいね、リポスト等）がリアルタイムで集計され、
+                      スコアリングに直接反映されます。この時間帯のパフォーマンスが初期配信範囲を決定します。
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-muted/50 p-4">
+                    <h4 className="font-medium text-foreground text-sm">🚀 初速が全てを決める理由</h4>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      初回配信のスコアが低いと、以降の配信対象が縮小。30分以内にリプライ(13.5x)や
+                      著者返信(75.0x)を獲得できるかが、投稿のリーチを指数関数的に変える。
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 加速度の概念 */}
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-accent" />
+                  加速度 — バイラルの方程式
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="rounded-xl bg-accent/10 border border-accent/30 p-4">
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground mb-1">バイラル速度の定義</p>
+                    <p className="text-xl font-mono font-bold text-accent">
+                      velocity = ΔEngagement / Δtime
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="rounded-lg bg-muted/50 p-4">
+                    <h4 className="font-medium text-foreground text-sm">📈 velocityとは</h4>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      単位時間あたりのエンゲージメント増加量。重み付きスコア(リプライ=13.5x, いいね=0.5x等)の
+                      合計が短時間で急増すると、velocityが高くなります。
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-muted/50 p-4">
+                    <h4 className="font-medium text-foreground text-sm">⚡ 加速度が高い投稿がバイラルになる仕組み</h4>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      velocityが高い → 配信範囲が拡大 → さらにエンゲージメントが増加 → velocityがさらに上昇。
+                      この正のフィードバックループが「バイラル」の正体。30分以内にリプライの連鎖を生み出すことが鍵。
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-muted/50 p-4">
+                    <h4 className="font-medium text-foreground text-sm">🎯 実践的なアクション</h4>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      投稿直後に自分からリプライに返信(75.0x)し、会話を生み出す。
+                      フォロワーのアクティブ時間帯に投稿し、初速のリプライ数を最大化する。
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Velocity Summary */}
+          <Card className="glass border-yellow-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-yellow-500/10">
+                  <Zap className="h-6 w-6 text-yellow-500" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">
+                    まとめ: 30分ルール
+                  </h3>
+                  <p className="mt-2 text-muted-foreground">
+                    投稿の運命は最初の<span className="font-bold text-yellow-500">30分</span>で決まる。
+                    この間に<span className="font-bold text-primary">リプライの連鎖</span>を作り、
+                    <span className="font-bold text-accent">velocity</span>を最大化することがバイラルへの唯一の道。
+                    いいね(0.5x)を100個集めるより、リプライ+著者返信(75.0x)を2件獲得する方が3倍効果的。
                   </p>
                 </div>
               </div>
@@ -326,56 +557,6 @@ export default function EngagementPage() {
           </Card>
         </TabsContent>
 
-        {/* Negative Signals Tab */}
-        <TabsContent value="negative" className="space-y-6">
-          <Card className="glass">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-destructive" />
-                ネガティブシグナル
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {negativeSignals.map((signal) => (
-                  <div
-                    key={signal.action}
-                    className="rounded-xl border border-destructive/30 bg-destructive/5 p-6"
-                  >
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-semibold text-foreground">
-                        {signal.action}
-                      </h4>
-                      <span className="text-2xl font-bold text-destructive">
-                        {signal.impact}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {signal.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 rounded-xl bg-orange-500/10 p-6 border border-orange-500/30">
-                <div className="flex items-start gap-4">
-                  <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0 text-orange-500" />
-                  <div>
-                    <h4 className="font-semibold text-foreground">
-                      90日ルールに注意
-                    </h4>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      90日以上非アクティブなアカウントからのエンゲージメントは、
-                      スコア計算から除外されます。また、新規アカウント(作成から90日未満)は
-                      スコアにペナルティが適用される場合があります。
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
         {/* Tips Tab */}
         <TabsContent value="tips" className="space-y-6">
           <Card className="glass">
@@ -433,9 +614,9 @@ export default function EngagementPage() {
                     まとめ: エンゲージメント最大化の公式
                   </h3>
                   <p className="mt-2 text-muted-foreground">
-                    <span className="font-semibold text-primary">動画/画像</span> +{" "}
-                    <span className="font-semibold text-accent">質問で締める</span> +{" "}
-                    <span className="font-semibold text-[#00ba7c]">著者リプライに返信</span> ={" "}
+                    <span className="font-semibold text-primary">質問で締めてリプライを促す</span> +{" "}
+                    <span className="font-semibold text-accent">全てのリプライに著者返信(75.0x)</span> +{" "}
+                    <span className="font-semibold text-yellow-500">投稿後30分以内に初速を最大化</span> ={" "}
                     <span className="font-bold text-foreground">最大エンゲージメント</span>
                   </p>
                 </div>
@@ -444,6 +625,39 @@ export default function EngagementPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Source Code Reference — always visible */}
+      <Card className="glass border-muted">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted">
+              <ExternalLink className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">
+                ソースコード出典
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                このページのエンゲージメント重み付けは、Xが公開したHeavy Rankerのソースコードに基づいています。
+              </p>
+              <div className="mt-3 space-y-1">
+                <a
+                  href="https://github.com/twitter/the-algorithm-ml/blob/main/projects/home/recap/README.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  twitter/the-algorithm-ml — projects/home/recap/README.md
+                </a>
+                <p className="text-xs text-muted-foreground">
+                  scored_tweets_model_weight_* パラメータより抽出
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
