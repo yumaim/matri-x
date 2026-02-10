@@ -76,22 +76,22 @@ const stats = [
 
 const recentUpdates = [
   {
-    title: "リプライの重み付けが調整されました",
-    date: "2025年2月3日",
+    title: "X API 従量課金（Pay-Per-Use）に移行",
+    date: "2026年2月1日",
     impact: "HIGH",
-    description: "著者リプライの重み付けが150xから140xに変更",
+    description: "月額サブスク廃止。Analytics APIの一般開放、Activity Stream追加",
   },
   {
-    title: "SimClustersの更新サイクル変更",
-    date: "2025年2月1日",
-    impact: "MEDIUM",
-    description: "クラスタ更新が週次から日次に変更",
+    title: "加速度（Velocity）重視の強化",
+    date: "2025年12月15日",
+    impact: "HIGH",
+    description: "投稿後30分のリアルタイム特徴量ウィンドウの影響力が拡大",
   },
   {
-    title: "新しいTrust & Safetyフィルター追加",
-    date: "2025年1月28日",
-    impact: "LOW",
-    description: "スパム検出の精度が向上",
+    title: "Grok AIがコンテンツ品質評価に統合",
+    date: "2025年10月1日",
+    impact: "HIGH",
+    description: "ツイートの品質を事前スコアリングし、初期表示の母数を調整",
   },
 ];
 
@@ -225,10 +225,12 @@ export default function DashboardPage() {
                 <Progress value={item.progress} className="h-2" />
               </div>
             ))}
-            <Button variant="outline" className="mt-4 w-full bg-transparent">
-              学習を続ける
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            <Link href="/dashboard/explore">
+              <Button variant="outline" className="mt-4 w-full bg-transparent">
+                学習を続ける
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 
@@ -272,10 +274,12 @@ export default function DashboardPage() {
                 </div>
               </div>
             ))}
-            <Button variant="outline" className="w-full bg-transparent">
-              すべての更新を見る
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            <Link href="/dashboard/updates">
+              <Button variant="outline" className="w-full bg-transparent">
+                すべての更新を見る
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

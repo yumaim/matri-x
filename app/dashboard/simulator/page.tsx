@@ -68,7 +68,7 @@ function calculateTweepCred(inputs: SimulatorInputs): number {
     : 0;
   
   const engagementScore = Math.min(
-    ((inputs.avgLikes * 30 + inputs.avgReplies * 150 + inputs.avgRetweets * 20) / 
+    ((inputs.avgLikes * 0.5 + inputs.avgReplies * 13.5 + inputs.avgRetweets * 1.0) / 
     Math.max(inputs.followers, 1)) * 100,
     1
   );
