@@ -79,12 +79,14 @@ const features = [
 ];
 
 const engagementWeights = [
-  { action: "リプライ", weight: "150x", color: "bg-primary" },
-  { action: "いいね", weight: "30x", color: "bg-accent" },
-  { action: "リツイート", weight: "20x", color: "bg-[#00ba7c]" },
-  { action: "プロフィールクリック", weight: "12x", color: "bg-orange-500" },
-  { action: "詳細表示", weight: "11x", color: "bg-pink-500" },
-  { action: "滞在時間(>2min)", weight: "加点", color: "bg-cyan-500" },
+  { action: "リプライ + 著者返信", weight: "75.0", color: "bg-primary" },
+  { action: "リプライ", weight: "13.5", color: "bg-primary/80" },
+  { action: "プロフィール→EG", weight: "12.0", color: "bg-orange-500" },
+  { action: "会話クリック→EG", weight: "11.0", color: "bg-[#00ba7c]" },
+  { action: "2分以上滞在", weight: "10.0", color: "bg-cyan-500" },
+  { action: "リポスト", weight: "1.0", color: "bg-accent" },
+  { action: "いいね", weight: "0.5", color: "bg-pink-500" },
+  { action: "スパム報告", weight: "-369", color: "bg-red-600" },
 ];
 
 const pricingPlans = [
@@ -406,18 +408,7 @@ function EngagementSection() {
                 <div
                   className={`h-2 rounded-full ${item.color}`}
                   style={{
-                    width:
-                      item.weight === "150x"
-                        ? "100%"
-                        : item.weight === "30x"
-                          ? "60%"
-                          : item.weight === "20x"
-                            ? "45%"
-                            : item.weight === "12x"
-                              ? "35%"
-                              : item.weight === "11x"
-                                ? "30%"
-                                : "25%",
+                    width: `${Math.max(5, Math.min(100, (Math.abs(parseFloat(item.weight)) / 75) * 100))}%`,
                   }}
                 />
               </div>
