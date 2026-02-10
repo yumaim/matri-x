@@ -37,6 +37,9 @@ const categories = [
   { id: "all", name: "すべて", icon: MessageCircle },
   { id: "ALGORITHM", name: "アルゴリズム解説", icon: BookOpen },
   { id: "VERIFICATION", name: "現場検証", icon: FlaskConical },
+  { id: "HEAVY_RANKER", name: "Heavy Ranker", icon: TrendingUp },
+  { id: "SIMCLUSTERS", name: "SimClusters", icon: Users },
+  { id: "TWEEPCRED", name: "TweepCred", icon: Award },
   { id: "STRATEGY", name: "戦略・Tips", icon: TrendingUp },
   { id: "UPDATES", name: "最新アップデート", icon: Flame },
   { id: "QUESTIONS", name: "質問・相談", icon: HelpCircle },
@@ -339,6 +342,69 @@ export default function ForumPage() {
             </CardContent>
           </Card>
 
+          {/* Verification Report Template */}
+          <Card className="bg-card/50 border-border/50 border-l-4 border-l-accent">
+            <CardContent className="p-4">
+              <h4 className="font-medium text-foreground text-sm flex items-center gap-2">
+                <FlaskConical className="h-4 w-4 text-accent" />
+                検証レポートテンプレート
+              </h4>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Before/Afterデータ付きの検証レポートを投稿する際のテンプレートです。
+              </p>
+              <div className="mt-3 rounded-lg bg-muted/30 p-3 text-xs font-mono text-muted-foreground space-y-1.5">
+                <p className="text-foreground font-semibold">📋 テンプレート:</p>
+                <p>【仮説】何をテストしたか</p>
+                <p>【期間】検証期間</p>
+                <p>【Before】変更前の数値</p>
+                <p>【After】変更後の数値</p>
+                <p>【変化率】imp/EG率の変動</p>
+                <p>【結論】仮説は正しかったか</p>
+                <p>【スクショ】アナリティクス画像</p>
+              </div>
+              <Link href="/dashboard/forum/new">
+                <Button variant="outline" size="sm" className="mt-3 w-full bg-transparent text-xs gap-1">
+                  <Plus className="h-3 w-3" />
+                  テンプレで投稿する
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Trending Tags */}
+          <Card className="bg-card/50 border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Flame className="h-4 w-4 text-orange-500" />
+                トレンドタグ
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "Heavy Ranker",
+                  "リプライ重み",
+                  "初速30分",
+                  "TweepCred",
+                  "SimClusters",
+                  "ネガティブFB",
+                  "フォロー比率",
+                  "Grok評価",
+                  "加速度",
+                  "Out-of-Network",
+                ].map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-primary/20 transition-colors text-xs"
+                  >
+                    #{tag}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Guidelines */}
           <Card className="bg-card/50 border-border/50 border-l-4 border-l-primary">
             <CardContent className="p-4">
@@ -361,6 +427,10 @@ export default function ForumPage() {
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-0.5">•</span>
                   検証データを添えると信頼性が上がります
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">•</span>
+                  Before/Afterデータ付きレポートが最も評価されます
                 </li>
               </ul>
             </CardContent>
