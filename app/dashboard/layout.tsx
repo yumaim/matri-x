@@ -228,13 +228,10 @@ function SidebarContent({
   return (
     <>
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2 px-4 border-b border-border">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary shrink-0">
-          <Zap className="h-5 w-5 text-primary-foreground" />
-        </div>
-        {!collapsed && (
-          <span className="text-xl font-bold text-gradient">Matri-X</span>
-        )}
+      <div className="flex h-16 items-center px-4 border-b border-border">
+        <span className={cn("font-bold text-gradient", collapsed ? "text-lg" : "text-xl")}>
+          {collapsed ? "MX" : "Matri-X"}
+        </span>
       </div>
 
       {/* Navigation */}
@@ -387,9 +384,6 @@ export default function DashboardLayout({
               </div>
             </SheetContent>
           </Sheet>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Zap className="h-4 w-4 text-primary-foreground" />
-          </div>
           <span className="text-lg font-bold text-gradient">Matri-X</span>
         </div>
         <div className="flex items-center gap-2">

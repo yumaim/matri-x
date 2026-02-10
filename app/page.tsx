@@ -494,20 +494,25 @@ function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <Zap className="h-4 w-4 text-primary-foreground" />
-            </div>
             <span className="text-lg font-bold text-gradient">Matri-X</span>
           </div>
           <div className="flex items-center gap-6">
-            <span className="text-sm text-muted-foreground/50">
-              利用規約（準備中）
-            </span>
-            <span className="text-sm text-muted-foreground/50">
-              プライバシー（準備中）
-            </span>
             <Link
-              href="mailto:info@matri-x-algo.wiki"
+              href="/terms"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              利用規約
+            </Link>
+            <Link
+              href="/privacy"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              プライバシー
+            </Link>
+            <Link
+              href="https://tally.so/r/wA6o1z"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
               お問い合わせ
