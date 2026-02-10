@@ -146,3 +146,15 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* CSS-only mobile menu toggle */
+#mobile-menu-toggle:checked ~ .mobile-menu-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+#mobile-menu-toggle:checked ~ .mobile-menu-overlay > div:last-child {
+  transform: translateX(0);
+}
+#mobile-menu-toggle:checked ~ header {
+  z-index: 40;
+}
