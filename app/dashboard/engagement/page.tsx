@@ -200,13 +200,13 @@ export default function EngagementPage() {
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-[350px] w-full overflow-hidden">
-                  <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 20, top: 5, bottom: 5 }}>
-                    <XAxis type="number" domain={[0, 'auto']} />
+                  <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
+                    <XAxis type="number" domain={[0, 80]} tickCount={5} />
                     <YAxis
                       type="category"
                       dataKey="name"
-                      width={140}
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                      width={100}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 9 }}
                     />
                     <ChartTooltip
                       content={<ChartTooltipContent />}

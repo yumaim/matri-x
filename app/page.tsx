@@ -469,7 +469,7 @@ function PricingSection() {
               key={plan.name}
               className={`glass rounded-3xl p-8 transition-all flex flex-col ${
                 plan.popular
-                  ? "ring-2 ring-primary glow-primary scale-105"
+                  ? "ring-2 ring-primary glow-primary lg:scale-105"
                   : "hover:glow-accent"
               }`}
             >
