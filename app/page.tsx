@@ -29,10 +29,10 @@ const navigation = [
 ];
 
 const stats = [
-  { value: "10,000+", label: "アクティブユーザー" },
-  { value: "95%", label: "アルゴリズム理解度向上" },
-  { value: "150x", label: "エンゲージメント重み付け" },
-  { value: "24時間", label: "最新情報を反映" },
+  { value: "6,000+", label: "分析対象の特徴量" },
+  { value: "75.0", label: "最強エンゲージメント重み" },
+  { value: "145K", label: "SimClustersコミュニティ" },
+  { value: "30分", label: "初速ウィンドウ" },
 ];
 
 const features = [
