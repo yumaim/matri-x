@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   Flame,
   Target,
+  Lock,
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -91,6 +92,7 @@ interface ProgressData {
     icon: string;
     xp: number;
     unlocked: boolean;
+    tier: string;
   }>;
   learningTopics: Array<{
     id: string;
@@ -98,6 +100,7 @@ interface ProgressData {
     description: string;
     completed: boolean;
     viewCount: number;
+    plan: string;
   }>;
   stats: {
     postCount: number;
@@ -305,27 +308,40 @@ export default function DashboardPage() {
                 className={`flex items-center gap-3 rounded-lg p-3 transition-colors ${
                   topic.completed
                     ? "bg-primary/5 border border-primary/20"
-                    : "bg-muted/50 hover:bg-muted"
+                    : topic.plan === "STANDARD"
+                      ? "bg-muted/30 opacity-70"
+                      : "bg-muted/50 hover:bg-muted"
                 }`}
               >
                 <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
                   topic.completed
                     ? "bg-primary text-white"
-                    : "bg-muted-foreground/10 text-muted-foreground"
+                    : topic.plan === "STANDARD"
+                      ? "bg-yellow-500/10 text-yellow-500"
+                      : "bg-muted-foreground/10 text-muted-foreground"
                 }`}>
                   {topic.completed ? (
                     <CheckCircle2 className="h-4 w-4" />
+                  ) : topic.plan === "STANDARD" ? (
+                    <Lock className="h-3.5 w-3.5" />
                   ) : (
                     <span className="text-xs font-medium">{topic.viewCount}</span>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium ${topic.completed ? "text-primary" : "text-foreground"}`}>
-                    {topic.name}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <p className={`text-sm font-medium ${topic.completed ? "text-primary" : "text-foreground"}`}>
+                      {topic.name}
+                    </p>
+                    {topic.plan === "STANDARD" && (
+                      <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-yellow-500/40 text-yellow-500">
+                        Standard
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground truncate">{topic.description}</p>
                 </div>
-                {topic.viewCount > 0 && !topic.completed && (
+                {topic.viewCount > 0 && !topic.completed && topic.plan !== "STANDARD" && (
                   <span className="text-xs text-muted-foreground">{topic.viewCount}回閲覧</span>
                 )}
               </div>
@@ -353,14 +369,20 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-2">
-              {progressData?.achievements.map((achievement) => (
+              {progressData?.achievements.map((achievement) => {
+                const tierColor = achievement.tier === "gold"
+                  ? "border-yellow-500/40 bg-yellow-500/5"
+                  : achievement.tier === "silver"
+                    ? "border-slate-400/40 bg-slate-400/5"
+                    : "border-amber-700/30 bg-amber-700/5";
+                return (
                 <div
                   key={achievement.id}
                   className={`flex items-center gap-2.5 rounded-lg p-3 transition-all ${
                     achievement.unlocked
-                      ? "bg-yellow-500/5 border border-yellow-500/20"
-                      : "bg-muted/30 opacity-50"
-                  }`}
+                      ? `${tierColor}`
+                      : "bg-muted/30 opacity-40 border border-transparent"
+                  } ${achievement.unlocked ? "border" : ""}`}
                 >
                   <span className={`text-xl ${!achievement.unlocked && "grayscale"}`}>
                     {achievement.icon}
@@ -372,12 +394,17 @@ export default function DashboardPage() {
                     <p className="text-[10px] text-muted-foreground truncate">
                       {achievement.description}
                     </p>
-                    <p className="text-[10px] text-yellow-500 font-medium">
+                    <p className={`text-[10px] font-medium ${
+                      achievement.tier === "gold" ? "text-yellow-500" 
+                        : achievement.tier === "silver" ? "text-slate-400" 
+                        : "text-amber-700"
+                    }`}>
                       +{achievement.xp} XP
                     </p>
                   </div>
                 </div>
-              )) ?? (
+                );
+              }) ?? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="h-20 animate-pulse rounded-lg bg-muted/30" />
                 ))
