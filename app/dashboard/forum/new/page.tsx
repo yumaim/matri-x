@@ -26,10 +26,14 @@ import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
   { value: "ALGORITHM", label: "アルゴリズム解説" },
-  { value: "VERIFICATION", label: "現場検証" },
   { value: "STRATEGY", label: "戦略・Tips" },
   { value: "UPDATES", label: "最新アップデート" },
+  { value: "BUGS", label: "不具合・エラー" },
   { value: "QUESTIONS", label: "質問・相談" },
+  { value: "VERIFICATION", label: "現場検証" },
+  { value: "HEAVY_RANKER", label: "Heavy Ranker" },
+  { value: "SIMCLUSTERS", label: "SimClusters" },
+  { value: "TWEEPCRED", label: "TweepCred" },
 ];
 
 export default function NewPostPage() {

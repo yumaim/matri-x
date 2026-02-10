@@ -18,6 +18,7 @@ import {
   ArrowUpDown,
   Loader2,
   Users,
+  AlertCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,13 +38,14 @@ import { cn } from "@/lib/utils";
 const categories = [
   { id: "all", name: "すべて", icon: MessageCircle },
   { id: "ALGORITHM", name: "アルゴリズム解説", icon: BookOpen },
+  { id: "STRATEGY", name: "戦略・Tips", icon: TrendingUp },
+  { id: "UPDATES", name: "最新アップデート", icon: Flame },
+  { id: "BUGS", name: "不具合・エラー", icon: AlertCircle },
+  { id: "QUESTIONS", name: "質問・相談", icon: HelpCircle },
   { id: "VERIFICATION", name: "現場検証", icon: FlaskConical },
   { id: "HEAVY_RANKER", name: "Heavy Ranker", icon: TrendingUp },
   { id: "SIMCLUSTERS", name: "SimClusters", icon: Users },
   { id: "TWEEPCRED", name: "TweepCred", icon: Award },
-  { id: "STRATEGY", name: "戦略・Tips", icon: TrendingUp },
-  { id: "UPDATES", name: "最新アップデート", icon: Flame },
-  { id: "QUESTIONS", name: "質問・相談", icon: HelpCircle },
 ];
 
 const sortOptions = [
