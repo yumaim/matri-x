@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Menu,
@@ -94,44 +94,45 @@ const pricingPlans = [
   {
     name: "Free",
     price: "¥0",
-    description: "アルゴリズムの基本を学びたい方",
+    description: "今なら全機能が無料で使えます",
     features: [
-      "パイプライン概要閲覧",
-      "基本的な重み付け表",
-      "週1回の更新通知",
+      "パイプライン完全探索",
+      "エンゲージメント重み付け分析",
+      "TweepCredシミュレーター",
+      "検証コミュニティ参加",
+      "アルゴリズム更新通知",
     ],
-    cta: "無料で始める",
-    popular: false,
+    cta: "今すぐ無料で始める",
+    popular: true,
     comingSoon: false,
   },
   {
     name: "Standard",
-    price: "¥980",
-    period: "/月",
-    description: "本格的に学びたいマーケター・クリエイター",
+    price: "—",
+    period: "",
+    description: "より深い分析機能を準備中",
     features: [
-      "全機能アクセス",
-      "TweepCredシミュレーター",
-      "SimClusters詳細解説",
-      "Deep AI検索(月50回)",
-      "リアルタイム更新通知",
+      "Free全機能",
+      "Deep AI検索",
+      "高度なシミュレーション",
+      "カスタムレポート",
+      "優先サポート",
     ],
     cta: "Coming Soon",
-    popular: true,
+    popular: false,
     comingSoon: true,
   },
   {
     name: "Pro",
-    price: "¥2,980",
-    period: "/月",
-    description: "チームや代理店向けの高度な分析",
+    price: "—",
+    period: "",
+    description: "チーム・代理店向けの高度な分析",
     features: [
       "Standard全機能",
-      "Deep AI検索(無制限)",
       "API アクセス",
       "チーム共有機能",
-      "優先サポート",
       "カスタムレポート",
+      "専用サポート",
     ],
     cta: "Coming Soon",
     popular: false,
@@ -229,6 +230,51 @@ function Header() {
   );
 }
 
+const heroLines = [
+  "あなたの投稿が届かない理由、全部わかります",
+  "リプライ1件 = いいね150個分。まだ\"いいね\"を追いかけますか？",
+  "あなたのクライアントが、これで納得します",
+  "ここであなたの理論は、評価され注目されます",
+];
+
+function TypewriterText() {
+  const [lineIndex, setLineIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [displayText, setDisplayText] = useState("");
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const currentLine = heroLines[lineIndex];
+
+    if (!isDeleting && charIndex <= currentLine.length) {
+      timerRef.current = setTimeout(() => {
+        setDisplayText(currentLine.slice(0, charIndex));
+        setCharIndex((c) => c + 1);
+      }, 60);
+    } else if (!isDeleting && charIndex > currentLine.length) {
+      timerRef.current = setTimeout(() => setIsDeleting(true), 2500);
+    } else if (isDeleting && charIndex > 0) {
+      timerRef.current = setTimeout(() => {
+        setCharIndex((c) => c - 1);
+        setDisplayText(currentLine.slice(0, charIndex - 1));
+      }, 30);
+    } else if (isDeleting && charIndex === 0) {
+      setIsDeleting(false);
+      setLineIndex((i) => (i + 1) % heroLines.length);
+    }
+
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [charIndex, isDeleting, lineIndex]);
+
+  return (
+    <span className="text-gradient">
+      {displayText}
+      <span className="animate-pulse text-primary">|</span>
+    </span>
+  );
+}
+
 function HeroSection() {
   return (
     <section className="relative min-h-screen overflow-hidden pt-32 pb-20">
@@ -246,20 +292,18 @@ function HeroSection() {
             </span>
           </div>
 
-          <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-            <span className="text-foreground">Xの推薦アルゴリズムを</span>
-            <br />
-            <span className="text-gradient">完全に理解する</span>
+          <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl min-h-[4.5rem] sm:min-h-[7rem] lg:min-h-[9rem]">
+            <TypewriterText />
           </h1>
 
           <p className="mt-6 text-pretty text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            オープンソース化されたX(旧Twitter)のアルゴリズムを視覚的・動的に学び、
-            あなたのコンテンツ戦略を次のレベルへ引き上げましょう。
+            ソースコードから判明した実際の数値で、Xアルゴリズムの真実を解き明かす。
+            あなたの運用戦略が、根拠に基づいたものに変わります。
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button asChild size="lg" className="glow-primary group"><Link href="/register">無料で始める<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link></Button>
-            <Button asChild size="lg" variant="outline" className="group bg-transparent"><Link href="#pipeline"><Play className="mr-2 h-4 w-4" />デモを見る</Link></Button>
+            <Button asChild size="lg" className="glow-primary group"><Link href="/register">今すぐ無料で始める<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link></Button>
+            <Button asChild size="lg" variant="outline" className="group bg-transparent"><Link href="#features"><Play className="mr-2 h-4 w-4" />アルゴリズムを覗く</Link></Button>
           </div>
         </div>
 

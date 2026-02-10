@@ -151,6 +151,17 @@ const DEFAULT_PROGRESS: ProgressData = {
   newAchievements: [],
 };
 
+const TOPIC_LINKS: Record<string, string> = {
+  pipeline: "/dashboard/explore",
+  engagement: "/dashboard/engagement",
+  velocity: "/dashboard/engagement",
+  filters: "/dashboard/explore",
+  heavy_ranker: "/dashboard/explore",
+  tweepcred: "/dashboard/simulator",
+  simclusters: "/dashboard/explore",
+  grok: "/dashboard/updates",
+};
+
 export default function DashboardPage() {
   const [progressData, setProgressData] = useState<ProgressData>(DEFAULT_PROGRESS);
   const [isLoading, setIsLoading] = useState(true);
@@ -337,13 +348,17 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {progressData.learningTopics.map((topic) => (
-              <div
+              <Link
                 key={topic.id}
-                className={`flex items-center gap-3 rounded-lg p-3 transition-colors ${
+                href={topic.plan === "STANDARD" ? "#" : (TOPIC_LINKS[topic.id] ?? "#")}
+                className="block"
+              >
+              <div
+                className={`flex items-center gap-3 rounded-lg p-3 transition-colors cursor-pointer ${
                   topic.completed
                     ? "bg-primary/5 border border-primary/20"
                     : topic.plan === "STANDARD"
-                      ? "bg-muted/30 opacity-70"
+                      ? "bg-muted/30 opacity-70 cursor-not-allowed"
                       : "bg-muted/50 hover:bg-muted"
                 }`}
               >
@@ -379,6 +394,7 @@ export default function DashboardPage() {
                   <span className="text-xs text-muted-foreground">{topic.viewCount}回閲覧</span>
                 )}
               </div>
+              </Link>
             ))}
             <Link href="/dashboard/explore">
               <Button variant="outline" className="mt-2 w-full bg-transparent">
