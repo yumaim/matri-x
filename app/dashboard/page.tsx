@@ -48,7 +48,6 @@ const quickActions = [
     href: "/dashboard/engagement",
     icon: BarChart3,
     color: "bg-[#00ba7c]",
-    paid: true,
   },
   {
     title: "DeepWiki AI検索",
