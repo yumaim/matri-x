@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { updatePostSchema } from "@/lib/validations/forum";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -54,11 +55,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "投稿が見つかりません" }, { status: 404 });
     }
 
-    // Increment view count
-    await prisma.forumPost.update({
-      where: { id },
-      data: { viewCount: { increment: 1 } },
-    });
+    // Increment view count (debounced per user per post, 5 min window)
+    const viewKey = `view:${session?.user?.id ?? "anon"}:${id}`;
+    const { allowed: viewAllowed } = checkRateLimit(viewKey, 1, 300000);
+    if (viewAllowed) {
+      await prisma.forumPost.update({
+        where: { id },
+        data: { viewCount: { increment: 1 } },
+      });
+    }
 
     // Get vote score
     const voteSum = await prisma.vote.aggregate({

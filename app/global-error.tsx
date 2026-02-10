@@ -12,9 +12,6 @@ export default function GlobalError({
       <body style={{ fontFamily: "sans-serif", padding: 40, background: "#0a0a0a", color: "#fff" }}>
         <h2>エラーが発生しました</h2>
         <p style={{ color: "#888" }}>{error.message}</p>
-        <pre style={{ fontSize: 12, color: "#666", whiteSpace: "pre-wrap", maxWidth: 600 }}>
-          {error.stack}
-        </pre>
         <button
           onClick={() => reset()}
           style={{

@@ -40,7 +40,7 @@ export async function GET(
     },
   });
 
-  if (!post) {
+  if (!post || post.status !== "PUBLISHED") {
     return new Response("Not found", { status: 404 });
   }
 

@@ -5,13 +5,17 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Admin user
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD;
+  if (!adminPassword) {
+    throw new Error("ADMIN_SEED_PASSWORD environment variable is required for seeding");
+  }
   const admin = await prisma.user.upsert({
-    where: { email: "admin@matri-x-algo.wiki" },
+    where: { email: process.env.ADMIN_EMAIL || "admin@matri-x-algo.wiki" },
     update: {},
     create: {
-      email: "admin@matri-x-algo.wiki",
+      email: process.env.ADMIN_EMAIL || "admin@matri-x-algo.wiki",
       name: "Matri-X Admin",
-      password: await hash("admin123456", 12),
+      password: await hash(adminPassword, 12),
       role: "ADMIN",
     },
   });

@@ -11,6 +11,17 @@ export const metadata: Metadata = {
   description:
     "Xの推薦アルゴリズムを視覚的・動的に学べる会員制SaaSプラットフォーム",
   generator: "v0.app",
+  openGraph: {
+    title: "Matri-X | X(Twitter)アルゴリズム解析プラットフォーム",
+    description: "Xの推薦アルゴリズムをソースコードレベルで解析。6,000+特徴量、パイプライン可視化、検証コミュニティ。",
+    type: "website",
+    siteName: "Matri-X",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Matri-X | X(Twitter)アルゴリズム解析プラットフォーム",
+    description: "Xの推薦アルゴリズムをソースコードレベルで解析するプラットフォーム",
+  },
 };
 
 export const viewport: Viewport = {

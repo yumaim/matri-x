@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { createPostSchema, postsQuerySchema } from "@/lib/validations/forum";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 // GET /api/forum/posts — 投稿一覧
 export async function GET(request: NextRequest) {
@@ -162,6 +163,11 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { allowed } = checkRateLimit(`post:${session.user.id}`, 10, 60000);
+    if (!allowed) {
+      return NextResponse.json({ error: "リクエストが多すぎます。しばらく待ってから再試行してください。" }, { status: 429 });
     }
 
     const body = await request.json();

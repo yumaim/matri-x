@@ -24,7 +24,7 @@ export function PlanGate({ requiredPlan, children, featureName }: PlanGateProps)
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <>{children}</>;
+  if (loading) return <div className="min-h-[60vh] flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" /></div>;
 
   const planLevel: Record<string, number> = { FREE: 0, STANDARD: 1, PRO: 2 };
   const userLevel = planLevel[plan ?? "FREE"] ?? 0;

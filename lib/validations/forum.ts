@@ -42,7 +42,7 @@ export const createPostSchema = z.object({
     .array(z.string().max(30))
     .max(10, "タグは最大10個まで設定できます")
     .default([]),
-  status: z.enum(POST_STATUSES).default("PUBLISHED"),
+  status: z.enum(["DRAFT", "PUBLISHED"] as const).default("PUBLISHED"),
 });
 
 export const updatePostSchema = createPostSchema.partial();
