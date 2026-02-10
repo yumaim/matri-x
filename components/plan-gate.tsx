@@ -35,13 +35,13 @@ export function PlanGate({ requiredPlan, children, featureName }: PlanGateProps)
   }
 
   return (
-    <div className="relative">
+    <div className="relative min-h-[60vh]">
       <div className="pointer-events-none select-none opacity-20 blur-[2px]">
         {children}
       </div>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <Card className="glass border-primary/30 max-w-md w-full mx-4">
-          <CardContent className="p-8 text-center">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <Card className="glass border-amber-500/30 max-w-sm w-full shadow-2xl shadow-amber-500/10">
+          <CardContent className="p-6 sm:p-8 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10">
               <Sparkles className="h-8 w-8 text-amber-400 animate-pulse" />
             </div>

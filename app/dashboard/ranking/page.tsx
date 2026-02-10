@@ -487,6 +487,44 @@ export default function RankingPage() {
           </Card>
         </div>
       </div>
+
+      {/* ─── Stats & Ad Placeholder ─────────────────────────────── */}
+      <div className="grid gap-4 sm:grid-cols-3 mt-8">
+        <Card className="bg-card/50 border-border/50">
+          <CardContent className="p-5 text-center">
+            <div className="text-3xl font-bold text-gradient tabular-nums">—</div>
+            <div className="text-sm text-muted-foreground mt-1">登録ユーザー数</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card/50 border-border/50">
+          <CardContent className="p-5 text-center">
+            <div className="text-3xl font-bold text-gradient tabular-nums">—</div>
+            <div className="text-sm text-muted-foreground mt-1">検証レポート数</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card/50 border-border/50">
+          <CardContent className="p-5 text-center">
+            <div className="text-3xl font-bold text-gradient tabular-nums">—</div>
+            <div className="text-sm text-muted-foreground mt-1">コメント数</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Ad Placeholder */}
+      <Card className="bg-card/50 border-border/50 border-dashed mt-6">
+        <CardContent className="p-6 sm:p-8 text-center">
+          <div className="text-muted-foreground/40 text-sm mb-2">📢 広告枠</div>
+          <p className="text-muted-foreground text-sm">
+            matri-xに広告を掲載しませんか？
+          </p>
+          <a
+            href="mailto:info@matri-x-algo.wiki"
+            className="inline-block mt-3 text-sm text-primary hover:text-primary/80 underline underline-offset-4"
+          >
+            お問い合わせはこちら →
+          </a>
+        </CardContent>
+      </Card>
     </div>
   );
 }

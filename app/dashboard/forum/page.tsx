@@ -23,7 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
@@ -97,6 +97,23 @@ export default function ForumPage() {
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
+  const [profileTab, setProfileTab] = useState<"posts" | "bookmarks">("posts");
+  const [myUser, setMyUser] = useState<{ name: string | null; image: string | null; community: string | null; level: number; xp: number; postCount: number; commentCount: number } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/users/me")
+      .then((r) => r.json())
+      .then((data) => setMyUser({
+        name: data.name ?? "匿名",
+        image: data.image ?? null,
+        community: data.community ?? null,
+        level: data.level ?? 1,
+        xp: data.xp ?? 0,
+        postCount: data._count?.posts ?? 0,
+        commentCount: data._count?.comments ?? 0,
+      }))
+      .catch(() => {});
+  }, []);
 
   const fetchPosts = useCallback(
     async (page = 1) => {
@@ -325,28 +342,88 @@ export default function ForumPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* My Activity */}
-          <Card className="bg-card/50 border-border/50 border-l-4 border-l-indigo-500">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Users className="h-4 w-4 text-indigo-400" />
-                マイ アクティビティ
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Link href="/dashboard/forum?filter=my" className="block">
-                <Button variant="outline" size="sm" className="w-full bg-transparent text-xs gap-1.5 justify-start">
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  自分の投稿を見る
-                </Button>
-              </Link>
-              <Link href="/dashboard/forum?filter=bookmarks" className="block">
-                <Button variant="outline" size="sm" className="w-full bg-transparent text-xs gap-1.5 justify-start">
-                  <Bookmark className="h-3.5 w-3.5" />
-                  ブックマーク一覧
-                </Button>
-              </Link>
-              <Link href="/dashboard/forum/new">
+          {/* Profile Preview (X-style) */}
+          <Card className="bg-card/50 border-border/50 overflow-hidden">
+            {/* Banner */}
+            <div className="h-16 bg-gradient-to-r from-indigo-600/40 via-violet-600/40 to-purple-600/40" />
+            <CardContent className="px-4 pb-4 -mt-6">
+              {/* Avatar */}
+              <Avatar className="h-14 w-14 border-4 border-background">
+                {myUser?.image && <AvatarImage src={myUser.image} />}
+                <AvatarFallback className="bg-primary/20 text-primary text-lg font-bold">
+                  {myUser?.name?.[0]?.toUpperCase() ?? "?"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="mt-2">
+                <div className="font-semibold text-foreground text-sm">{myUser?.name ?? "匿名"}</div>
+                {myUser?.community && (
+                  <div className="text-xs text-muted-foreground">@{myUser.community}</div>
+                )}
+              </div>
+              {/* Stats */}
+              <div className="mt-3 flex items-center gap-4 text-xs">
+                <div>
+                  <span className="font-bold text-foreground tabular-nums">{myUser?.postCount ?? 0}</span>
+                  <span className="text-muted-foreground ml-1">投稿</span>
+                </div>
+                <div>
+                  <span className="font-bold text-foreground tabular-nums">{myUser?.commentCount ?? 0}</span>
+                  <span className="text-muted-foreground ml-1">コメント</span>
+                </div>
+                <div>
+                  <span className="font-bold text-foreground tabular-nums">Lv.{myUser?.level ?? 1}</span>
+                </div>
+              </div>
+              {/* Tabs */}
+              <div className="mt-3 flex border-b border-border/50">
+                <button
+                  className={cn(
+                    "flex-1 pb-2 text-xs font-medium transition-colors border-b-2",
+                    profileTab === "posts"
+                      ? "text-primary border-primary"
+                      : "text-muted-foreground border-transparent hover:text-foreground"
+                  )}
+                  onClick={() => setProfileTab("posts")}
+                >
+                  自分の投稿
+                </button>
+                <button
+                  className={cn(
+                    "flex-1 pb-2 text-xs font-medium transition-colors border-b-2",
+                    profileTab === "bookmarks"
+                      ? "text-primary border-primary"
+                      : "text-muted-foreground border-transparent hover:text-foreground"
+                  )}
+                  onClick={() => setProfileTab("bookmarks")}
+                >
+                  ブックマーク
+                </button>
+              </div>
+              {/* Tab Content */}
+              <div className="mt-3 space-y-2">
+                {profileTab === "posts" ? (
+                  <Link href="/dashboard/forum?filter=my">
+                    <Button variant="outline" size="sm" className="w-full bg-transparent text-xs gap-1.5 justify-start">
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      自分の投稿を見る
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/dashboard/forum?filter=bookmarks">
+                    <Button variant="outline" size="sm" className="w-full bg-transparent text-xs gap-1.5 justify-start">
+                      <Bookmark className="h-3.5 w-3.5" />
+                      ブックマーク一覧
+                    </Button>
+                  </Link>
+                )}
+                <Link href="/dashboard/profile">
+                  <Button variant="ghost" size="sm" className="w-full text-xs gap-1.5 justify-start text-muted-foreground">
+                    プロフィールを編集
+                  </Button>
+                </Link>
+              </div>
+              {/* New Post */}
+              <Link href="/dashboard/forum/new" className="block mt-3">
                 <Button size="sm" className="w-full text-xs gap-1.5">
                   <Plus className="h-3.5 w-3.5" />
                   新規投稿を作成

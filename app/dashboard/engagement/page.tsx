@@ -479,13 +479,18 @@ export default function EngagementPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">
-                    まとめ: 30分ルール
+                    まとめ: 初速ウィンドウの正体
                   </h3>
                   <p className="mt-2 text-muted-foreground">
-                    投稿の運命は最初の<span className="font-bold text-yellow-500">30分</span>で決まる。
-                    この間に<span className="font-bold text-primary">リプライの連鎖</span>を作り、
-                    <span className="font-bold text-accent">velocity</span>を最大化することがバイラルへの唯一の道。
+                    投稿の拡散力は<span className="font-bold text-yellow-500">初期エンゲージメントの集中度</span>で決まる。
+                    ただし「30分」は<span className="font-bold text-orange-400">投稿時刻からの30分ではない</span>。
+                    ソースコード上の30分ウィンドウは<span className="font-bold text-foreground">ローリング集計</span>で、
+                    著者全体の直近30分のEGを見ている。
+                  </p>
+                  <p className="mt-2 text-muted-foreground">
                     いいね(0.5x)を100個集めるより、リプライ+著者返信(75.0x)を2件獲得する方が3倍効果的。
+                    <span className="font-bold text-primary">リプライの連鎖</span>を生み出し、
+                    <span className="font-bold text-accent">velocity</span>を最大化することがバイラルへの道。
                   </p>
                 </div>
               </div>

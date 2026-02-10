@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Database,
   TrendingUp,
@@ -306,138 +306,134 @@ const sourceTypes = [
   },
 ];
 
-// ─── Animation Types ─────────────────────────────────────────────────────────
-
-type AnimationPhase = "idle" | "fetch" | "ranking" | "filter" | "serve" | "complete";
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function ExplorePage() {
   const [activeStage, setActiveStage] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("idle");
-  const [displayCounts, setDisplayCounts] = useState<number[]>([0, 0, 0, 0]);
   const [expandedStage, setExpandedStage] = useState<string | null>(null);
 
-  // Refs for stable closure access
-  const isPlayingRef = useRef(isPlaying);
-  const animationPhaseRef = useRef(animationPhase);
-  const animFrameRef = useRef<number | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // ─── Pipeline Play/Reset Animation State ──────────────────────────────────
+  // currentStep: 0=idle(dim), 1-5=stage being animated, 6=complete(all lit)
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  // Count-up values for stages that show counts: stage2(1400), stage3(1000), stage5(50)
+  const [countStage2, setCountStage2] = useState(0);
+  const [countStage3, setCountStage3] = useState(0);
+  const [countStage5, setCountStage5] = useState(0);
 
-  isPlayingRef.current = isPlaying;
-  animationPhaseRef.current = animationPhase;
+  // Refs for cleanup
+  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
+  const intervalsRef = useRef<NodeJS.Timeout[]>([]);
 
-  const phaseIndex = (phase: AnimationPhase): number => {
-    const map: Record<AnimationPhase, number> = {
-      idle: -1,
-      fetch: 0,
-      ranking: 1,
-      filter: 2,
-      serve: 3,
-      complete: 4,
-    };
-    return map[phase];
+  const clearAllTimers = () => {
+    timeoutsRef.current.forEach(clearTimeout);
+    intervalsRef.current.forEach(clearInterval);
+    timeoutsRef.current = [];
+    intervalsRef.current = [];
   };
 
-  const isStageActive = (stageId: string): boolean => {
-    const stageIdx = funnelStages.findIndex((s) => s.id === stageId);
-    const currentIdx = phaseIndex(animationPhase);
-    return stageIdx === currentIdx;
+  // Count-up helper using setInterval
+  const startCountUp = (
+    setter: React.Dispatch<React.SetStateAction<number>>,
+    target: number,
+    durationMs: number
+  ) => {
+    const steps = 30;
+    const interval = durationMs / steps;
+    let tick = 0;
+    const id = setInterval(() => {
+      tick++;
+      const t = Math.min(tick / steps, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setter(Math.round(eased * target));
+      if (tick >= steps) clearInterval(id);
+    }, interval);
+    intervalsRef.current.push(id);
   };
 
-  const isStageDone = (stageId: string): boolean => {
-    const stageIdx = funnelStages.findIndex((s) => s.id === stageId);
-    const currentIdx = phaseIndex(animationPhase);
-    return stageIdx < currentIdx;
-  };
-
-  const overallProgress = (() => {
-    const idx = phaseIndex(animationPhase);
-    if (idx < 0) return 0;
-    if (animationPhase === "complete") return 100;
-    const stageTarget = funnelStages[idx]?.count ?? 0;
-    const stageProgress = stageTarget > 0 ? displayCounts[idx] / stageTarget : 0;
-    return Math.min(100, ((idx + stageProgress) / funnelStages.length) * 100);
-  })();
-
-  // Count-up animation for a single stage
-  const animateCountUp = useCallback(
-    (stageIdx: number, target: number, durationMs: number): Promise<void> => {
-      return new Promise((resolve) => {
-        const startTime = performance.now();
-        const tick = (now: number) => {
-          if (!isPlayingRef.current) {
-            resolve();
-            return;
-          }
-          const elapsed = now - startTime;
-          const t = Math.min(elapsed / durationMs, 1);
-          // Ease-out cubic
-          const eased = 1 - Math.pow(1 - t, 3);
-          const current = Math.round(eased * target);
-          setDisplayCounts((prev) => {
-            const next = [...prev];
-            next[stageIdx] = current;
-            return next;
-          });
-          if (t < 1) {
-            animFrameRef.current = requestAnimationFrame(tick);
-          } else {
-            resolve();
-          }
-        };
-        animFrameRef.current = requestAnimationFrame(tick);
-      });
-    },
-    []
-  );
-
-  const resetAnimation = useCallback(() => {
+  const resetAnimation = () => {
+    clearAllTimers();
     setIsPlaying(false);
-    setAnimationPhase("idle");
-    setDisplayCounts([0, 0, 0, 0]);
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  }, []);
+    setCurrentStep(0);
+    setCountStage2(0);
+    setCountStage3(0);
+    setCountStage5(0);
+  };
 
-  const runAnimation = useCallback(async () => {
+  const playAnimation = () => {
     resetAnimation();
-
-    // Small delay so state clears
-    await new Promise((r) => setTimeout(r, 50));
-
+    // Start from step 0 (dim), then advance
     setIsPlaying(true);
-    isPlayingRef.current = true;
+    setCurrentStep(0);
 
-    for (let i = 0; i < funnelStages.length; i++) {
-      if (!isPlayingRef.current) return;
+    const STEP_DELAY = 900; // ms between stages
 
-      const stage = funnelStages[i];
-      setAnimationPhase(stage.id as AnimationPhase);
-      animationPhaseRef.current = stage.id as AnimationPhase;
+    // Step 1: Light up sources (Level 1)
+    const t1 = setTimeout(() => {
+      setCurrentStep(1);
+    }, 100);
+    timeoutsRef.current.push(t1);
 
-      await animateCountUp(i, stage.count, 1800);
+    // Step 2: Light up 候補プール + count up to 1400
+    const t2 = setTimeout(() => {
+      setCurrentStep(2);
+      startCountUp(setCountStage2, 1400, 700);
+    }, 100 + STEP_DELAY);
+    timeoutsRef.current.push(t2);
 
-      if (!isPlayingRef.current) return;
+    // Step 3: Light up AIスコアリング + count up to 1000
+    const t3 = setTimeout(() => {
+      setCurrentStep(3);
+      startCountUp(setCountStage3, 1000, 700);
+    }, 100 + STEP_DELAY * 2);
+    timeoutsRef.current.push(t3);
 
-      // Pause between stages
-      await new Promise<void>((resolve) => {
-        timeoutRef.current = setTimeout(resolve, 400);
-      });
-    }
+    // Step 4: Light up 3 filters
+    const t4 = setTimeout(() => {
+      setCurrentStep(4);
+    }, 100 + STEP_DELAY * 3);
+    timeoutsRef.current.push(t4);
 
-    setAnimationPhase("complete");
-    setIsPlaying(false);
-  }, [resetAnimation, animateCountUp]);
+    // Step 5: Light up timeline + count up to 50
+    const t5 = setTimeout(() => {
+      setCurrentStep(5);
+      startCountUp(setCountStage5, 50, 700);
+    }, 100 + STEP_DELAY * 4);
+    timeoutsRef.current.push(t5);
+
+    // Step 6: Complete — all nodes stay lit
+    const t6 = setTimeout(() => {
+      setCurrentStep(6);
+      setIsPlaying(false);
+    }, 100 + STEP_DELAY * 5);
+    timeoutsRef.current.push(t6);
+  };
 
   // Cleanup on unmount
   useEffect(() => {
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
+    return () => clearAllTimers();
   }, []);
+
+  // Helper: determine node CSS class based on currentStep and stage number
+  const nodeClass = (stage: number): string => {
+    if (currentStep === 0 && !isPlaying) return ""; // initial state (no animation started)
+    if (currentStep === 0 && isPlaying) return "pipeline-node-dim"; // just started, all dim
+    if (stage <= currentStep) return "pipeline-node-active";
+    return "pipeline-node-dim";
+  };
+
+  // Helper: determine edge CSS class
+  const edgeClass = (fromStage: number, toStage: number): string => {
+    if (currentStep === 0 && !isPlaying) return "node-graph-edge"; // default
+    if (currentStep >= toStage) return "node-graph-edge pipeline-edge-active";
+    return "node-graph-edge pipeline-edge-dim";
+  };
+
+  const edgeSlowClass = (fromStage: number, toStage: number): string => {
+    if (currentStep === 0 && !isPlaying) return "node-graph-edge-slow";
+    if (currentStep >= toStage) return "node-graph-edge-slow pipeline-edge-active";
+    return "node-graph-edge-slow pipeline-edge-dim";
+  };
 
   const toggleExpanded = (id: string) => {
     setExpandedStage((prev) => (prev === id ? null : id));
@@ -474,32 +470,92 @@ export default function ExplorePage() {
           0%, 100% { filter: drop-shadow(0 0 4px currentColor); }
           50% { filter: drop-shadow(0 0 12px currentColor); }
         }
+        @keyframes nodeGlow {
+          0%, 100% { box-shadow: 0 0 8px 2px rgba(255,255,255,0.15); }
+          50% { box-shadow: 0 0 20px 6px rgba(255,255,255,0.3); }
+        }
+        @keyframes edgeFlowActive {
+          to { stroke-dashoffset: -40; }
+        }
         .node-graph-node {
           opacity: 0;
           animation: nodeFadeIn 0.6s ease-out forwards;
+          transition: opacity 0.5s ease, filter 0.5s ease, box-shadow 0.5s ease;
         }
         .node-graph-node-mobile {
           opacity: 0;
           animation: nodeFadeInMobile 0.6s ease-out forwards;
+          transition: opacity 0.5s ease, filter 0.5s ease, box-shadow 0.5s ease;
         }
         .node-graph-edge {
           stroke-dasharray: 8 6;
           animation: dashFlow 1.2s linear infinite;
+          transition: opacity 0.5s ease;
         }
         .node-graph-edge-slow {
           stroke-dasharray: 12 8;
           animation: dashFlow 2s linear infinite;
+          transition: opacity 0.5s ease;
+        }
+        /* Pipeline animation: dim state */
+        .pipeline-node-dim {
+          opacity: 0.25 !important;
+          filter: grayscale(0.5) brightness(0.5);
+        }
+        /* Pipeline animation: active/lit state */
+        .pipeline-node-active {
+          opacity: 1 !important;
+          filter: brightness(1.15);
+          animation: nodeFadeIn 0.6s ease-out forwards, nodeGlow 1.5s ease-in-out 2;
+        }
+        .pipeline-node-active.node-graph-node-mobile {
+          animation: nodeFadeInMobile 0.6s ease-out forwards, nodeGlow 1.5s ease-in-out 2;
+        }
+        /* Edge dim/active */
+        .pipeline-edge-dim {
+          opacity: 0.15;
+        }
+        .pipeline-edge-active {
+          opacity: 1;
+          stroke-dasharray: 8 6;
+          animation: edgeFlowActive 0.6s linear infinite;
         }
       `}</style>
       <Card className="glass overflow-hidden">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Network className="h-5 w-5 text-primary" />
-            パイプライン ノードグラフ
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            1,400件の候補が5段階のノードを経て50件のタイムラインに変わります
-          </p>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Network className="h-5 w-5 text-primary" />
+                パイプライン ノードグラフ
+              </CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                1,400件の候補が5段階のノードを経て50件のタイムラインに変わります
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={playAnimation}
+                disabled={isPlaying}
+                className="gap-1.5"
+              >
+                <Play className="h-3.5 w-3.5" />
+                再生
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={resetAnimation}
+                disabled={currentStep === 0 && !isPlaying}
+                className="gap-1.5"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                リセット
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="pt-4">
           {/* ── Desktop: Left-to-Right Node Graph ── */}
