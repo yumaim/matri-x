@@ -13,18 +13,23 @@ export const knowledgeBase: KnowledgeEntry[] = [
     id: "pipeline-overview",
     topic: "パイプライン概要",
     category: "アーキテクチャ",
-    content: `Xの推薦アルゴリズムは、ユーザーのタイムラインに表示するツイートを選択するために、以下のパイプラインを通過させます：
+    content: `Xの推薦アルゴリズムは、ユーザーのタイムライン（For You）に表示するツイートを選択するために、以下のパイプラインを通過させます：
 
-1. **候補取得 (Candidate Fetch)**: 約1500のツイート候補を収集
-   - In-Network: フォロー中のアカウントから約500ツイート
-   - Out-of-Network: フォロー外から約1000ツイート（SimClusters、GraphJet等）
-2. **ランキング (Ranking)**: Heavy Rankerモデルで候補をスコアリング
-3. **フィルタリング (Filtering)**: Trust & Safety、品質フィルター適用
-4. **ブレンド (Blending)**: 広告、トレンド等とミックス
-5. **配信 (Serving)**: 最終的なタイムラインを構成
+1. **候補取得 (Candidate Fetch)**: 約1,400のツイート候補を4つのソースから収集
+   - Earlybird (In-Network): フォロー中のアカウントから最大600件
+   - UTEG (User-Tweet-Entity-Graph): GraphJetベースのグラフ探索で300件
+   - CrMixer (SimClusters ANN): Out-of-Network候補400件
+   - FRS (Follow Recommendation Service): 注目アカウントから100件
+2. **ランキング (Heavy Ranker)**: MaskNetアーキテクチャで~6,000特徴量を入力、10種のEG確率を予測してスコアリング
+3. **フィルタリング (Visibility Filtering)**: Trust & Safety、Author Diversity、Content Balance、Feedback Fatigueフィルター適用
+4. **ミキシング (Home Mixer)**: 広告、おすすめユーザー(WTF)、会話モジュールとミックス
+5. **配信 (Serving)**: 最終50件をタイムラインに表示（キャッシュTTL: 3分）
 
-リポジトリ: \`twitter/the-algorithm\` (GitHub)
-主要ディレクトリ: \`home-mixer/\`, \`product-mixer/\`, \`trust-safety/\``,
+**ソースコード参照:**
+- \`home-mixer/\` — タイムライン構築サービス（Scala）
+- \`the-algorithm-ml/projects/home/recap/\` — Heavy Rankerモデル（Python/TF）
+- \`simclusters_v2/\` — コミュニティ検出・埋め込み
+- \`visibilitylib/\` — コンテンツフィルタリングエンジン`,
     keywords: [
       "パイプライン", "推薦", "タイムライン", "候補取得", "ランキング",
       "フィルタリング", "ブレンド", "配信", "In-Network", "Out-of-Network",
@@ -42,23 +47,31 @@ export const knowledgeBase: KnowledgeEntry[] = [
     id: "tweepcred",
     topic: "TweepCred スコア",
     category: "スコアリング",
-    content: `TweepCredは、ユーザーの信頼度を0-1のスコアで評価する指標です。PageRankベースのアルゴリズムで計算されます。
+    content: `TweepCredは、ユーザーの信頼度を0-100のスコアで評価する指標です。Googleの検索ランキングと同じ**PageRankアルゴリズム**がベースです。
 
-**計算要素:**
-- **フォロワー/フォロー比率**: 高いほど良い（上限10倍で正規化）
-- **アカウント年齢**: 古いアカウントほど信頼度が高い
-- **エンゲージメント率**: いいね・リプライ・リポスト数
-- **アクティブフォロワー率**: 実際にアクティブなフォロワーの割合
-- **報告履歴**: スパム報告が少ないほど良い
+**計算の仕組み（ソースコードから）:**
+1. ユーザーのフォロー/メンション/リツイートのインタラクショングラフを構築
+2. Hadoop MapReduceで3段階処理:
+   - PreparePageRankData → WeightedPageRank → ExtractTweepcred
+3. PageRankの対数スケールで0-100に変換
 
-**スコアレベル:**
+**UserMass（ユーザー質量）計算要素:**
+- **加算要素**: アカウント年齢、フォロワー数、正規デバイス使用、認証バッジ
+- **減算要素**: 制限状態、停止状態、異常なフォロー比率
+
+**フォロー/フォロワー比率ペナルティ:**
+\`Reputation.scala\` の \`adjustReputationsPostCalculation\` 関数で計算:
+- followings/followers比が高い → ペナルティ（division factor）
+- フォロー数 >> フォロワー数のアカウントは信用度が低下
+
+**スコアレベル（推定）:**
 | スコア | レベル | 説明 |
 |--------|--------|------|
-| 0.0-0.2 | 低 | 改善が必要 |
-| 0.2-0.4 | 普通 | 平均以下 |
-| 0.4-0.6 | 良好 | 平均的 |
-| 0.6-0.8 | 優秀 | 平均以上 |
-| 0.8-1.0 | 最高 | トップクラス |`,
+| 0-20 | 低 | 新規 or 非アクティブ |
+| 20-40 | 普通 | 一般ユーザー |
+| 40-60 | 良好 | アクティブユーザー |
+| 60-80 | 優秀 | インフルエンサー |
+| 80-100 | 最高 | トップクラス |`,
     keywords: [
       "TweepCred", "信頼度", "スコア", "PageRank", "フォロワー",
       "フォロー比率", "アカウント年齢", "エンゲージメント率",
@@ -75,40 +88,46 @@ export const knowledgeBase: KnowledgeEntry[] = [
     id: "engagement-weights",
     topic: "エンゲージメント重み付け",
     category: "スコアリング",
-    content: `各エンゲージメントアクションには異なる重みが設定されています。
+    content: `各エンゲージメントアクションには異なる重みが設定されています。以下はソースコード（twitter/the-algorithm-ml）から判明した**実際の重み値**です。
 
-**アクション別の重み:**
+**スコア計算式:**
+\`score = Σ (weight_i × probability_i)\`
+
+**アクション別の重み（ソースコード準拠）:**
 | アクション | 重み | 説明 |
 |-----------|------|------|
-| リプライ + 著者リプライ | 150x | 双方向コミュニケーションが最も高く評価 |
-| いいね | 30x | 基本的なポジティブシグナル |
-| リポスト | 20x | コンテンツ拡散のシグナル |
-| プロフィール訪問 | 12x | 興味関心の強いシグナル |
-| 引用ポスト | 20x | リポスト+独自コメント |
-| 動画視聴 (50%以上) | 10x | 動画コンテンツへの関与 |
-| リンククリック | 1x | 最も弱いシグナル |
+| リプライ + 著者が返信 | 75.0 | 最強。双方向会話を最も重視 |
+| リプライ | 13.5 | いいねの27倍 |
+| プロフィール訪問→いいね/リプ | 12.0 | プロフを開いてからEGした場合 |
+| 会話クリック→リプ/いいね | 11.0 | 会話スレッドに入ってEG |
+| 会話クリック→2分以上滞在 | 10.0 | 深い関心の指標 |
+| リポスト | 1.0 | 拡散シグナル |
+| いいね | 0.5 | 最も弱いポジティブシグナル |
+| 動画50%以上視聴 | 0.005 | 極めて小さいが計測される |
 
 **ネガティブシグナル:**
-| アクション | 影響 |
+| アクション | 重み |
 |-----------|------|
-| ミュート | -74x (強いネガティブ) |
-| ブロック | -74x (最も強いネガティブ) |
-| スパム報告 | -369x (致命的) |
-| 「興味がない」 | -11x |
+| スパム報告 | -369.0 (いいね738個分のマイナス) |
+| 興味なし / ミュート / ブロック | -74.0 (いいね148個分のマイナス) |
 
-**メディアブースト:**
-| メディアタイプ | ブースト倍率 |
-|--------------|-------------|
-| 動画 | 3.0x |
-| 画像 | 1.8x |
-| GIF | 1.5x |
-| リンク | 1.2x |
-| テキストのみ | 1.0x (基準) |`,
+**重要な発見:**
+- いいね(0.5)はリプライ+著者返信(75.0)の**150分の1**
+- スパム報告1件でいいね738個分が帳消し
+- 多くのSNSコンサルが「いいねを増やそう」と言うが、アルゴリズム的にはリプライの方が27倍重要
+
+**ソースコード参照:**
+\`scored_tweets_model_weight_fav: 0.5\`
+\`scored_tweets_model_weight_reply: 13.5\`
+\`scored_tweets_model_weight_reply_engaged_by_author: 75.0\`
+\`scored_tweets_model_weight_negative_feedback_v2: -74.0\`
+\`scored_tweets_model_weight_report: -369.0\``,
     keywords: [
       "エンゲージメント", "重み", "リプライ", "いいね", "リポスト",
       "プロフィール", "引用", "動画", "ミュート", "ブロック",
       "スパム", "メディア", "ブースト", "ネガティブ", "weight",
-      "engagement", "150x", "30x", "20x", "重み付け",
+      "engagement", "75.0", "0.5", "13.5", "重み付け", "-369",
+      "report", "negative", "fav", "reply",
     ],
     codeReferences: [
       { file: "home-mixer/server/src/main/scala/com/twitter/home_mixer/", description: "ホームミキサーのスコアリング" },
@@ -120,22 +139,32 @@ export const knowledgeBase: KnowledgeEntry[] = [
     id: "simclusters",
     topic: "SimClusters",
     category: "推薦エンジン",
-    content: `SimClustersは、Xのユーザーとコンテンツを興味関心に基づいてクラスタリングするシステムです。
+    content: `SimClustersは、Xのユーザーとコンテンツを興味関心に基づいて分類するシステムです。KDD'2020 Applied Data Science Trackで発表された論文がベース。
 
-**仕組み:**
-1. ユーザーの行動（フォロー、いいね、リプライ等）を分析
-2. 類似した興味を持つユーザーを「クラスター」にグループ化
-3. 各ツイートがどのクラスターに属するかを計算
-4. ユーザーのクラスターに関連するツイートを推薦
+**仕組み（ソースコードから）:**
+1. フォロー関係を二部グラフとして構築: [Consumer] →follows→ [Producer]
+2. Producer-Producer類似度をコサイン類似度で計算（共通フォロワー基準）
+3. Metropolis-Hastingsサンプリングでコミュニティ検出
+4. 各Producerを1つのコミュニティに割り当て（KnownFor行列）
+5. Consumer埋め込み = フォローグラフ × KnownFor行列
+6. ツイート埋め込み = いいねしたユーザーのInterestedInベクトルを**リアルタイム**加算
 
-**クラスター数:**
-- 約145,000のクラスターが存在
+**規模:**
+- 約145,000のコミュニティが存在
+- Top 20M producersが分類対象
 - ユーザーは複数のクラスターに属する
-- クラスターは動的に更新される
 
-**Out-of-Network推薦への影響:**
-- SimClustersが最も重要なOut-of-Network推薦ソース
-- 「おすすめ」タブの約50%がSimClusters由来`,
+**埋め込みの種類:**
+| 種類 | 用途 | 更新頻度 |
+|------|------|---------|
+| KnownFor | Producerのコミュニティ所属 | バッチ（日次） |
+| InterestedIn | Consumerの興味 | バッチ（日次） |
+| Tweet Embeddings | ツイートのベクトル | **リアルタイム** |
+
+**実践的意味:**
+- 発信軸を絞ればKnownForが明確になり、同じクラスターの人に届きやすくなる
+- いいねするたびにリアルタイムでツイート埋め込みが変わる
+- おすすめタブの約50%がSimClusters由来`,
     keywords: [
       "SimClusters", "クラスター", "クラスタリング", "興味関心",
       "Out-of-Network", "推薦", "おすすめ", "グループ化",
@@ -153,16 +182,35 @@ export const knowledgeBase: KnowledgeEntry[] = [
     category: "ランキング",
     content: `Heavy Rankerは、候補ツイートの最終スコアリングを行うニューラルネットワークモデルです。
 
-**入力特徴量:**
-- ユーザー特徴: フォロワー数、エンゲージメント履歴、TweepCredスコア
-- ツイート特徴: テキスト、メディア、エンゲージメント数、経過時間
-- コンテキスト特徴: ユーザーとツイート著者の関係性
-- 約6,000の特徴量を使用
+**モデルアーキテクチャ:** Parallel MaskNet
+- 複数のMaskBlockを並列に実行し、特徴量の非線形な相互作用を学習
 
-**スコアリング:**
-- 各ツイートに対して「エンゲージメント確率」を予測
-- リプライ確率 × 150 + いいね確率 × 30 + リポスト確率 × 20 + ...
-- 最終スコアでランキング`,
+**入力特徴量 (~6,000):**
+- **author_aggregate**: 著者の過去50日間のEG統計 + リアルタイム30分集計
+- **user_aggregate**: 閲覧ユーザーの行動パターン
+- **user_author_aggregate**: ユーザー×著者ペアの相互作用履歴
+- **tweet_aggregate**: ツイート自体の集計特徴量
+- **RealGraph**: ユーザー間インタラクション予測モデル
+- **SimClusters embeddings**: コミュニティベースの類似度
+
+**スコア計算:**
+\`score = Σ (weight_i × P(engagement_i))\`
+
+| エンゲージメント | 重み |
+|----------------|------|
+| reply_engaged_by_author | 75.0 |
+| reply | 13.5 |
+| good_profile_click | 12.0 |
+| good_click | 11.0 |
+| good_click_v2 | 10.0 |
+| retweet | 1.0 |
+| fav | 0.5 |
+| video_playback50 | 0.005 |
+| negative_feedback_v2 | -74.0 |
+| report | -369.0 |
+
+**リアルタイム特徴量（30分ウィンドウ）:**
+投稿後30分間のEG速度が初期スコアを決定。この「加速度」がバイラルの鍵。`,
     keywords: [
       "Heavy Ranker", "ランキング", "ニューラルネットワーク", "スコアリング",
       "特徴量", "モデル", "予測", "確率", "6000", "ランカー",
@@ -281,7 +329,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
 A: フォロワー数自体よりも、フォロワー/フォロー比率とエンゲージメント率が重要。TweepCredスコアの計算にフォロワー数は含まれるが、正規化される。
 
 **Q: インプレッションを増やすには？**
-A: リプライを促すコンテンツが最も効果的（150x重み）。動画コンテンツ（3.0xブースト）、適切な投稿時間、一貫したエンゲージメント活動が重要。
+A: リプライを促すコンテンツが最も効果的（重み75.0、著者が返信すると最大）。投稿後30分の初速が重要（リアルタイム特徴量のウィンドウ）。一貫したエンゲージメント活動が重要。
 
 **Q: シャドウバンは存在する？**
 A: 「シャドウバン」という公式の仕組みはない。ただし、Trust & Safetyフィルターによる表示制限は存在する。Visibility Filteringによって、特定のコンテキストでツイートが表示されないことがある。
