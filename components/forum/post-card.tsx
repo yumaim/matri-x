@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { VoteButton } from "@/components/forum/vote-button";
+import { PostReactions } from "@/components/forum/post-reactions";
 import { cn } from "@/lib/utils";
 import { useState, useTransition } from "react";
 
@@ -206,6 +207,11 @@ export function PostCard({ post }: PostCardProps) {
                 </div>
               )}
             </Link>
+
+            {/* Reactions */}
+            <div className="mt-2.5" onClick={(e) => e.preventDefault()}>
+              <PostReactions postId={post.id} compact />
+            </div>
 
             {/* Meta row */}
             <div className="mt-3 flex items-center gap-3 sm:gap-4 text-xs text-muted-foreground flex-wrap">
