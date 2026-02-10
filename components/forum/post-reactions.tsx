@@ -12,15 +12,13 @@ import {
 const REACTION_TYPES = [
   { type: "WANT_MORE", icon: "🤔", label: "もっと聞きたい", color: "text-blue-400 bg-blue-400/10 hover:bg-blue-400/20" },
   { type: "DISCOVERY", icon: "🔥", label: "これは発見だ", color: "text-orange-400 bg-orange-400/10 hover:bg-orange-400/20" },
-  { type: "VERIFY", icon: "⚗️", label: "検証したい", color: "text-purple-400 bg-purple-400/10 hover:bg-purple-400/20" },
-  { type: "DATA_NEEDED", icon: "📊", label: "データで見たい", color: "text-emerald-400 bg-emerald-400/10 hover:bg-emerald-400/20" },
+  { type: "CONSULT", icon: "💬", label: "直接相談したい", color: "text-violet-400 bg-violet-400/10 hover:bg-violet-400/20" },
 ] as const;
 
 interface ReactionCounts {
   WANT_MORE: number;
   DISCOVERY: number;
-  VERIFY: number;
-  DATA_NEEDED: number;
+  CONSULT: number;
 }
 
 interface PostReactionsProps {
@@ -37,7 +35,7 @@ export function PostReactions({
   compact = false,
 }: PostReactionsProps) {
   const [reactions, setReactions] = useState<ReactionCounts>(
-    initialReactions ?? { WANT_MORE: 0, DISCOVERY: 0, VERIFY: 0, DATA_NEEDED: 0 }
+    initialReactions ?? { WANT_MORE: 0, DISCOVERY: 0, CONSULT: 0 }
   );
   const [userReactions, setUserReactions] = useState<string[]>(initialUserReactions);
   const [isPending, startTransition] = useTransition();

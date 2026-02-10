@@ -113,7 +113,7 @@ model Comment {
 model Vote {
   id        String   @id @default(cuid())
   value     Int      // +1 or -1
-  type      String   @default("UPVOTE") // UPVOTE | DOWNVOTE | WANT_MORE | DISCOVERY | VERIFY | DATA_NEEDED
+  type      String   @default("UPVOTE") // UPVOTE | DOWNVOTE | WANT_MORE | DISCOVERY | CONSULT
   userId    String
   postId    String?
   commentId String?

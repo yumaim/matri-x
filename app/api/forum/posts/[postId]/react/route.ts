@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, handleApiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
-const VALID_REACTION_TYPES = ["WANT_MORE", "DISCOVERY", "VERIFY", "DATA_NEEDED"];
+const VALID_REACTION_TYPES = ["WANT_MORE", "DISCOVERY", "CONSULT"];
 
 export async function POST(
   request: NextRequest,
@@ -64,8 +64,7 @@ async function getReactionCounts(postId: string) {
   const counts: Record<string, number> = {
     WANT_MORE: 0,
     DISCOVERY: 0,
-    VERIFY: 0,
-    DATA_NEEDED: 0,
+    CONSULT: 0,
   };
 
   const votes = await prisma.vote.groupBy({
