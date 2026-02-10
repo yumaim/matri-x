@@ -190,7 +190,7 @@ export default function EngagementPage() {
       </div>
 
       <Tabs defaultValue="weights" className="space-y-6">
-        <TabsList className="glass w-full overflow-x-auto flex justify-start sm:justify-center no-scrollbar">
+        <TabsList className="glass w-full overflow-x-auto overflow-y-hidden flex justify-start sm:justify-center no-scrollbar" style={{ touchAction: "pan-x", overscrollBehavior: "contain" }}>
           <TabsTrigger value="weights" className="shrink-0">重み付け</TabsTrigger>
           <TabsTrigger value="negative" className="shrink-0">ネガティブシグナル</TabsTrigger>
           <TabsTrigger value="velocity" className="shrink-0">加速度</TabsTrigger>
@@ -210,7 +210,7 @@ export default function EngagementPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={chartConfig} className="h-[350px] w-full" style={{ maxWidth: "100%", overflow: "hidden" }}>
+                <ChartContainer config={chartConfig} className="h-[350px] w-full" style={{ maxWidth: "100%", overflow: "hidden", touchAction: "pan-x" }}>
                   <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
                     <XAxis type="number" domain={[0, 80]} tickCount={5} />
                     <YAxis
@@ -310,7 +310,7 @@ export default function EngagementPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={negativeChartConfig} className="h-[200px]" style={{ maxWidth: "100%", overflow: "hidden" }}>
+                <ChartContainer config={negativeChartConfig} className="h-[200px]" style={{ maxWidth: "100%", overflow: "hidden", touchAction: "pan-x" }}>
                   <BarChart data={negativeChartData} layout="vertical" margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
                     <XAxis type="number" />
                     <YAxis
