@@ -475,42 +475,87 @@ export default function ForumPage() {
             </CardContent>
           </Card>
 
-          {/* 投稿テンプレート (Accordion) */}
-          <Card className="bg-card/50 border-border/50 border-l-4 border-l-accent">
-            <CardContent className="p-4">
-              <h4 className="font-medium text-foreground text-sm flex items-center gap-2 mb-3">
-                <FileEdit className="h-4 w-4 text-accent" />
-                投稿テンプレート
+          {/* 投稿テンプレート */}
+          <Card className="bg-card/50 border-border/50 overflow-hidden">
+            <div className="bg-gradient-to-r from-primary/10 to-primary/5 px-4 py-3 border-b border-border/30">
+              <h4 className="font-semibold text-foreground text-sm flex items-center gap-2">
+                <FileEdit className="h-4 w-4 text-primary" />
+                テンプレートで投稿
               </h4>
-              <Accordion type="single" collapsible className="w-full">
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                カテゴリを選んですぐに書き始められます
+              </p>
+            </div>
+            <CardContent className="p-3">
+              {/* よく使うテンプレート */}
+              <div className="space-y-1.5 mb-2">
                 {[
-                  { id: "ALGORITHM", name: "アルゴリズム解説", template: "このアルゴリズムの仕組みと、運用への影響をまとめます。" },
-                  { id: "STRATEGY", name: "戦略・Tips", template: "この戦略を試した結果と、おすすめのやり方を共有します。" },
-                  { id: "UPDATES", name: "最新アップデート", template: "最新の変更内容と、運用への影響をまとめます。" },
-                  { id: "BUGS", name: "不具合・エラー", template: "発生した不具合の状況と、対処法を共有します。" },
-                  { id: "QUESTIONS", name: "質問・相談", template: "〇〇について質問です。" },
-                  { id: "VERIFICATION", name: "現場検証", template: "【仮説】\n\n【期間】\n\n【Before】\n\n【After】\n\n【変化率】\n\n【結論】" },
-                  { id: "HEAVY_RANKER", name: "Heavy Ranker", template: "Heavy Rankerの〇〇について検証・解説します。" },
-                  { id: "SIMCLUSTERS", name: "SimClusters", template: "SimClustersの〇〇について検証・解説します。" },
-                  { id: "TWEEPCRED", name: "TweepCred", template: "TweepCredの〇〇について検証・解説します。" },
+                  { id: "VERIFICATION", name: "現場検証", icon: FlaskConical, color: "text-emerald-500", desc: "Before/Afterデータ付き",
+                    title: "【検証】",
+                    template: "## 仮説\n\n\n## 検証期間\nYYYY/MM/DD 〜 YYYY/MM/DD（◯日間）\n\n## Before（変更前のデータ）\n- インプレッション: \n- エンゲージメント率: \n- フォロワー増減: \n\n## After（変更後のデータ）\n- インプレッション: \n- エンゲージメント率: \n- フォロワー増減: \n\n## 変化率\n\n\n## 考察・結論\n\n\n## 補足・注意点\n" },
+                  { id: "QUESTIONS", name: "質問・相談", icon: HelpCircle, color: "text-blue-500", desc: "気軽に聞いてみよう",
+                    title: "【質問】",
+                    template: "## 質問内容\n\n\n## 背景・状況\n- アカウント歴: \n- フォロワー数: 約◯人\n- 普段の投稿ジャンル: \n\n## 試したこと\n\n\n## 期待していること\n" },
+                  { id: "STRATEGY", name: "戦略・Tips", icon: TrendingUp, color: "text-amber-500", desc: "試した結果を共有",
+                    title: "【Tips】",
+                    template: "## 戦略の概要\n\n\n## 具体的なやり方\n1. \n2. \n3. \n\n## 実際の結果\n- 期間: \n- 効果: \n\n## おすすめ度\n★★★☆☆\n\n## 注意点・コツ\n" },
+                  { id: "BUGS", name: "不具合・エラー", icon: AlertCircle, color: "text-red-500", desc: "問題を報告",
+                    title: "【不具合】",
+                    template: "## 発生した問題\n\n\n## 再現手順\n1. \n2. \n3. \n\n## 期待する動作\n\n\n## 実際の動作\n\n\n## 環境\n- デバイス: \n- ブラウザ: \n- 発生日時: \n" },
                 ].map((item) => (
-                  <AccordionItem key={item.id} value={item.id} className="border-border/30">
-                    <AccordionTrigger className="py-2.5 text-xs font-medium hover:no-underline hover:text-primary">
-                      {item.name}
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <p className="text-xs text-muted-foreground whitespace-pre-line mb-2.5">
-                        「{item.template}」
-                      </p>
-                      <Link href={`/dashboard/forum/new?category=${item.id}&template=${encodeURIComponent(item.template)}`}>
-                        <Button variant="outline" size="sm" className="w-full bg-transparent text-xs gap-1">
-                          <Plus className="h-3 w-3" />
-                          テンプレで投稿する
-                        </Button>
-                      </Link>
-                    </AccordionContent>
-                  </AccordionItem>
+                  <Link
+                    key={item.id}
+                    href={`/dashboard/forum/new?category=${item.id}&title=${encodeURIComponent(item.title)}&template=${encodeURIComponent(item.template)}`}
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 hover:bg-muted/50 transition-colors group border border-transparent hover:border-border/30"
+                  >
+                    <item.icon className={cn("h-4 w-4 shrink-0", item.color)} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium text-foreground group-hover:text-primary transition-colors">{item.name}</div>
+                      <div className="text-[10px] text-muted-foreground">{item.desc}</div>
+                    </div>
+                    <Plus className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  </Link>
                 ))}
+              </div>
+
+              {/* その他のテンプレート (折りたたみ) */}
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="more" className="border-border/30 border-t border-b-0">
+                  <AccordionTrigger className="py-2 text-[11px] text-muted-foreground font-medium hover:no-underline hover:text-foreground">
+                    その他のカテゴリ
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-1">
+                    <div className="space-y-1">
+                      {[
+                        { id: "ALGORITHM", name: "アルゴリズム解説", icon: BookOpen, color: "text-violet-500",
+                          title: "【解説】",
+                          template: "## 対象アルゴリズム\n\n\n## 概要\n\n\n## 仕組みの詳細\n\n\n## 運用への影響\n- ポジティブ: \n- ネガティブ: \n\n## まとめ・推奨アクション\n" },
+                        { id: "UPDATES", name: "最新アップデート", icon: Flame, color: "text-orange-500",
+                          title: "【速報】",
+                          template: "## アップデート概要\n\n\n## 変更点\n- \n- \n\n## 運用への影響\n\n\n## 推奨アクション\n\n\n## ソース・参考リンク\n" },
+                        { id: "HEAVY_RANKER", name: "Heavy Ranker", icon: TrendingUp, color: "text-cyan-500",
+                          title: "【Heavy Ranker】",
+                          template: "## 対象パラメータ/機能\n\n\n## 検証内容\n\n\n## 結果・データ\n\n\n## 考察\n\n\n## 実運用への示唆\n" },
+                        { id: "SIMCLUSTERS", name: "SimClusters", icon: Users, color: "text-indigo-500",
+                          title: "【SimClusters】",
+                          template: "## 対象トピック\n\n\n## 検証内容\n\n\n## 結果・データ\n\n\n## 考察\n\n\n## 実運用への示唆\n" },
+                        { id: "TWEEPCRED", name: "TweepCred", icon: Award, color: "text-yellow-500",
+                          title: "【TweepCred】",
+                          template: "## 対象トピック\n\n\n## 検証内容\n\n\n## 結果・データ\n\n\n## 考察\n\n\n## 実運用への示唆\n" },
+                      ].map((item) => (
+                        <Link
+                          key={item.id}
+                          href={`/dashboard/forum/new?category=${item.id}&title=${encodeURIComponent(item.title)}&template=${encodeURIComponent(item.template)}`}
+                          className="flex items-center gap-2.5 rounded-lg px-3 py-2 hover:bg-muted/50 transition-colors group"
+                        >
+                          <item.icon className={cn("h-3.5 w-3.5 shrink-0", item.color)} />
+                          <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{item.name}</span>
+                          <Plus className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-auto" />
+                        </Link>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
               </Accordion>
             </CardContent>
           </Card>

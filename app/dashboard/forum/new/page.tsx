@@ -60,11 +60,15 @@ function NewPostPage() {
   useEffect(() => {
     const qCategory = searchParams.get("category");
     const qTemplate = searchParams.get("template");
+    const qTitle = searchParams.get("title");
     if (qCategory && CATEGORIES.some((c) => c.value === qCategory)) {
       setCategory(qCategory);
     }
     if (qTemplate) {
       setContent(qTemplate);
+    }
+    if (qTitle) {
+      setTitle(qTitle);
     }
   }, [searchParams]);
 
