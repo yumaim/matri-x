@@ -6,11 +6,11 @@ const VALID_REACTION_TYPES = ["WANT_MORE", "DISCOVERY", "CONSULT"];
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ postId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await requireAuth();
-    const { postId } = await params;
+    const { id: postId } = await params;
     const { type } = await request.json();
 
     if (!VALID_REACTION_TYPES.includes(type)) {
