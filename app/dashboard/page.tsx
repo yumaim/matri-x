@@ -306,45 +306,6 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Quick Actions */}
-      <div data-tour="quick-actions">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">
-          クイックアクション
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {quickActions.map((action) => (
-            <Link key={action.title} href={action.href}>
-              <Card className="glass group h-full transition-all hover:glow-primary">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-xl ${action.color}`}
-                    >
-                      <action.icon className="h-6 w-6 text-white" />
-                    </div>
-                    {action.paid && (
-                      <Badge variant="outline" className="text-[10px] border-yellow-500/50 text-yellow-500">
-                        有料
-                      </Badge>
-                    )}
-                  </div>
-                  <h3 className="mt-4 font-semibold text-foreground">
-                    {action.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {action.description}
-                  </p>
-                  <div className="mt-4 flex items-center text-sm text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                    開始する
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </div>
-
       {/* Activity Graph */}
       {activityData.length > 0 && (
         <Card className="glass overflow-hidden">
@@ -391,6 +352,45 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Quick Actions */}
+      <div data-tour="quick-actions">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">
+          クイックアクション
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {quickActions.map((action) => (
+            <Link key={action.title} href={action.href}>
+              <Card className="glass group h-full transition-all hover:glow-primary">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`flex h-12 w-12 items-center justify-center rounded-xl ${action.color}`}
+                    >
+                      <action.icon className="h-6 w-6 text-white" />
+                    </div>
+                    {action.paid && (
+                      <Badge variant="outline" className="text-[10px] border-yellow-500/50 text-yellow-500">
+                        有料
+                      </Badge>
+                    )}
+                  </div>
+                  <h3 className="mt-4 font-semibold text-foreground">
+                    {action.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {action.description}
+                  </p>
+                  <div className="mt-4 flex items-center text-sm text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                    開始する
+                    <ArrowRight className="ml-1 h-4 w-4" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </div>
 
       {/* Two Column Layout */}
       <div className="grid gap-6 lg:grid-cols-2">

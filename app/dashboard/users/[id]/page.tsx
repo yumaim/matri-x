@@ -193,11 +193,12 @@ export default function UserProfilePage({
           </Avatar>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-bold">
-                {user.name ?? "匿名ユーザー"}
-              </h1>
-              {user.role !== "USER" && (
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-bold">
+                  {user.name ?? "匿名ユーザー"}
+                </h1>
+                {user.role !== "USER" && (
                 <Badge
                   variant="outline"
                   className={cn(
@@ -209,6 +210,14 @@ export default function UserProfilePage({
                 >
                   {user.role}
                 </Badge>
+              )}
+              </div>
+              {isOwnPage && (
+                <Link href="/dashboard/profile">
+                  <Button variant="outline" size="sm" className="shrink-0">
+                    プロフィール編集
+                  </Button>
+                </Link>
               )}
             </div>
             {user.xHandle && (
@@ -250,14 +259,6 @@ export default function UserProfilePage({
               </span>
             </div>
           </div>
-
-          {isOwnPage && (
-            <Link href="/dashboard/profile">
-              <Button variant="outline" size="sm" className="shrink-0">
-                プロフィール編集
-              </Button>
-            </Link>
-          )}
         </div>
 
         {/* Stats Bar */}
