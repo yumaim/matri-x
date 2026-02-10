@@ -123,7 +123,7 @@ model Vote {
   post    ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
   comment Comment?   @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, postId])
+  @@unique([userId, postId, type])
   @@unique([userId, commentId])
 }
 

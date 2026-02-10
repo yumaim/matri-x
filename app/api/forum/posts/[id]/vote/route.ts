@@ -27,13 +27,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "投稿が見つかりません" }, { status: 404 });
     }
 
-    // Check existing vote
-    const existingVote = await prisma.vote.findUnique({
+    // Check existing UPVOTE or DOWNVOTE
+    const existingVote = await prisma.vote.findFirst({
       where: {
-        userId_postId: {
-          userId: session.user.id,
-          postId: id,
-        },
+        userId: session.user.id,
+        postId: id,
+        type: { in: ["UPVOTE", "DOWNVOTE"] },
       },
     });
 
@@ -50,7 +49,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         // Different vote — update
         await prisma.vote.update({
           where: { id: existingVote.id },
-          data: { value },
+          data: { value, type: value > 0 ? "UPVOTE" : "DOWNVOTE" },
         });
         action = "updated";
       }
@@ -59,6 +58,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       await prisma.vote.create({
         data: {
           value,
+          type: value > 0 ? "UPVOTE" : "DOWNVOTE",
           userId: session.user.id,
           postId: id,
         },
@@ -68,17 +68,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Get new score
     const voteSum = await prisma.vote.aggregate({
-      where: { postId: id },
+      where: { postId: id, type: { in: ["UPVOTE", "DOWNVOTE"] } },
       _sum: { value: true },
     });
 
     // Get user's current vote
-    const userVote = await prisma.vote.findUnique({
+    const userVote = await prisma.vote.findFirst({
       where: {
-        userId_postId: {
-          userId: session.user.id,
-          postId: id,
-        },
+        userId: session.user.id,
+        postId: id,
+        type: { in: ["UPVOTE", "DOWNVOTE"] },
       },
       select: { value: true },
     });

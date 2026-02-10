@@ -129,133 +129,124 @@ export function PostCard({ post }: PostCardProps) {
       )}
     >
       <CardContent className="p-4 sm:p-5">
-        <div className="flex gap-3 sm:gap-4">
-          {/* Vote column */}
-          <div className="hidden sm:flex shrink-0" onClick={(e) => e.preventDefault()}>
-            <VoteButton
-              postId={post.id}
-              initialScore={post.voteScore}
-              initialUserVote={post.userVote}
-              orientation="vertical"
-            />
+        <div className="flex gap-3">
+          {/* Avatar column (X-style) */}
+          <div className="shrink-0">
+            <Avatar className="h-10 w-10 sm:h-11 sm:w-11">
+              {post.author.image && <AvatarImage src={post.author.image} />}
+              <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                {getInitials(post.author.name)}
+              </AvatarFallback>
+            </Avatar>
           </div>
 
           {/* Main content */}
           <div className="flex-1 min-w-0">
-            <Link href={`/dashboard/forum/${post.id}`} className="block group">
-              {/* Badges row */}
-              <div className="flex items-center gap-2 flex-wrap mb-2">
-                {post.isPinned && (
-                  <Badge variant="outline" className="shrink-0 border-primary/50 text-primary text-xs gap-1">
-                    <Pin className="h-3 w-3" />
-                    固定
-                  </Badge>
-                )}
-                {post.isVerified && (
-                  <Badge variant="outline" className="shrink-0 border-emerald-500/50 text-emerald-400 text-xs gap-1">
-                    <CheckCircle2 className="h-3 w-3" />
-                    検証済み
-                  </Badge>
-                )}
-                {post._count.evidence > 0 && (
-                  <Badge variant="outline" className="shrink-0 border-purple-500/50 text-purple-400 text-xs gap-1">
-                    <FlaskConical className="h-3 w-3" />
-                    {post._count.evidence}件のエビデンス
-                  </Badge>
-                )}
-                {post.voteScore >= 10 && (
-                  <Badge className="shrink-0 bg-orange-500/10 text-orange-400 border-orange-500/30 text-xs gap-1">
-                    <Flame className="h-3 w-3" />
-                    人気
-                  </Badge>
-                )}
-                {cat && (
-                  <Badge variant="outline" className={cn("text-xs", cat.color)}>
-                    {cat.label}
-                  </Badge>
-                )}
-              </div>
-
-              {/* Title */}
-              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 text-sm sm:text-base">
-                {post.title}
-              </h3>
-
-              {/* Preview */}
-              <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                {preview}
-              </p>
-
-              {/* Tags */}
-              {post.tags.length > 0 && (
-                <div className="mt-2.5 flex flex-wrap gap-1.5">
-                  {post.tags.slice(0, 5).map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="secondary"
-                      className="bg-muted/60 text-muted-foreground text-xs font-normal gap-1"
-                    >
-                      <Tag className="h-2.5 w-2.5" />
-                      {tag}
-                    </Badge>
-                  ))}
-                  {post.tags.length > 5 && (
-                    <Badge variant="secondary" className="bg-muted/60 text-muted-foreground text-xs font-normal">
-                      +{post.tags.length - 5}
-                    </Badge>
-                  )}
-                </div>
+            {/* Author line + time */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold text-sm text-foreground">
+                {post.author.name ?? "匿名"}
+              </span>
+              {post.author.company && (
+                <span className="text-xs text-muted-foreground/60">@{post.author.company}</span>
               )}
-            </Link>
-
-            {/* Reactions */}
-            <div className="mt-2.5" onClick={(e) => e.preventDefault()}>
-              <PostReactions postId={post.id} compact />
-            </div>
-
-            {/* Meta row */}
-            <div className="mt-3 flex items-center gap-3 sm:gap-4 text-xs text-muted-foreground flex-wrap">
-              {/* Author */}
-              <div className="flex items-center gap-1.5">
-                <Avatar className="h-5 w-5">
-                  {post.author.image && <AvatarImage src={post.author.image} />}
-                  <AvatarFallback className="bg-primary/10 text-primary text-[10px]">
-                    {getInitials(post.author.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="font-medium text-foreground/80">{post.author.name ?? "匿名"}</span>
-                {post.author.company && (
-                  <span className="text-muted-foreground/60">@{post.author.company}</span>
-                )}
-              </div>
-
-              <span className="flex items-center gap-1">
+              {post.author.xHandle && (
+                <span className="text-xs text-muted-foreground/60">@{post.author.xHandle}</span>
+              )}
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Clock className="h-3 w-3" />
                 {timeAgo(post.createdAt)}
               </span>
 
-              <span className="flex items-center gap-1">
-                <MessageSquare className="h-3 w-3" />
+              {/* Pinned / Verified inline badges */}
+              {post.isPinned && (
+                <Badge variant="outline" className="shrink-0 border-primary/50 text-primary text-[10px] gap-0.5 px-1.5 py-0">
+                  <Pin className="h-2.5 w-2.5" />
+                  固定
+                </Badge>
+              )}
+              {post.isVerified && (
+                <Badge variant="outline" className="shrink-0 border-emerald-500/50 text-emerald-400 text-[10px] gap-0.5 px-1.5 py-0">
+                  <CheckCircle2 className="h-2.5 w-2.5" />
+                  検証済み
+                </Badge>
+              )}
+            </div>
+
+            {/* Category + Tags line */}
+            <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+              {cat && (
+                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", cat.color)}>
+                  {cat.label}
+                </Badge>
+              )}
+              {post._count.evidence > 0 && (
+                <Badge variant="outline" className="shrink-0 border-purple-500/50 text-purple-400 text-[10px] gap-0.5 px-1.5 py-0">
+                  <FlaskConical className="h-2.5 w-2.5" />
+                  {post._count.evidence}件
+                </Badge>
+              )}
+              {post.voteScore >= 10 && (
+                <Badge className="shrink-0 bg-orange-500/10 text-orange-400 border-orange-500/30 text-[10px] gap-0.5 px-1.5 py-0">
+                  <Flame className="h-2.5 w-2.5" />
+                  人気
+                </Badge>
+              )}
+              {post.tags.slice(0, 3).map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="bg-muted/60 text-muted-foreground text-[10px] font-normal gap-0.5 px-1.5 py-0"
+                >
+                  <Tag className="h-2 w-2" />
+                  {tag}
+                </Badge>
+              ))}
+              {post.tags.length > 3 && (
+                <span className="text-[10px] text-muted-foreground">+{post.tags.length - 3}</span>
+              )}
+            </div>
+
+            {/* Title */}
+            <Link href={`/dashboard/forum/${post.id}`} className="block group mt-2">
+              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 text-sm sm:text-base">
+                {post.title}
+              </h3>
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground line-clamp-2">
+                {preview}
+              </p>
+            </Link>
+
+            {/* Action bar (X-style bottom row) */}
+            <div className="mt-3 flex items-center gap-1 flex-wrap" onClick={(e) => e.preventDefault()}>
+              {/* Vote buttons */}
+              <VoteButton
+                postId={post.id}
+                initialScore={post.voteScore}
+                initialUserVote={post.userVote}
+                size="sm"
+                orientation="horizontal"
+              />
+
+              <div className="w-px h-5 bg-border/40 mx-1 hidden sm:block" />
+
+              {/* Reactions */}
+              <PostReactions postId={post.id} compact />
+
+              <div className="w-px h-5 bg-border/40 mx-1 hidden sm:block" />
+
+              {/* Stats */}
+              <span className="flex items-center gap-1 text-xs text-muted-foreground px-1.5 py-1">
+                <MessageSquare className="h-3.5 w-3.5" />
                 {post._count.comments}
               </span>
 
-              <span className="flex items-center gap-1">
-                <Eye className="h-3 w-3" />
+              <span className="flex items-center gap-1 text-xs text-muted-foreground px-1.5 py-1">
+                <Eye className="h-3.5 w-3.5" />
                 {post.viewCount.toLocaleString()}
               </span>
 
-              {/* Mobile vote */}
-              <div className="sm:hidden flex items-center" onClick={(e) => e.preventDefault()}>
-                <VoteButton
-                  postId={post.id}
-                  initialScore={post.voteScore}
-                  initialUserVote={post.userVote}
-                  size="sm"
-                  orientation="horizontal"
-                />
-              </div>
-
-              {/* Bookmark */}
+              {/* Bookmark (right-aligned) */}
               <Button
                 variant="ghost"
                 size="icon"

@@ -42,22 +42,22 @@ export function PlanGate({ requiredPlan, children, featureName }: PlanGateProps)
       <div className="absolute inset-0 flex items-center justify-center">
         <Card className="glass border-primary/30 max-w-md w-full mx-4">
           <CardContent className="p-8 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <Lock className="h-8 w-8 text-primary" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10">
+              <Sparkles className="h-8 w-8 text-amber-400 animate-pulse" />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">
-              {requiredPlan}プラン限定機能
+              現在開発中 🚧
             </h3>
             <p className="text-muted-foreground text-sm mb-4">
               {featureName ? `「${featureName}」は` : "この機能は"}
-              {requiredPlan}プラン以上でご利用いただけます。
+              エンジニアが鋭意開発中です。
             </p>
             <p className="text-xs text-muted-foreground mb-6">
-              Coming Soon — 有料プランは近日公開予定です
+              もう少しお待ちください — まもなくリリース予定です
             </p>
-            <Button variant="outline" className="gap-2" disabled>
+            <Button variant="outline" className="gap-2 border-amber-500/30 text-amber-400" disabled>
               <Sparkles className="h-4 w-4" />
-              準備中
+              Coming Soon
             </Button>
           </CardContent>
         </Card>

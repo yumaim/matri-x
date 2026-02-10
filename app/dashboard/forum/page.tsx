@@ -325,6 +325,36 @@ export default function ForumPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* My Activity */}
+          <Card className="bg-card/50 border-border/50 border-l-4 border-l-indigo-500">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Users className="h-4 w-4 text-indigo-400" />
+                マイ アクティビティ
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Link href="/dashboard/forum?filter=my" className="block">
+                <Button variant="outline" size="sm" className="w-full bg-transparent text-xs gap-1.5 justify-start">
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  自分の投稿を見る
+                </Button>
+              </Link>
+              <Link href="/dashboard/forum?filter=bookmarks" className="block">
+                <Button variant="outline" size="sm" className="w-full bg-transparent text-xs gap-1.5 justify-start">
+                  <Bookmark className="h-3.5 w-3.5" />
+                  ブックマーク一覧
+                </Button>
+              </Link>
+              <Link href="/dashboard/forum/new">
+                <Button size="sm" className="w-full text-xs gap-1.5">
+                  <Plus className="h-3.5 w-3.5" />
+                  新規投稿を作成
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
           {/* Community Stats */}
           <Card className="bg-card/50 border-border/50">
             <CardHeader className="pb-3">
