@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { PlanGate } from "@/components/plan-gate";
 import {
   Search,
   Send,
@@ -50,6 +51,14 @@ const initialMessages: Message[] = [
 ];
 
 export default function DeepWikiPage() {
+  return (
+    <PlanGate requiredPlan="STANDARD" featureName="DeepWiki AI検索">
+      <DeepWikiContent />
+    </PlanGate>
+  );
+}
+
+function DeepWikiContent() {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);

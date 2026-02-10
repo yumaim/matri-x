@@ -6,9 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Building2, Globe, AtSign, Loader2, Save, CheckCircle2 } from "lucide-react";
+import { User, Mail, Building2, Globe, AtSign, Loader2, Save, CheckCircle2, Users, Camera } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -18,6 +18,7 @@ interface Profile {
   role: string;
   plan: string;
   company: string | null;
+  community: string | null;
   bio: string | null;
   website: string | null;
   xHandle: string | null;
@@ -33,9 +34,12 @@ export default function ProfilePage() {
 
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
+  const [community, setCommunity] = useState("");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [xHandle, setXHandle] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   useEffect(() => {
     fetch("/api/users/me")
@@ -44,9 +48,11 @@ export default function ProfilePage() {
         setProfile(data);
         setName(data.name ?? "");
         setCompany(data.company ?? "");
+        setCommunity(data.community ?? "");
         setBio(data.bio ?? "");
         setWebsite(data.website ?? "");
         setXHandle(data.xHandle ?? "");
+        setAvatarUrl(data.image ?? "");
       })
       .catch(() => setError("プロフィールの読み込みに失敗しました"))
       .finally(() => setLoading(false));
@@ -60,7 +66,7 @@ export default function ProfilePage() {
       const res = await fetch("/api/users/me", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, company, bio, website, xHandle }),
+        body: JSON.stringify({ name, company, community, bio, website, xHandle, image: avatarUrl || "" }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -97,11 +103,51 @@ export default function ProfilePage() {
       {/* Avatar Section */}
       <Card>
         <CardContent className="flex items-center gap-6 pt-6">
-          <Avatar className="h-20 w-20">
-            <AvatarFallback className="bg-primary/20 text-primary text-2xl font-bold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative group">
+            <Avatar className="h-20 w-20">
+              {avatarUrl && <AvatarImage src={avatarUrl} />}
+              <AvatarFallback className="bg-primary/20 text-primary text-2xl font-bold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <label
+              htmlFor="avatar-upload"
+              className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            >
+              {avatarUploading ? (
+                <Loader2 className="h-6 w-6 text-white animate-spin" />
+              ) : (
+                <Camera className="h-6 w-6 text-white" />
+              )}
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                if (file.size > 2 * 1024 * 1024) {
+                  setError("画像は2MB以下にしてください");
+                  return;
+                }
+                setAvatarUploading(true);
+                try {
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    const dataUrl = ev.target?.result as string;
+                    setAvatarUrl(dataUrl);
+                    setAvatarUploading(false);
+                  };
+                  reader.readAsDataURL(file);
+                } catch {
+                  setError("画像のアップロードに失敗しました");
+                  setAvatarUploading(false);
+                }
+              }}
+            />
+          </div>
           <div>
             <p className="text-lg font-semibold">{profile?.name || "未設定"}</p>
             <p className="text-sm text-muted-foreground">{profile?.email}</p>
@@ -113,6 +159,7 @@ export default function ProfilePage() {
                 {profile?.plan} プラン
               </span>
             </div>
+            <p className="text-xs text-muted-foreground mt-1">画像をクリックして変更（2MB以下）</p>
           </div>
         </CardContent>
       </Card>
@@ -167,6 +214,19 @@ export default function ProfilePage() {
               value={company}
               onChange={(e) => setCompany(e.target.value)}
               placeholder="所属する会社や組織"
+              maxLength={100}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="community" className="flex items-center gap-2">
+              <Users className="h-4 w-4" /> 所属コミュニティ
+            </Label>
+            <Input
+              id="community"
+              value={community}
+              onChange={(e) => setCommunity(e.target.value)}
+              placeholder="所属するコミュニティ（例: マーケティング勉強会、X運用サロン）"
               maxLength={100}
             />
           </div>

@@ -20,6 +20,7 @@ model User {
   role          String    @default("USER") // USER | MODERATOR | ADMIN
   plan          String    @default("FREE") // FREE | STANDARD | PRO
   company       String?
+  community     String?   // 所属コミュニティ
   bio           String?
   website       String?
   xHandle       String?
@@ -34,6 +35,8 @@ model User {
   simulations   Simulation[]
   bookmarks     Bookmark[]
   notifications Notification[]
+  achievements  UserAchievement[]
+  progress      LearningProgress[]
 }
 
 model Account {
@@ -177,4 +180,29 @@ model AlgorithmUpdate {
   impact      String   // CRITICAL | HIGH | MEDIUM | LOW
   category    String
   publishedAt DateTime @default(now())
+}
+
+model LearningProgress {
+  id         String   @id @default(cuid())
+  userId     String
+  topicId    String   // e.g. "pipeline", "heavy_ranker", "simclusters", "tweepcred", "engagement"
+  completed  Boolean  @default(false)
+  viewCount  Int      @default(0)
+  lastViewAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String   // e.g. "first_post", "10_posts", "first_verification", "simulator_pro"
+  unlockedAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
 }

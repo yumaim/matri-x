@@ -165,8 +165,11 @@ const tips = [
   },
 ];
 
+import { PlanGate } from "@/components/plan-gate";
+
 export default function EngagementPage() {
   return (
+    <PlanGate requiredPlan="STANDARD" featureName="エンゲージメント分析">
     <div className="p-6 lg:p-8 space-y-8">
       {/* Header */}
       <div>
@@ -690,5 +693,6 @@ export default function EngagementPage() {
         </CardContent>
       </Card>
     </div>
+    </PlanGate>
   );
 }

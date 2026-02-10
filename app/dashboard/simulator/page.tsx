@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { PlanGate } from "@/components/plan-gate";
 import {
   Users,
   UserCheck,
@@ -89,6 +90,14 @@ function getScoreLevel(score: number) {
 }
 
 export default function SimulatorPage() {
+  return (
+    <PlanGate requiredPlan="STANDARD" featureName="TweepCredシミュレーター">
+      <SimulatorContent />
+    </PlanGate>
+  );
+}
+
+function SimulatorContent() {
   const [inputs, setInputs] = useState<SimulatorInputs>({
     followers: 1000,
     following: 500,
