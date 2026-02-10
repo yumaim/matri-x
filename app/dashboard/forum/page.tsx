@@ -341,7 +341,7 @@ export default function ForumPage() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="hidden lg:block space-y-6">
           {/* Profile Preview (X-style) */}
           <Card className="bg-card/50 border-border/50 overflow-hidden">
             {/* Banner */}

@@ -105,8 +105,19 @@ const negativeWeights = [
   },
 ];
 
+const SHORT_NAMES: Record<string, string> = {
+  "リプライ + 著者が返信": "リプライ+返信",
+  "リプライ": "リプライ",
+  "プロフィール訪問→いいね/リプ": "プロフ→いいね/リプ",
+  "会話クリック→リプ/いいね": "会話→リプ/いいね",
+  "会話クリック→2分以上滞在": "滞在2分+",
+  "リポスト": "リポスト",
+  "いいね": "いいね",
+  "動画50%以上視聴": "動画50%視聴",
+};
+
 const chartData = engagementWeights.map((item) => ({
-  name: `${item.action} ${item.weight}×`,
+  name: `${SHORT_NAMES[item.action] ?? item.action} ${item.weight}×`,
   weight: item.weight,
   fill: item.color,
 }));
@@ -200,13 +211,13 @@ export default function EngagementPage() {
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-[350px] w-full overflow-hidden">
-                  <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
+                  <BarChart data={chartData} layout="vertical" margin={{ left: 10, right: 10, top: 5, bottom: 5 }}>
                     <XAxis type="number" domain={[0, 80]} tickCount={5} />
                     <YAxis
                       type="category"
                       dataKey="name"
-                      width={100}
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 9 }}
+                      width={120}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
                     />
                     <ChartTooltip
                       content={<ChartTooltipContent />}
