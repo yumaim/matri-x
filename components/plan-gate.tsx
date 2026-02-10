@@ -39,7 +39,7 @@ export function PlanGate({ requiredPlan, children, featureName }: PlanGateProps)
       <div className="pointer-events-none select-none opacity-20 blur-[2px]">
         {children}
       </div>
-      <div className="absolute inset-0 z-30 flex items-center justify-center p-4">
+      <div className="absolute inset-x-0 top-0 z-30 flex justify-center p-4 pt-16 sm:pt-24">
         <Card className="glass border-amber-500/30 max-w-sm w-full shadow-2xl shadow-amber-500/10">
           <CardContent className="p-6 sm:p-8 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10">

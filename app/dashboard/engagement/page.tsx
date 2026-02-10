@@ -106,7 +106,7 @@ const negativeWeights = [
 ];
 
 const chartData = engagementWeights.map((item) => ({
-  name: item.action,
+  name: `${item.action} ${item.weight}×`,
   weight: item.weight,
   fill: item.color,
 }));

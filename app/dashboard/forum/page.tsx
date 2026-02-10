@@ -182,7 +182,7 @@ export default function ForumPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -296,7 +296,7 @@ export default function ForumPage() {
             </div>
           ) : posts.length === 0 ? (
             <Card className="bg-card/50 border-border/50">
-              <CardContent className="py-12 text-center">
+              <CardContent className="py-8 sm:py-12 text-center">
                 <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
                 <p className="text-muted-foreground">
                   {searchQuery || selectedCategory !== "all" || showBookmarked
