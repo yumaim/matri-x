@@ -212,7 +212,7 @@ export default function EngagementPage() {
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-[350px] w-full overflow-hidden">
                   <BarChart data={chartData} layout="vertical" margin={{ left: 10, right: 10, top: 5, bottom: 5 }}>
-                    <XAxis type="number" domain={[0, 80]} tickCount={5} />
+                    <XAxis type="number" domain={[0, 80]} tickCount={5} allowDataOverflow />
                     <YAxis
                       type="category"
                       dataKey="name"
@@ -262,7 +262,7 @@ export default function EngagementPage() {
                           className="text-lg font-bold"
                           style={{ color: item.color }}
                         >
-                          {item.weight}x
+                          {item.weight}×
                         </span>
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">
@@ -363,7 +363,7 @@ export default function EngagementPage() {
                             className="text-2xl font-bold"
                             style={{ color: item.color }}
                           >
-                            {item.weight}x
+                            {item.weight}×
                           </span>
                         </div>
                         <p className="mt-2 text-sm text-muted-foreground">

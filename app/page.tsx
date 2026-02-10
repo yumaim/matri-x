@@ -593,20 +593,14 @@ function Footer() {
             <span className="text-lg font-bold text-gradient">Matri-X</span>
           </div>
           <div className="flex items-center gap-6">
+            <span className="text-sm text-muted-foreground/50">
+              利用規約（準備中）
+            </span>
+            <span className="text-sm text-muted-foreground/50">
+              プライバシー（準備中）
+            </span>
             <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              利用規約
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              プライバシー
-            </Link>
-            <Link
-              href="#"
+              href="mailto:info@matri-x-algo.wiki"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
               お問い合わせ

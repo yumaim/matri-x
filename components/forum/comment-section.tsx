@@ -185,7 +185,18 @@ function CommentItem({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="text-destructive">
+                  <DropdownMenuItem 
+                    className="text-destructive"
+                    onClick={async () => {
+                      if (!confirm("このコメントを削除しますか？")) return;
+                      try {
+                        const res = await fetch(`/api/forum/posts/${postId}/comments?commentId=${comment.id}`, { method: "DELETE" });
+                        if (res.ok) {
+                          onCommentAdded?.();
+                        }
+                      } catch { /* ignore */ }
+                    }}
+                  >
                     <Trash2 className="h-3.5 w-3.5 mr-2" />
                     削除
                   </DropdownMenuItem>

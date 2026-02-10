@@ -207,3 +207,37 @@ function enrichComments(comments: any[], voteMap: Map<string | null, number>): a
     replies: c.replies ? enrichComments(c.replies, voteMap) : [],
   }));
 }
+
+// DELETE /api/forum/posts/[id]/comments?commentId=xxx — コメント削除
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
+    }
+
+    const commentId = request.nextUrl.searchParams.get("commentId");
+    if (!commentId) {
+      return NextResponse.json({ error: "commentId is required" }, { status: 400 });
+    }
+
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: { authorId: true },
+    });
+
+    if (!comment) {
+      return NextResponse.json({ error: "コメントが見つかりません" }, { status: 404 });
+    }
+
+    if (comment.authorId !== session.user.id) {
+      return NextResponse.json({ error: "削除権限がありません" }, { status: 403 });
+    }
+
+    await prisma.comment.delete({ where: { id: commentId } });
+
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "削除に失敗しました" }, { status: 500 });
+  }
+}

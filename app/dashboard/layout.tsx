@@ -3,6 +3,7 @@
 import React from "react"
 
 import { useState, useEffect, useCallback } from "react";
+import { signOut } from "next-auth/react";
 import { OnboardingProvider } from "@/components/onboarding";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -212,6 +213,13 @@ function SidebarContent({
   collapsed: boolean;
   pathname: string;
 }) {
+  const [userName, setUserName] = useState("ユーザー");
+  useEffect(() => {
+    fetch("/api/users/me").then(r => r.ok ? r.json() : null).then(d => {
+      if (d?.name) setUserName(d.name);
+    }).catch(() => {});
+  }, []);
+  const userInitial = userName[0]?.toUpperCase() ?? "U";
   return (
     <>
       {/* Logo */}
@@ -280,13 +288,13 @@ function SidebarContent({
             >
               <Avatar className="h-8 w-8 shrink-0">
                 <AvatarFallback className="bg-primary/20 text-primary text-sm">
-                  MX
+                  {userInitial}
                 </AvatarFallback>
               </Avatar>
               {!collapsed && (
                 <div className="flex-1 text-left">
-                  <p className="font-medium text-foreground">Demo User</p>
-                  <p className="text-xs text-muted-foreground">Pro Plan</p>
+                  <p className="font-medium text-foreground">{userName}</p>
+                  <p className="text-xs text-muted-foreground">Free プラン</p>
                 </div>
               )}
             </button>
@@ -297,7 +305,7 @@ function SidebarContent({
               設定
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive" onClick={() => signOut({ callbackUrl: "/" })}>
               <LogOut className="mr-2 h-4 w-4" />
               ログアウト
             </DropdownMenuItem>

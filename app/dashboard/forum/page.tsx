@@ -505,6 +505,10 @@ export default function ForumPage() {
                     key={tag}
                     variant="secondary"
                     className="cursor-pointer hover:bg-primary/20 transition-colors text-xs"
+                    onClick={() => {
+                      setSearchInput(tag);
+                      setSearchQuery(tag);
+                    }}
                   >
                     #{tag}
                   </Badge>
