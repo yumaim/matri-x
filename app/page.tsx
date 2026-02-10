@@ -19,6 +19,7 @@ import {
   BookOpen,
   Check,
   Twitter,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -101,6 +102,7 @@ const pricingPlans = [
     ],
     cta: "無料で始める",
     popular: false,
+    comingSoon: false,
   },
   {
     name: "Standard",
@@ -114,8 +116,9 @@ const pricingPlans = [
       "DeepWiki AI検索(月50回)",
       "リアルタイム更新通知",
     ],
-    cta: "Standardで始める",
+    cta: "Coming Soon",
     popular: true,
+    comingSoon: true,
   },
   {
     name: "Pro",
@@ -130,8 +133,9 @@ const pricingPlans = [
       "優先サポート",
       "カスタムレポート",
     ],
-    cta: "Proで始める",
+    cta: "Coming Soon",
     popular: false,
+    comingSoon: true,
   },
 ];
 
@@ -285,39 +289,39 @@ function HeroSection() {
                 ライブプレビュー
               </span>
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
               {[
                 {
                   step: "01",
                   title: "候補取得",
-                  desc: "Earlybird(600件) + UTEG(300件) + CrMixer(400件) + FRS(100件) = 約1,500ツイート",
+                  desc: "あなたのタイムラインに表示する候補を約1,400件収集します",
                   color: "bg-primary",
-                  detail: "In-Network ~50% / Out-of-Network ~50%",
+                  tags: ["フォロー中 50%", "フォロー外 50%"],
                 },
                 {
                   step: "02",
                   title: "ランキング",
-                  desc: "Heavy Ranker（MaskNet）が~6,000特徴量でスコアリング。10種のEG確率を予測",
+                  desc: "AIが「あなたが反応しそうな投稿」を予測してスコアをつけます",
                   color: "bg-accent",
-                  detail: "reply×著者返信 = 75.0 / いいね = 0.5",
+                  tags: ["約1,000件に絞込"],
                 },
                 {
                   step: "03",
                   title: "フィルタリング",
-                  desc: "Trust & Safety + Author Diversity + Content Balance + Feedback Fatigue",
+                  desc: "安全でない投稿や、同じ人の投稿が連続しないように調整します",
                   color: "bg-[#00ba7c]",
-                  detail: "ブロック/ミュート/NSFW除外",
+                  tags: ["約700件に絞込"],
                 },
                 {
                   step: "04",
                   title: "配信",
-                  desc: "広告・WTF・会話モジュールとミックスしてタイムラインに表示",
+                  desc: "広告やおすすめユーザーと組み合わせて、タイムラインが完成します",
                   color: "bg-orange-500",
-                  detail: "最終50件を返却",
+                  tags: ["最終50件を表示"],
                 },
               ].map((item, index) => (
-                <div key={item.step} className="relative">
-                  <div className="rounded-xl bg-muted/50 p-4 transition-all hover:bg-muted">
+                <div key={item.step} className="relative flex">
+                  <div className="rounded-xl bg-muted/50 p-5 transition-all hover:bg-muted flex-1 flex flex-col">
                     <div
                       className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${item.color} text-sm font-bold text-white`}
                     >
@@ -326,15 +330,21 @@ function HeroSection() {
                     <h4 className="font-semibold text-foreground">
                       {item.title}
                     </h4>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground flex-1">
                       {item.desc}
                     </p>
-                    <p className="mt-2 text-[10px] font-mono text-primary/70">
-                      {item.detail}
-                    </p>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {item.tags.map((tag) => (
+                        <span key={tag} className={`rounded-full ${item.color} px-2.5 py-0.5 text-[10px] font-medium text-white`}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                   {index < 3 && (
-                    <div className="absolute top-1/2 -right-2 hidden h-0.5 w-4 -translate-y-1/2 bg-border md:block" />
+                    <div className="absolute top-1/2 -right-3 hidden w-6 -translate-y-1/2 md:flex items-center justify-center">
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
                   )}
                 </div>
               ))}
@@ -457,7 +467,7 @@ function PricingSection() {
           {pricingPlans.map((plan) => (
             <div
               key={plan.name}
-              className={`glass rounded-3xl p-8 transition-all ${
+              className={`glass rounded-3xl p-8 transition-all flex flex-col ${
                 plan.popular
                   ? "ring-2 ring-primary glow-primary scale-105"
                   : "hover:glow-accent"
@@ -482,7 +492,7 @@ function PricingSection() {
               <p className="mt-2 text-sm text-muted-foreground">
                 {plan.description}
               </p>
-              <ul className="mt-6 space-y-3">
+              <ul className="mt-6 space-y-3 flex-1">
                 {plan.features.map((feature) => (
                   <li
                     key={feature}
@@ -493,7 +503,13 @@ function PricingSection() {
                   </li>
                 ))}
               </ul>
-              <Button asChild className={`mt-8 w-full ${plan.popular ? "glow-primary" : ""}`} variant={plan.popular ? "default" : "outline"}><Link href="/register">{plan.cta}</Link></Button>
+              {plan.comingSoon ? (
+                <Button className="mt-8 w-full opacity-50 cursor-not-allowed" variant="outline" disabled>
+                  {plan.cta}
+                </Button>
+              ) : (
+                <Button asChild className={`mt-8 w-full ${plan.popular ? "glow-primary" : ""}`} variant={plan.popular ? "default" : "outline"}><Link href="/register">{plan.cta}</Link></Button>
+              )}
             </div>
           ))}
         </div>
