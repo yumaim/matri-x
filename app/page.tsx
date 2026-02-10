@@ -181,13 +181,13 @@ function Header() {
       </nav>
 
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-[100] lg:hidden">
           <div
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60"
             onClick={() => setMobileMenuOpen(false)}
             onKeyDown={(e) => e.key === "Escape" && setMobileMenuOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-background border-l border-border p-6 z-50">
+          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-background border-l border-border p-6 z-[101] shadow-2xl">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">

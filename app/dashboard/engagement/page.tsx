@@ -202,7 +202,7 @@ export default function EngagementPage() {
         <TabsContent value="weights" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Chart */}
-            <Card className="glass">
+            <Card className="glass overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-primary" />
@@ -210,14 +210,14 @@ export default function EngagementPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={chartConfig} className="h-[350px] w-full overflow-hidden overflow-x-hidden">
-                  <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 20, top: 5, bottom: 5 }}>
-                    <XAxis type="number" domain={[0, 100]} tickCount={6} allowDataOverflow />
+                <ChartContainer config={chartConfig} className="h-[350px] w-full" style={{ maxWidth: "100%", overflow: "hidden" }}>
+                  <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
+                    <XAxis type="number" domain={[0, 80]} tickCount={5} />
                     <YAxis
                       type="category"
                       dataKey="name"
-                      width={80}
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 9 }}
+                      width={70}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 8 }}
                     />
                     <ChartTooltip
                       content={<ChartTooltipContent />}
