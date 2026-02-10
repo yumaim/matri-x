@@ -3,10 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Database,
-  TrendingUp,
-  Filter,
   Send,
-  ChevronRight,
   Zap,
   Users,
   MessageSquare,
@@ -18,11 +15,7 @@ import {
   UserPlus,
   Sparkles,
   Play,
-  Pause,
   RotateCcw,
-  ArrowRight,
-  ChevronDown,
-  ChevronUp,
   Inbox,
   Trophy,
   Shield,
@@ -36,7 +29,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Progress } from "@/components/ui/progress";
 
 // ─── Funnel Data ─────────────────────────────────────────────────────────────
 
@@ -439,7 +431,6 @@ export default function ExplorePage() {
     setExpandedStage((prev) => (prev === id ? null : id));
   };
 
-  const maxCount = funnelStages[0].count;
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
@@ -616,23 +607,23 @@ export default function ExplorePage() {
               </defs>
 
               {/* Level 1 → Level 2 (4 sources converge to pool) */}
-              <path d="M 195 75 C 280 75, 320 190, 390 190" stroke="url(#grad-blue-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '0.8s' }} />
-              <path d="M 195 185 C 280 185, 320 200, 390 200" stroke="url(#grad-purple-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '0.9s' }} />
-              <path d="M 195 300 C 280 300, 320 210, 390 210" stroke="url(#grad-cyan-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.0s' }} />
-              <path d="M 195 410 C 280 410, 320 220, 390 220" stroke="url(#grad-pink-indigo)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.1s' }} />
+              <path d="M 195 75 C 280 75, 320 190, 390 190" stroke="url(#grad-blue-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '0.8s' }} />
+              <path d="M 195 185 C 280 185, 320 200, 390 200" stroke="url(#grad-purple-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '0.9s' }} />
+              <path d="M 195 300 C 280 300, 320 210, 390 210" stroke="url(#grad-cyan-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '1.0s' }} />
+              <path d="M 195 410 C 280 410, 320 220, 390 220" stroke="url(#grad-pink-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '1.1s' }} />
 
               {/* Level 2 → Level 3 (pool to scorer) */}
-              <path d="M 530 210 C 580 210, 600 250, 640 250" stroke="url(#grad-indigo-violet)" strokeWidth="3" className="node-graph-edge-slow" style={{ animationDelay: '1.4s' }} />
+              <path d="M 530 210 C 580 210, 600 250, 640 250" stroke="url(#grad-indigo-violet)" strokeWidth="3" className={edgeSlowClass(2, 3)} style={{ animationDelay: '1.4s' }} />
 
               {/* Level 3 → Level 4 (scorer fans out to 3 filters) */}
-              <path d="M 810 230 C 870 230, 870 145, 910 145" stroke="url(#grad-violet-green)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.8s' }} />
-              <path d="M 810 250 C 870 250, 870 250, 910 250" stroke="url(#grad-violet-teal)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '1.9s' }} />
-              <path d="M 810 270 C 870 270, 870 355, 910 355" stroke="url(#grad-violet-emerald)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.0s' }} />
+              <path d="M 810 230 C 870 230, 870 145, 910 145" stroke="url(#grad-violet-green)" strokeWidth="2.5" className={edgeClass(3, 4)} style={{ animationDelay: '1.8s' }} />
+              <path d="M 810 250 C 870 250, 870 250, 910 250" stroke="url(#grad-violet-teal)" strokeWidth="2.5" className={edgeClass(3, 4)} style={{ animationDelay: '1.9s' }} />
+              <path d="M 810 270 C 870 270, 870 355, 910 355" stroke="url(#grad-violet-emerald)" strokeWidth="2.5" className={edgeClass(3, 4)} style={{ animationDelay: '2.0s' }} />
 
               {/* Level 4 → Level 5 (3 filters converge to timeline) */}
-              <path d="M 1010 145 C 1060 145, 1060 230, 1100 230" stroke="url(#grad-green-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.3s' }} />
-              <path d="M 1010 250 C 1060 250, 1060 250, 1100 250" stroke="url(#grad-teal-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.4s' }} />
-              <path d="M 1010 355 C 1060 355, 1060 270, 1100 270" stroke="url(#grad-emerald-amber)" strokeWidth="2.5" className="node-graph-edge" style={{ animationDelay: '2.5s' }} />
+              <path d="M 1010 145 C 1060 145, 1060 230, 1100 230" stroke="url(#grad-green-amber)" strokeWidth="2.5" className={edgeClass(4, 5)} style={{ animationDelay: '2.3s' }} />
+              <path d="M 1010 250 C 1060 250, 1060 250, 1100 250" stroke="url(#grad-teal-amber)" strokeWidth="2.5" className={edgeClass(4, 5)} style={{ animationDelay: '2.4s' }} />
+              <path d="M 1010 355 C 1060 355, 1060 270, 1100 270" stroke="url(#grad-emerald-amber)" strokeWidth="2.5" className={edgeClass(4, 5)} style={{ animationDelay: '2.5s' }} />
             </svg>
 
             {/* Nodes Layer */}
@@ -641,7 +632,7 @@ export default function ExplorePage() {
               {/* ── Column 1: Sources (4 nodes, stacked vertically on the left) ── */}
               <div className="absolute flex flex-col justify-between gap-2" style={{ left: '0%', top: '4%', bottom: '4%', width: '16%' }}>
                 {/* Earlybird */}
-                <div className="node-graph-node flex-1 rounded-xl border border-blue-500/30 bg-blue-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2" style={{ animationDelay: '0.1s' }}>
+                <div data-stage="1" className={`node-graph-node flex-1 rounded-xl border border-blue-500/30 bg-blue-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2 ${nodeClass(1)}`} style={{ animationDelay: '0.1s' }}>
                   <span className="text-xl shrink-0">📥</span>
                   <div className="min-w-0">
                     <div className="text-xs font-semibold text-blue-400 truncate">フォロー中の投稿</div>
@@ -650,7 +641,7 @@ export default function ExplorePage() {
                   </div>
                 </div>
                 {/* UTEG */}
-                <div className="node-graph-node flex-1 rounded-xl border border-purple-500/30 bg-purple-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2" style={{ animationDelay: '0.2s' }}>
+                <div data-stage="1" className={`node-graph-node flex-1 rounded-xl border border-purple-500/30 bg-purple-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2 ${nodeClass(1)}`} style={{ animationDelay: '0.2s' }}>
                   <span className="text-xl shrink-0">📥</span>
                   <div className="min-w-0">
                     <div className="text-xs font-semibold text-purple-400 truncate">似た人が見ている投稿</div>
@@ -659,7 +650,7 @@ export default function ExplorePage() {
                   </div>
                 </div>
                 {/* CrMixer */}
-                <div className="node-graph-node flex-1 rounded-xl border border-cyan-500/30 bg-cyan-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2" style={{ animationDelay: '0.3s' }}>
+                <div data-stage="1" className={`node-graph-node flex-1 rounded-xl border border-cyan-500/30 bg-cyan-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2 ${nodeClass(1)}`} style={{ animationDelay: '0.3s' }}>
                   <span className="text-xl shrink-0">📥</span>
                   <div className="min-w-0">
                     <div className="text-xs font-semibold text-cyan-400 truncate">興味が近い人のおすすめ</div>
@@ -668,7 +659,7 @@ export default function ExplorePage() {
                   </div>
                 </div>
                 {/* FRS */}
-                <div className="node-graph-node flex-1 rounded-xl border border-pink-500/30 bg-pink-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2" style={{ animationDelay: '0.4s' }}>
+                <div data-stage="1" className={`node-graph-node flex-1 rounded-xl border border-pink-500/30 bg-pink-500/10 backdrop-blur-sm p-2.5 flex items-center gap-2 ${nodeClass(1)}`} style={{ animationDelay: '0.4s' }}>
                   <span className="text-xl shrink-0">📥</span>
                   <div className="min-w-0">
                     <div className="text-xs font-semibold text-pink-400 truncate">注目アカウントの投稿</div>
@@ -679,20 +670,20 @@ export default function ExplorePage() {
               </div>
 
               {/* ── Column 2: Candidate Pool (1 node, vertically centered) ── */}
-              <div className="absolute top-1/2 -translate-y-1/2 node-graph-node" style={{ left: '22%', width: '16%', animationDelay: '0.6s' }}>
+              <div data-stage="2" className={`absolute top-1/2 -translate-y-1/2 node-graph-node ${nodeClass(2)}`} style={{ left: '22%', width: '16%', animationDelay: '0.6s' }}>
                 <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-sm p-4 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">🔄</span>
                     <div className="text-sm font-semibold text-indigo-400">候補プール</div>
                   </div>
                   <div className="text-2xl font-bold text-indigo-300 tabular-nums mt-1">
-                    ~1,400<span className="text-sm font-normal ml-1">件</span>
+                    {currentStep >= 2 ? <>~{countStage2.toLocaleString()}</> : <>~1,400</>}<span className="text-sm font-normal ml-1">件</span>
                   </div>
                 </div>
               </div>
 
               {/* ── Column 3: Heavy Ranker (1 large node, vertically centered) ── */}
-              <div className="absolute top-1/2 -translate-y-1/2 node-graph-node" style={{ left: '42%', width: '22%', animationDelay: '1.0s' }}>
+              <div data-stage="3" className={`absolute top-1/2 -translate-y-1/2 node-graph-node ${nodeClass(3)}`} style={{ left: '42%', width: '22%', animationDelay: '1.0s' }}>
                 <div className="rounded-xl border-2 border-violet-500/40 bg-violet-500/10 backdrop-blur-sm p-5 text-center shadow-lg shadow-violet-500/5">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-3xl">🧠</span>
@@ -702,7 +693,7 @@ export default function ExplorePage() {
                     </div>
                   </div>
                   <div className="text-2xl font-bold text-violet-300 tabular-nums mt-2">
-                    ~1,000<span className="text-sm font-normal ml-1">件に選別</span>
+                    {currentStep >= 3 ? <>~{countStage3.toLocaleString()}</> : <>~1,000</>}<span className="text-sm font-normal ml-1">件に選別</span>
                   </div>
                   <div className="mt-2 text-xs text-violet-300/60 border-t border-violet-500/20 pt-2">
                     約6,000の特徴量で各投稿をスコアリング
@@ -713,31 +704,31 @@ export default function ExplorePage() {
               {/* ── Column 4: Filters (3 nodes, stacked vertically) ── */}
               <div className="absolute flex flex-col justify-between gap-3" style={{ left: '68%', top: '10%', bottom: '10%', width: '14%' }}>
                 {/* Safety */}
-                <div className="node-graph-node flex-1 rounded-xl border border-green-500/30 bg-green-500/10 backdrop-blur-sm p-3 flex flex-col items-center justify-center text-center" style={{ animationDelay: '1.4s' }}>
+                <div data-stage="4" className={`node-graph-node flex-1 rounded-xl border border-green-500/30 bg-green-500/10 backdrop-blur-sm p-3 flex flex-col items-center justify-center text-center ${nodeClass(4)}`} style={{ animationDelay: '1.4s' }}>
                   <span className="text-xl">🛡️</span>
                   <div className="text-xs font-semibold text-green-400 mt-1">安全性チェック</div>
                 </div>
                 {/* Diversity */}
-                <div className="node-graph-node flex-1 rounded-xl border border-teal-500/30 bg-teal-500/10 backdrop-blur-sm p-3 flex flex-col items-center justify-center text-center" style={{ animationDelay: '1.5s' }}>
+                <div data-stage="4" className={`node-graph-node flex-1 rounded-xl border border-teal-500/30 bg-teal-500/10 backdrop-blur-sm p-3 flex flex-col items-center justify-center text-center ${nodeClass(4)}`} style={{ animationDelay: '1.5s' }}>
                   <span className="text-xl">👥</span>
                   <div className="text-xs font-semibold text-teal-400 mt-1">著者多様性</div>
                 </div>
                 {/* Balance */}
-                <div className="node-graph-node flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-sm p-3 flex flex-col items-center justify-center text-center" style={{ animationDelay: '1.6s' }}>
+                <div data-stage="4" className={`node-graph-node flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-sm p-3 flex flex-col items-center justify-center text-center ${nodeClass(4)}`} style={{ animationDelay: '1.6s' }}>
                   <span className="text-xl">⚖️</span>
                   <div className="text-xs font-semibold text-emerald-400 mt-1">コンテンツバランス</div>
                 </div>
               </div>
 
               {/* ── Column 5: Timeline Output (1 node, vertically centered, right edge) ── */}
-              <div className="absolute top-1/2 -translate-y-1/2 node-graph-node" style={{ left: '85%', width: '14.5%', animationDelay: '1.8s' }}>
+              <div data-stage="5" className={`absolute top-1/2 -translate-y-1/2 node-graph-node ${nodeClass(5)}`} style={{ left: '85%', width: '14.5%', animationDelay: '1.8s' }}>
                 <div className="rounded-xl border-2 border-amber-500/30 bg-amber-500/10 backdrop-blur-sm p-4 text-center shadow-lg shadow-amber-500/5">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">📱</span>
                     <div className="text-sm font-semibold text-amber-400">あなたのタイムライン</div>
                   </div>
                   <div className="text-2xl font-bold text-amber-300 tabular-nums mt-1">
-                    50<span className="text-sm font-normal ml-1">件</span>
+                    {currentStep >= 5 ? countStage5 : 50}<span className="text-sm font-normal ml-1">件</span>
                   </div>
                   <div className="text-xs text-amber-300/60 mt-1">
                     広告・おすすめと組み合わせて完成
@@ -751,7 +742,7 @@ export default function ExplorePage() {
           <div className="md:hidden space-y-0">
             {/* Level 1 */}
             <div className="space-y-2">
-              <div className="node-graph-node-mobile rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.1s' }}>
+              <div data-stage="1" className={`node-graph-node-mobile rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 flex items-center gap-3 ${nodeClass(1)}`} style={{ animationDelay: '0.1s' }}>
                 <span className="text-xl">📥</span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-blue-400 truncate">フォロー中の投稿</div>
@@ -759,7 +750,7 @@ export default function ExplorePage() {
                 </div>
                 <div className="text-lg font-bold text-blue-300 tabular-nums shrink-0">600<span className="text-xs font-normal">件</span></div>
               </div>
-              <div className="node-graph-node-mobile rounded-xl border border-purple-500/30 bg-purple-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.2s' }}>
+              <div data-stage="1" className={`node-graph-node-mobile rounded-xl border border-purple-500/30 bg-purple-500/10 p-3 flex items-center gap-3 ${nodeClass(1)}`} style={{ animationDelay: '0.2s' }}>
                 <span className="text-xl">📥</span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-purple-400 truncate">似た人が見ている投稿</div>
@@ -767,7 +758,7 @@ export default function ExplorePage() {
                 </div>
                 <div className="text-lg font-bold text-purple-300 tabular-nums shrink-0">300<span className="text-xs font-normal">件</span></div>
               </div>
-              <div className="node-graph-node-mobile rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.3s' }}>
+              <div data-stage="1" className={`node-graph-node-mobile rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-3 flex items-center gap-3 ${nodeClass(1)}`} style={{ animationDelay: '0.3s' }}>
                 <span className="text-xl">📥</span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-cyan-400 truncate">興味が近い人のおすすめ</div>
@@ -775,7 +766,7 @@ export default function ExplorePage() {
                 </div>
                 <div className="text-lg font-bold text-cyan-300 tabular-nums shrink-0">400<span className="text-xs font-normal">件</span></div>
               </div>
-              <div className="node-graph-node-mobile rounded-xl border border-pink-500/30 bg-pink-500/10 p-3 flex items-center gap-3" style={{ animationDelay: '0.4s' }}>
+              <div data-stage="1" className={`node-graph-node-mobile rounded-xl border border-pink-500/30 bg-pink-500/10 p-3 flex items-center gap-3 ${nodeClass(1)}`} style={{ animationDelay: '0.4s' }}>
                 <span className="text-xl">📥</span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-pink-400 truncate">注目アカウントの投稿</div>
@@ -791,10 +782,10 @@ export default function ExplorePage() {
             </div>
 
             {/* Level 2 */}
-            <div className="node-graph-node-mobile rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-3 text-center" style={{ animationDelay: '0.6s' }}>
+            <div data-stage="2" className={`node-graph-node-mobile rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-3 text-center ${nodeClass(2)}`} style={{ animationDelay: '0.6s' }}>
               <span className="text-xl">🔄</span>
               <span className="text-sm font-semibold text-indigo-400 ml-2">候補プール</span>
-              <span className="text-lg font-bold text-indigo-300 tabular-nums ml-2">~1,400件</span>
+              <span className="text-lg font-bold text-indigo-300 tabular-nums ml-2">{currentStep >= 2 ? `~${countStage2.toLocaleString()}件` : '~1,400件'}</span>
             </div>
 
             <div className="flex justify-center py-1">
@@ -802,13 +793,13 @@ export default function ExplorePage() {
             </div>
 
             {/* Level 3 */}
-            <div className="node-graph-node-mobile rounded-xl border-2 border-violet-500/40 bg-violet-500/10 p-4 text-center" style={{ animationDelay: '1.0s' }}>
+            <div data-stage="3" className={`node-graph-node-mobile rounded-xl border-2 border-violet-500/40 bg-violet-500/10 p-4 text-center ${nodeClass(3)}`} style={{ animationDelay: '1.0s' }}>
               <div className="flex items-center justify-center gap-2">
                 <span className="text-2xl">🧠</span>
                 <div className="text-base font-bold text-violet-400">AIスコアリング</div>
               </div>
               <div className="text-xs text-violet-300/70">Heavy Ranker</div>
-              <div className="text-lg font-bold text-violet-300 tabular-nums mt-1">~1,000件に選別</div>
+              <div className="text-lg font-bold text-violet-300 tabular-nums mt-1">{currentStep >= 3 ? `~${countStage3.toLocaleString()}件に選別` : '~1,000件に選別'}</div>
               <div className="text-xs text-violet-300/60 mt-1 border-t border-violet-500/20 pt-1">約6,000の特徴量で各投稿をスコアリング</div>
             </div>
 
@@ -818,15 +809,15 @@ export default function ExplorePage() {
 
             {/* Level 4 */}
             <div className="space-y-2">
-              <div className="node-graph-node-mobile rounded-xl border border-green-500/30 bg-green-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.4s' }}>
+              <div data-stage="4" className={`node-graph-node-mobile rounded-xl border border-green-500/30 bg-green-500/10 p-3 flex items-center gap-2 ${nodeClass(4)}`} style={{ animationDelay: '1.4s' }}>
                 <span className="text-lg">🛡️</span>
                 <span className="text-sm font-semibold text-green-400">安全性チェック</span>
               </div>
-              <div className="node-graph-node-mobile rounded-xl border border-teal-500/30 bg-teal-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.5s' }}>
+              <div data-stage="4" className={`node-graph-node-mobile rounded-xl border border-teal-500/30 bg-teal-500/10 p-3 flex items-center gap-2 ${nodeClass(4)}`} style={{ animationDelay: '1.5s' }}>
                 <span className="text-lg">👥</span>
                 <span className="text-sm font-semibold text-teal-400">著者多様性</span>
               </div>
-              <div className="node-graph-node-mobile rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 flex items-center gap-2" style={{ animationDelay: '1.6s' }}>
+              <div data-stage="4" className={`node-graph-node-mobile rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 flex items-center gap-2 ${nodeClass(4)}`} style={{ animationDelay: '1.6s' }}>
                 <span className="text-lg">⚖️</span>
                 <span className="text-sm font-semibold text-emerald-400">コンテンツバランス</span>
               </div>
@@ -837,12 +828,12 @@ export default function ExplorePage() {
             </div>
 
             {/* Level 5 */}
-            <div className="node-graph-node-mobile rounded-xl border-2 border-amber-500/30 bg-amber-500/10 p-4 text-center" style={{ animationDelay: '1.8s' }}>
+            <div data-stage="5" className={`node-graph-node-mobile rounded-xl border-2 border-amber-500/30 bg-amber-500/10 p-4 text-center ${nodeClass(5)}`} style={{ animationDelay: '1.8s' }}>
               <div className="flex items-center justify-center gap-2">
                 <span className="text-xl">📱</span>
                 <span className="text-base font-semibold text-amber-400">あなたのタイムライン</span>
               </div>
-              <div className="text-xl font-bold text-amber-300 tabular-nums mt-1">50件</div>
+              <div className="text-xl font-bold text-amber-300 tabular-nums mt-1">{currentStep >= 5 ? `${countStage5}件` : '50件'}</div>
               <div className="text-xs text-amber-300/60 mt-1">広告・おすすめユーザーと組み合わせて完成</div>
             </div>
           </div>
