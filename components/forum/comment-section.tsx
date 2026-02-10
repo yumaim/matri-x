@@ -80,12 +80,14 @@ function CommentItem({
   depth,
   currentUserId,
   onReplyAdded,
+  onCommentDeleted,
 }: {
   comment: CommentData;
   postId: string;
   depth: number;
   currentUserId?: string;
   onReplyAdded: (parentId: string, newComment: CommentData) => void;
+  onCommentDeleted?: (commentId: string) => void;
 }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
@@ -192,7 +194,7 @@ function CommentItem({
                       try {
                         const res = await fetch(`/api/forum/posts/${postId}/comments?commentId=${comment.id}`, { method: "DELETE" });
                         if (res.ok) {
-                          onCommentAdded?.();
+                          onCommentDeleted?.(comment.id);
                         }
                       } catch { /* ignore */ }
                     }}
@@ -249,6 +251,7 @@ function CommentItem({
               depth={depth + 1}
               currentUserId={currentUserId}
               onReplyAdded={onReplyAdded}
+              onCommentDeleted={onCommentDeleted}
             />
           ))}
         </div>
@@ -286,6 +289,25 @@ export function CommentSection({
       setComments((prev) => addReplyToTree(parentId, newReply, prev));
     },
     [addReplyToTree]
+  );
+
+  const removeCommentFromTree = useCallback(
+    (commentId: string, commentList: CommentData[]): CommentData[] => {
+      return commentList
+        .filter((c) => c.id !== commentId)
+        .map((c) => ({
+          ...c,
+          replies: c.replies ? removeCommentFromTree(commentId, c.replies) : c.replies,
+        }));
+    },
+    []
+  );
+
+  const handleCommentDeleted = useCallback(
+    (commentId: string) => {
+      setComments((prev) => removeCommentFromTree(commentId, prev));
+    },
+    [removeCommentFromTree]
   );
 
   const handleSubmit = () => {
@@ -366,6 +388,7 @@ export function CommentSection({
               depth={0}
               currentUserId={currentUserId}
               onReplyAdded={handleReplyAdded}
+              onCommentDeleted={handleCommentDeleted}
             />
           ))
         )}

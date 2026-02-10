@@ -92,10 +92,13 @@ export async function GET() {
 
     // Award new achievements
     if (newAchievements.length > 0) {
-      await prisma.userAchievement.createMany({
-        data: newAchievements.map((id) => ({ userId, achievementId: id })),
-        skipDuplicates: true,
-      });
+      for (const achievementId of newAchievements) {
+        await prisma.userAchievement.upsert({
+          where: { userId_achievementId: { userId, achievementId } },
+          create: { userId, achievementId },
+          update: {},
+        });
+      }
     }
 
     const allEarned = [...earned, ...newAchievements];

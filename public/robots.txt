@@ -1,0 +1,8 @@
+# https://matrix.10x-dev.tech
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/settings/
+
+Sitemap: https://matrix.10x-dev.tech/sitemap.xml

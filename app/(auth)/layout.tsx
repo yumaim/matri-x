@@ -1,8 +1,14 @@
 import React from "react";
 import Link from "next/link";
 import { Zap } from "lucide-react";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "ログイン | Matri-X",
+  description: "Matri-Xにログインして、Xアルゴリズム解析プラットフォームにアクセスしましょう。",
+};
 
 export default function AuthLayout({
   children,
