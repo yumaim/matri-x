@@ -24,6 +24,9 @@ import { useState, useTransition } from "react";
 const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
   ALGORITHM: { label: "アルゴリズム解説", color: "border-blue-500/50 text-blue-400" },
   VERIFICATION: { label: "現場検証", color: "border-purple-500/50 text-purple-400" },
+  HEAVY_RANKER: { label: "Heavy Ranker", color: "border-cyan-500/50 text-cyan-400" },
+  SIMCLUSTERS: { label: "SimClusters", color: "border-indigo-500/50 text-indigo-400" },
+  TWEEPCRED: { label: "TweepCred", color: "border-pink-500/50 text-pink-400" },
   STRATEGY: { label: "戦略・Tips", color: "border-emerald-500/50 text-emerald-400" },
   UPDATES: { label: "最新アップデート", color: "border-orange-500/50 text-orange-400" },
   QUESTIONS: { label: "質問・相談", color: "border-yellow-500/50 text-yellow-400" },
@@ -48,6 +51,8 @@ interface PostCardProps {
       name: string | null;
       image: string | null;
       role: string;
+      company?: string | null;
+      xHandle?: string | null;
     };
     _count: {
       comments: number;
@@ -213,6 +218,9 @@ export function PostCard({ post }: PostCardProps) {
                   </AvatarFallback>
                 </Avatar>
                 <span className="font-medium text-foreground/80">{post.author.name ?? "匿名"}</span>
+                {post.author.company && (
+                  <span className="text-muted-foreground/60">@{post.author.company}</span>
+                )}
               </div>
 
               <span className="flex items-center gap-1">

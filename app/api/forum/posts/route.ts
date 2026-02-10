@@ -76,6 +76,8 @@ export async function GET(request: NextRequest) {
               name: true,
               image: true,
               role: true,
+              company: true,
+              xHandle: true,
             },
           },
           _count: {
@@ -181,6 +183,8 @@ export async function POST(request: NextRequest) {
             name: true,
             image: true,
             role: true,
+            company: true,
+            xHandle: true,
           },
         },
       },
