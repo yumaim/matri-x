@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -22,16 +23,19 @@ export function CTASection() {
             14日間の無料トライアルで、すべての機能をお試しいただけます。
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button size="lg" className="glow-primary group">
-              無料で始める
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <Button asChild size="lg" className="glow-primary group">
+              <Link href="/register">
+                無料で始める
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
             </Button>
             <Button
+              asChild
               size="lg"
               variant="outline"
               className="group bg-transparent"
             >
-              料金プランを見る
+              <Link href="#pricing">料金プランを見る</Link>
             </Button>
           </div>
           <p className="mt-6 text-xs text-muted-foreground">

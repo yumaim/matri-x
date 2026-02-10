@@ -168,12 +168,8 @@ function Header() {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
-          <Button variant="ghost" size="sm">
-            ログイン
-          </Button>
-          <Button size="sm" className="glow-primary">
-            無料で始める
-          </Button>
+          <Button asChild variant="ghost" size="sm"><Link href="/login">ログイン</Link></Button>
+          <Button asChild size="sm" className="glow-primary"><Link href="/register">無料で始める</Link></Button>
         </div>
       </nav>
 
@@ -215,10 +211,8 @@ function Header() {
                   ))}
                 </div>
                 <div className="py-6 space-y-3">
-                  <Button variant="outline" className="w-full bg-transparent">
-                    ログイン
-                  </Button>
-                  <Button className="w-full glow-primary">無料で始める</Button>
+                  <Button asChild variant="outline" className="w-full bg-transparent"><Link href="/login">ログイン</Link></Button>
+                  <Button asChild className="w-full glow-primary"><Link href="/register">無料で始める</Link></Button>
                 </div>
               </div>
             </div>
@@ -258,18 +252,8 @@ function HeroSection() {
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button size="lg" className="glow-primary group">
-              無料で始める
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="group bg-transparent"
-            >
-              <Play className="mr-2 h-4 w-4" />
-              デモを見る
-            </Button>
+            <Button asChild size="lg" className="glow-primary group"><Link href="/register">無料で始める<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link></Button>
+            <Button asChild size="lg" variant="outline" className="group bg-transparent"><Link href="#pipeline"><Play className="mr-2 h-4 w-4" />デモを見る</Link></Button>
           </div>
         </div>
 
@@ -511,12 +495,7 @@ function PricingSection() {
                   </li>
                 ))}
               </ul>
-              <Button
-                className={`mt-8 w-full ${plan.popular ? "glow-primary" : ""}`}
-                variant={plan.popular ? "default" : "outline"}
-              >
-                {plan.cta}
-              </Button>
+              <Button asChild className={`mt-8 w-full ${plan.popular ? "glow-primary" : ""}`} variant={plan.popular ? "default" : "outline"}><Link href="/register">{plan.cta}</Link></Button>
             </div>
           ))}
         </div>
@@ -536,10 +515,7 @@ function CTASection() {
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Xアルゴリズムを理解し、あなたのコンテンツ戦略を最適化しましょう。
           </p>
-          <Button size="lg" className="mt-8 glow-primary group">
-            無料トライアルを開始
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Button>
+          <Button asChild size="lg" className="mt-8 glow-primary group"><Link href="/register">無料トライアルを開始<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link></Button>
         </div>
       </div>
     </section>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -108,11 +109,12 @@ export function PricingSection() {
                 ))}
               </ul>
               <Button
-                className={`mt-8 w-full ${plan.popular ? "glow-primary" : ""}`}
-                variant={plan.popular ? "default" : "outline"}
-              >
-                {plan.cta}
-              </Button>
+                  asChild
+                  className={`mt-8 w-full ${plan.popular ? "glow-primary" : ""}`}
+                  variant={plan.popular ? "default" : "outline"}
+                >
+                  <Link href="/register">{plan.cta}</Link>
+                </Button>
             </div>
           ))}
         </div>
@@ -126,8 +128,8 @@ export function PricingSection() {
             <p className="mt-2 text-muted-foreground">
               チーム機能、API アクセス、専属サポートが必要な企業様へ
             </p>
-            <Button variant="outline" className="mt-6 bg-transparent">
-              お問い合わせ
+            <Button asChild variant="outline" className="mt-6 bg-transparent">
+              <Link href="mailto:info@matri-x-algo.wiki">お問い合わせ</Link>
             </Button>
           </div>
         </div>

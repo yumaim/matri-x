@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight, Play, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -44,17 +45,22 @@ export function HeroSection() {
 
           {/* CTA Buttons */}
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button size="lg" className="glow-primary group">
-              無料で始める
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <Button asChild size="lg" className="glow-primary group">
+              <Link href="/register">
+                無料で始める
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
             </Button>
             <Button
+              asChild
               size="lg"
               variant="outline"
               className="group bg-transparent"
             >
-              <Play className="mr-2 h-4 w-4" />
-              デモを見る
+              <Link href="#pipeline">
+                <Play className="mr-2 h-4 w-4" />
+                デモを見る
+              </Link>
             </Button>
           </div>
         </div>

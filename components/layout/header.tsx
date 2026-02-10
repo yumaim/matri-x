@@ -6,12 +6,9 @@ import { Menu, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navigation = [
-  { name: "探索", href: "/explore" },
-  { name: "シミュレーター", href: "/simulator" },
-  { name: "SimClusters", href: "/simclusters" },
-  { name: "更新履歴", href: "/updates" },
-  { name: "事例", href: "/case-studies" },
-  { name: "料金", href: "/pricing" },
+  { name: "探索", href: "#features" },
+  { name: "シミュレーター", href: "#engagement" },
+  { name: "料金", href: "#pricing" },
 ];
 
 export function Header() {
@@ -49,11 +46,11 @@ export function Header() {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
-          <Button variant="ghost" size="sm">
-            ログイン
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/login">ログイン</Link>
           </Button>
-          <Button size="sm" className="glow-primary">
-            無料で始める
+          <Button asChild size="sm" className="glow-primary">
+            <Link href="/register">無料で始める</Link>
           </Button>
         </div>
       </nav>
@@ -96,10 +93,16 @@ export function Header() {
                   ))}
                 </div>
                 <div className="py-6 space-y-3">
-                  <Button variant="outline" className="w-full bg-transparent">
-                    ログイン
+                  <Button asChild variant="outline" className="w-full bg-transparent">
+                    <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                      ログイン
+                    </Link>
                   </Button>
-                  <Button className="w-full glow-primary">無料で始める</Button>
+                  <Button asChild className="w-full glow-primary">
+                    <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                      無料で始める
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </div>
