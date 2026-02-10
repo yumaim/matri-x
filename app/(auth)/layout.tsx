@@ -37,9 +37,6 @@ export default function AuthLayout({
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/25">
-              <Zap className="h-5 w-5 text-primary-foreground" />
-            </div>
             <span className="text-2xl font-bold text-gradient">Matri-X</span>
           </Link>
 

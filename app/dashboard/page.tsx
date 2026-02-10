@@ -371,7 +371,7 @@ export default function DashboardPage() {
                     </div>
                     {action.paid && (
                       <Badge variant="outline" className="text-[10px] border-yellow-500/50 text-yellow-500">
-                        有料
+                        開発中
                       </Badge>
                     )}
                   </div>

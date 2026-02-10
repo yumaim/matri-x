@@ -56,9 +56,6 @@ export default function LoginPage() {
     <div className="space-y-8">
       {/* Mobile logo */}
       <div className="flex items-center gap-3 lg:hidden">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/25">
-          <Zap className="h-5 w-5 text-primary-foreground" />
-        </div>
         <span className="text-2xl font-bold text-gradient">Matri-X</span>
       </div>
 
