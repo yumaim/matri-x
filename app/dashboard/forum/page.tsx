@@ -12,13 +12,13 @@ import {
   Search,
   Plus,
   Award,
-  SlidersHorizontal,
   FlaskConical,
   Bookmark,
   ArrowUpDown,
   Loader2,
   Users,
   AlertCircle,
+  FileEdit,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { PostCard } from "@/components/forum/post-card";
 import { cn } from "@/lib/utils";
 
@@ -436,50 +442,43 @@ export default function ForumPage() {
             </CardContent>
           </Card>
 
-          {/* Community Stats */}
-          <Card className="bg-card/50 border-border/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <SlidersHorizontal className="h-4 w-4 text-primary" />
-                コミュニティ統計
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">総トピック数</span>
-                <span className="font-semibold text-foreground tabular-nums">
-                  {pagination?.total ?? "—"}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Verification Report Template */}
+          {/* 投稿テンプレート (Accordion) */}
           <Card className="bg-card/50 border-border/50 border-l-4 border-l-accent">
             <CardContent className="p-4">
-              <h4 className="font-medium text-foreground text-sm flex items-center gap-2">
-                <FlaskConical className="h-4 w-4 text-accent" />
-                検証レポートテンプレート
+              <h4 className="font-medium text-foreground text-sm flex items-center gap-2 mb-3">
+                <FileEdit className="h-4 w-4 text-accent" />
+                投稿テンプレート
               </h4>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Before/Afterデータ付きの検証レポートを投稿する際のテンプレートです。
-              </p>
-              <div className="mt-3 rounded-lg bg-muted/30 p-3 text-xs font-mono text-muted-foreground space-y-1.5">
-                <p className="text-foreground font-semibold">📋 テンプレート:</p>
-                <p>【仮説】何をテストしたか</p>
-                <p>【期間】検証期間</p>
-                <p>【Before】変更前の数値</p>
-                <p>【After】変更後の数値</p>
-                <p>【変化率】imp/EG率の変動</p>
-                <p>【結論】仮説は正しかったか</p>
-                <p>【スクショ】アナリティクス画像</p>
-              </div>
-              <Link href="/dashboard/forum/new">
-                <Button variant="outline" size="sm" className="mt-3 w-full bg-transparent text-xs gap-1">
-                  <Plus className="h-3 w-3" />
-                  テンプレで投稿する
-                </Button>
-              </Link>
+              <Accordion type="single" collapsible className="w-full">
+                {[
+                  { id: "ALGORITHM", name: "アルゴリズム解説", template: "このアルゴリズムの仕組みと、運用への影響をまとめます。" },
+                  { id: "STRATEGY", name: "戦略・Tips", template: "この戦略を試した結果と、おすすめのやり方を共有します。" },
+                  { id: "UPDATES", name: "最新アップデート", template: "最新の変更内容と、運用への影響をまとめます。" },
+                  { id: "BUGS", name: "不具合・エラー", template: "発生した不具合の状況と、対処法を共有します。" },
+                  { id: "QUESTIONS", name: "質問・相談", template: "〇〇について質問です。" },
+                  { id: "VERIFICATION", name: "現場検証", template: "【仮説】\n\n【期間】\n\n【Before】\n\n【After】\n\n【変化率】\n\n【結論】" },
+                  { id: "HEAVY_RANKER", name: "Heavy Ranker", template: "Heavy Rankerの〇〇について検証・解説します。" },
+                  { id: "SIMCLUSTERS", name: "SimClusters", template: "SimClustersの〇〇について検証・解説します。" },
+                  { id: "TWEEPCRED", name: "TweepCred", template: "TweepCredの〇〇について検証・解説します。" },
+                ].map((item) => (
+                  <AccordionItem key={item.id} value={item.id} className="border-border/30">
+                    <AccordionTrigger className="py-2.5 text-xs font-medium hover:no-underline hover:text-primary">
+                      {item.name}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="text-xs text-muted-foreground whitespace-pre-line mb-2.5">
+                        「{item.template}」
+                      </p>
+                      <Link href={`/dashboard/forum/new?category=${item.id}&template=${encodeURIComponent(item.template)}`}>
+                        <Button variant="outline" size="sm" className="w-full bg-transparent text-xs gap-1">
+                          <Plus className="h-3 w-3" />
+                          テンプレで投稿する
+                        </Button>
+                      </Link>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </CardContent>
           </Card>
 

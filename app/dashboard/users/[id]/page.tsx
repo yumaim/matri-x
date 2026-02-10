@@ -14,13 +14,30 @@ import {
   Trophy,
   BookmarkIcon,
   ExternalLink,
+  Palette,
+  Check,
+  Loader2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+
+const HEADER_COLORS = [
+  { id: "blue", label: "ブルー", gradient: "from-primary/30 via-accent/20 to-primary/10", preview: "bg-gradient-to-r from-blue-500 to-blue-300" },
+  { id: "purple", label: "パープル", gradient: "from-purple-600/30 via-pink-500/20 to-purple-400/10", preview: "bg-gradient-to-r from-purple-500 to-pink-400" },
+  { id: "green", label: "グリーン", gradient: "from-emerald-600/30 via-teal-500/20 to-cyan-400/10", preview: "bg-gradient-to-r from-emerald-500 to-cyan-400" },
+  { id: "orange", label: "オレンジ", gradient: "from-orange-600/30 via-amber-500/20 to-yellow-400/10", preview: "bg-gradient-to-r from-orange-500 to-yellow-400" },
+  { id: "red", label: "レッド", gradient: "from-red-600/30 via-rose-500/20 to-pink-400/10", preview: "bg-gradient-to-r from-red-500 to-pink-400" },
+] as const;
 
 // Achievement definitions for display
 const ACHIEVEMENT_META: Record<string, { label: string; emoji: string; description: string }> = {
@@ -57,6 +74,7 @@ interface UserProfile {
     bio: string | null;
     website: string | null;
     xHandle: string | null;
+    headerColor: string | null;
     createdAt: string;
   };
   stats: {
@@ -121,6 +139,8 @@ export default function UserProfilePage({
   const [error, setError] = useState("");
   const [isOwnPage, setIsOwnPage] = useState(false);
   const [activeTab, setActiveTab] = useState("posts");
+  const [headerColor, setHeaderColor] = useState("blue");
+  const [savingColor, setSavingColor] = useState(false);
 
   const fetchProfile = useCallback(async () => {
     setLoading(true);
@@ -137,6 +157,7 @@ export default function UserProfilePage({
 
       const profileData = await profileRes.json();
       setProfile(profileData);
+      setHeaderColor(profileData.user.headerColor || "blue");
 
       if (meRes && meRes.ok) {
         const meData = await meRes.json();
@@ -152,6 +173,23 @@ export default function UserProfilePage({
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  const handleColorChange = async (colorId: string) => {
+    setHeaderColor(colorId);
+    setSavingColor(true);
+    try {
+      await fetch("/api/users/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ headerColor: colorId }),
+      });
+    } catch {
+      // revert on error
+      setHeaderColor(headerColor);
+    } finally {
+      setSavingColor(false);
+    }
+  };
 
   if (loading) {
     return <UserProfileSkeleton />;
@@ -175,10 +213,12 @@ export default function UserProfilePage({
 
   const { user, stats, posts, comments, achievements } = profile;
 
+  const currentGradient = HEADER_COLORS.find((c) => c.id === headerColor)?.gradient || HEADER_COLORS[0].gradient;
+
   return (
     <div className="overflow-x-hidden">
       {/* Cover Gradient Header */}
-      <div className="relative h-32 sm:h-44 bg-gradient-to-r from-primary/30 via-accent/20 to-primary/10">
+      <div className={cn("relative h-32 sm:h-44 bg-gradient-to-r", currentGradient)}>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
       </div>
 
@@ -213,11 +253,40 @@ export default function UserProfilePage({
               )}
               </div>
               {isOwnPage && (
-                <Link href="/dashboard/profile">
-                  <Button variant="outline" size="sm" className="shrink-0">
-                    プロフィール編集
-                  </Button>
-                </Link>
+                <div className="flex items-center gap-2 shrink-0">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-1.5">
+                        {savingColor ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Palette className="h-3.5 w-3.5" />
+                        )}
+                        カバー色
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      {HEADER_COLORS.map((color) => (
+                        <DropdownMenuItem
+                          key={color.id}
+                          onClick={() => handleColorChange(color.id)}
+                          className="gap-2.5 cursor-pointer"
+                        >
+                          <div className={cn("h-4 w-4 rounded-full shrink-0", color.preview)} />
+                          <span className="flex-1">{color.label}</span>
+                          {headerColor === color.id && (
+                            <Check className="h-3.5 w-3.5 text-primary" />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <Link href="/dashboard/profile">
+                    <Button variant="outline" size="sm">
+                      プロフィール編集
+                    </Button>
+                  </Link>
+                </div>
               )}
             </div>
             {user.xHandle && (

@@ -24,6 +24,7 @@ model User {
   bio           String?
   website       String?
   xHandle       String?
+  headerColor   String?   @default("blue") // blue | purple | green | orange | red
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

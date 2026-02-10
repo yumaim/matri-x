@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Suspense } from "react";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
@@ -36,8 +37,17 @@ const CATEGORIES = [
   { value: "TWEEPCRED", label: "TweepCred" },
 ];
 
-export default function NewPostPage() {
+export default function NewPostPageWrapper() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">読み込み中...</div>}>
+      <NewPostPage />
+    </Suspense>
+  );
+}
+
+function NewPostPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [activeTab, setActiveTab] = useState("edit");
 
@@ -45,6 +55,18 @@ export default function NewPostPage() {
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Pre-fill from query params (template redirect)
+  useEffect(() => {
+    const qCategory = searchParams.get("category");
+    const qTemplate = searchParams.get("template");
+    if (qCategory && CATEGORIES.some((c) => c.value === qCategory)) {
+      setCategory(qCategory);
+    }
+    if (qTemplate) {
+      setContent(qTemplate);
+    }
+  }, [searchParams]);
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};

@@ -20,6 +20,7 @@ export async function GET(
         bio: true,
         website: true,
         xHandle: true,
+        headerColor: true,
         createdAt: true,
         _count: {
           select: {
@@ -115,6 +116,7 @@ export async function GET(
         bio: user.bio,
         website: user.website,
         xHandle: user.xHandle,
+        headerColor: user.headerColor,
         createdAt: user.createdAt,
       },
       stats: {
