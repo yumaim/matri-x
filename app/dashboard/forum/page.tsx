@@ -246,9 +246,9 @@ export default function ForumPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:gap-8 lg:grid-cols-4">
+      <div className="grid gap-6 lg:gap-8 lg:grid-cols-4 min-w-0">
         {/* Main Content */}
-        <div className="lg:col-span-3 space-y-4 sm:space-y-6">
+        <div className="lg:col-span-3 space-y-4 sm:space-y-6 min-w-0">
           {/* Category Tabs */}
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {categories.map((category) => (

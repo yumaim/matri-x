@@ -265,7 +265,7 @@ export default function DashboardPage() {
         </Card>
 
       {/* Stats Grid */}
-      <div data-tour="stats-cards" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div data-tour="stats-cards" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
           { title: "投稿数", value: progressData.stats.postCount, icon: FileText, color: "text-primary" },
           { title: "コメント数", value: progressData.stats.commentCount, icon: MessageSquare, color: "text-accent" },

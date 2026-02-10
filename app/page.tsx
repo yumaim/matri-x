@@ -31,7 +31,7 @@ const navigation = [
 
 const stats = [
   { value: "6,000+", label: "分析対象の特徴量" },
-  { value: "75.0", label: "最強エンゲージメント重み" },
+  { value: "75.0×", label: "最強エンゲージメント重み" },
   { value: "145K", label: "SimClustersコミュニティ" },
   { value: "30分", label: "初速ウィンドウ" },
 ];
@@ -187,7 +187,7 @@ function Header() {
             onClick={() => setMobileMenuOpen(false)}
             onKeyDown={(e) => e.key === "Escape" && setMobileMenuOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm glass p-6">
+          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-card border-l border-border p-6 z-50">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
@@ -463,7 +463,7 @@ function EngagementSection() {
                 <span
                   className={`${item.color} rounded-full px-3 py-1 text-sm font-bold text-white`}
                 >
-                  {item.weight}
+                  {item.weight} ×
                 </span>
               </div>
               <div className="mt-4 h-2 w-full rounded-full bg-muted">
