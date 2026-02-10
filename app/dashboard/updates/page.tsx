@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  History,
   GitCommit,
   GitBranch,
   Calendar,
@@ -13,7 +12,6 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
-  Filter,
   Search,
   Bell,
   ArrowUpRight,
@@ -22,7 +20,7 @@ import {
   Shield,
   Users,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";

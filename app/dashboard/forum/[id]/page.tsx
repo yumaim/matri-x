@@ -20,8 +20,6 @@ import {
   Pencil,
   Trash2,
   Plus,
-  Link2,
-  Check,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,7 +41,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -55,7 +52,7 @@ import {
 import { VoteButton } from "@/components/forum/vote-button";
 import { PostReactions } from "@/components/forum/post-reactions";
 import { CommentSection } from "@/components/forum/comment-section";
-import { EvidenceSection, EvidenceCard } from "@/components/forum/evidence-card";
+import { EvidenceSection } from "@/components/forum/evidence-card";
 import { cn } from "@/lib/utils";
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {

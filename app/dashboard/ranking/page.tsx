@@ -11,7 +11,6 @@ import {
   Eye,
   ThumbsUp,
   FlaskConical,
-  Loader2,
   Users,
   FileText,
 } from "lucide-react";

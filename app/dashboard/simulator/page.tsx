@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { PlanGate } from "@/components/plan-gate";
 import {
   Users,
-  UserCheck,
   Heart,
   MessageSquare,
   Repeat2,
@@ -27,7 +26,6 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 interface SimulatorInputs {
@@ -112,7 +110,7 @@ function SimulatorContent() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [history, setHistory] = useState<SimulationRecord[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const [lastSavedId, setLastSavedId] = useState<string | null>(null);
+  const [, setLastSavedId] = useState<string | null>(null);
 
   const fetchHistory = useCallback(async () => {
     try {

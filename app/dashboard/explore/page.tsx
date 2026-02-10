@@ -301,8 +301,7 @@ const sourceTypes = [
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function ExplorePage() {
-  const [activeStage, setActiveStage] = useState<string | null>(null);
-  const [expandedStage, setExpandedStage] = useState<string | null>(null);
+  const [expandedStage, _setExpandedStage] = useState<string | null>(null);
 
   // ─── Pipeline Play/Reset Animation State ──────────────────────────────────
   // currentStep: 0=idle(dim), 1-5=stage being animated, 6=complete(all lit)
@@ -426,11 +425,6 @@ export default function ExplorePage() {
     if (currentStep >= toStage) return "node-graph-edge-slow pipeline-edge-active";
     return "node-graph-edge-slow pipeline-edge-dim";
   };
-
-  const toggleExpanded = (id: string) => {
-    setExpandedStage((prev) => (prev === id ? null : id));
-  };
-
 
   return (
     <div className="p-6 lg:p-8 space-y-8">

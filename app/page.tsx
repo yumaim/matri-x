@@ -574,7 +574,7 @@ function CTASection() {
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Xアルゴリズムを理解し、あなたのコンテンツ戦略を最適化しましょう。
           </p>
-          <Button asChild size="lg" className="mt-8 glow-primary group"><Link href="/register">無料トライアルを開始<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link></Button>
+          <Button asChild size="lg" className="mt-8 glow-primary group"><Link href="/register">今すぐ無料で始める<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link></Button>
         </div>
       </div>
     </section>
@@ -608,7 +608,9 @@ function Footer() {
           </div>
           <div className="flex items-center gap-4">
             <Link
-              href="#"
+              href="https://x.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground"
             >
               <Twitter className="h-5 w-5" />

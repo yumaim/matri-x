@@ -6,10 +6,10 @@ import {
   Users,
   BarChart3,
   Search,
-  TrendingUp,
+
   ArrowRight,
-  Zap,
-  Clock,
+
+
   AlertCircle,
   MessageSquare,
   ThumbsUp,
