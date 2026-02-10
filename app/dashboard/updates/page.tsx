@@ -467,9 +467,12 @@ export default function UpdatesPage() {
                                   size="sm"
                                   variant="outline"
                                   className="bg-transparent"
+                                  asChild
                                 >
+                                  <a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener noreferrer">
                                   <ExternalLink className="h-4 w-4 mr-2" />
                                   GitHubで見る
+                                  </a>
                                 </Button>
                               </div>
                             )}
@@ -505,10 +508,12 @@ export default function UpdatesPage() {
                 X(Twitter)のアルゴリズムはGitHubで公開されています
               </p>
             </div>
-            <Button className="glow-primary">
+            <Button className="glow-primary" asChild>
+              <a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener noreferrer">
               <ExternalLink className="h-4 w-4 mr-2" />
               GitHubで確認
               <ArrowUpRight className="h-4 w-4 ml-1" />
+              </a>
             </Button>
           </div>
         </CardContent>
