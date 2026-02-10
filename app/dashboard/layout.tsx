@@ -193,7 +193,7 @@ const navigation = [
   { name: "パイプライン探索", href: "/dashboard/explore", icon: GitBranch },
   { name: "TweepCredシミュレーター", href: "/dashboard/simulator", icon: Users },
   { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3 },
-  { name: "ディープAI検索", href: "/dashboard/deepwiki", icon: Search },
+  { name: "Deep AI検索", href: "/dashboard/deepwiki", icon: Search },
   { name: "フォーラム", href: "/dashboard/forum", icon: MessageCircle },
   { name: "ランキング", href: "/dashboard/ranking", icon: Trophy },
   { name: "更新履歴", href: "/dashboard/updates", icon: History },

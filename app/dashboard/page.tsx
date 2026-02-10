@@ -51,7 +51,7 @@ const quickActions = [
     color: "bg-[#00ba7c]",
   },
   {
-    title: "ディープAI検索",
+    title: "Deep AI検索",
     description: "AIに質問してソースコードを探索",
     href: "/dashboard/deepwiki",
     icon: Search,
@@ -115,8 +115,44 @@ interface ProgressData {
   }>;
 }
 
+const DEFAULT_PROGRESS: ProgressData = {
+  level: 1,
+  totalXp: 0,
+  nextLevelXp: 50,
+  achievements: [
+    { id: "first_login", name: "はじめの一歩", description: "matri-xに初めてログイン", icon: "🎯", xp: 10, unlocked: false, tier: "bronze" },
+    { id: "first_post", name: "発言者", description: "フォーラムに初投稿", icon: "💬", xp: 20, unlocked: false, tier: "bronze" },
+    { id: "first_comment", name: "交流の第一歩", description: "初めてのコメント投稿", icon: "💭", xp: 15, unlocked: false, tier: "bronze" },
+    { id: "first_vote", name: "いいね職人", description: "初めての投票", icon: "👆", xp: 10, unlocked: false, tier: "bronze" },
+    { id: "5_posts", name: "常連メンバー", description: "フォーラムに5件投稿", icon: "📝", xp: 50, unlocked: false, tier: "silver" },
+    { id: "10_comments", name: "議論好き", description: "10件以上のコメント", icon: "🗣️", xp: 30, unlocked: false, tier: "silver" },
+    { id: "10_votes", name: "目利き", description: "10件以上の投票", icon: "👁️", xp: 20, unlocked: false, tier: "silver" },
+    { id: "first_verification", name: "検証者", description: "初めての検証レポート", icon: "🔬", xp: 30, unlocked: false, tier: "silver" },
+    { id: "20_posts", name: "情報発信者", description: "フォーラムに20件投稿", icon: "🏆", xp: 80, unlocked: false, tier: "gold" },
+    { id: "community_builder", name: "コミュニティビルダー", description: "50件以上のコメント", icon: "🤝", xp: 50, unlocked: false, tier: "gold" },
+    { id: "3_verifications", name: "検証マスター", description: "3件以上の検証レポート", icon: "⚗️", xp: 60, unlocked: false, tier: "gold" },
+    { id: "popular_post", name: "バズメーカー", description: "10以上のスコアを獲得した投稿", icon: "🔥", xp: 40, unlocked: false, tier: "gold" },
+    { id: "pipeline_master", name: "パイプラインマスター", description: "パイプライン探索を全セクション閲覧", icon: "🔧", xp: 40, unlocked: false, tier: "silver" },
+    { id: "simulator_pro", name: "シミュレーター達人", description: "シミュレーターを5回以上使用", icon: "🧮", xp: 30, unlocked: false, tier: "silver" },
+    { id: "deepwiki_seeker", name: "知識の探求者", description: "Deep AI検索で10回以上検索", icon: "🔍", xp: 30, unlocked: false, tier: "silver" },
+    { id: "algorithm_sage", name: "アルゴリズム賢者", description: "全トピックの学習を完了", icon: "🧠", xp: 100, unlocked: false, tier: "gold" },
+  ],
+  learningTopics: [
+    { id: "pipeline", name: "推薦パイプライン", description: "候補取得からランキングまでの全体フロー", completed: false, viewCount: 0, plan: "FREE" },
+    { id: "engagement", name: "エンゲージメント重み付け", description: "いいね・リプライ・リポストの重み", completed: false, viewCount: 0, plan: "FREE" },
+    { id: "velocity", name: "加速度とバイラル", description: "30分ウィンドウと拡散の仕組み", completed: false, viewCount: 0, plan: "FREE" },
+    { id: "filters", name: "フィルタリング", description: "安全性・多様性・品質フィルター", completed: false, viewCount: 0, plan: "FREE" },
+    { id: "heavy_ranker", name: "Heavy Ranker", description: "AIスコアリングの仕組み", completed: false, viewCount: 0, plan: "STANDARD" },
+    { id: "tweepcred", name: "TweepCred", description: "アカウント信頼度スコア", completed: false, viewCount: 0, plan: "STANDARD" },
+    { id: "simclusters", name: "SimClusters", description: "興味コミュニティの分類", completed: false, viewCount: 0, plan: "STANDARD" },
+    { id: "grok", name: "Grok統合", description: "AI品質評価と配信判定", completed: false, viewCount: 0, plan: "STANDARD" },
+  ],
+  stats: { postCount: 0, commentCount: 0, voteCount: 0, simCount: 0, verifiedPosts: 0 },
+  newAchievements: [],
+};
+
 export default function DashboardPage() {
-  const [progressData, setProgressData] = useState<ProgressData | null>(null);
+  const [progressData, setProgressData] = useState<ProgressData>(DEFAULT_PROGRESS);
   const [isLoading, setIsLoading] = useState(true);
   const [showNewAchievement, setShowNewAchievement] = useState(false);
 
@@ -145,13 +181,13 @@ export default function DashboardPage() {
     ? ((progressData.totalXp % 50) / 50) * 100
     : 0;
 
-  const completedTopics = progressData?.learningTopics.filter((t) => t.completed).length ?? 0;
-  const totalTopics = progressData?.learningTopics.length ?? 8;
+  const completedTopics = progressData.learningTopics.filter((t) => t.completed).length ?? 0;
+  const totalTopics = progressData.learningTopics.length ?? 8;
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
       {/* New Achievement Toast */}
-      {showNewAchievement && progressData?.newAchievements && progressData.newAchievements.length > 0 && (
+      {showNewAchievement && progressData.newAchievements && progressData.newAchievements.length > 0 && (
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right">
           <Card className="glass border-yellow-500/50 bg-yellow-500/10 w-80">
             <CardContent className="p-4 flex items-center gap-3">
@@ -189,8 +225,7 @@ export default function DashboardPage() {
       </div>
 
       {/* XP Progress Bar */}
-      {progressData && (
-        <Card className="glass border-primary/20">
+      <Card className="glass border-primary/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white font-bold text-xl">
@@ -217,15 +252,14 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-      )}
 
       {/* Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { title: "投稿数", value: progressData?.stats.postCount, icon: FileText, color: "text-primary" },
-          { title: "コメント数", value: progressData?.stats.commentCount, icon: MessageSquare, color: "text-accent" },
-          { title: "投票数", value: progressData?.stats.voteCount, icon: ThumbsUp, color: "text-[#00ba7c]" },
-          { title: "検証レポート", value: progressData?.stats.verifiedPosts, icon: Target, color: "text-orange-500" },
+          { title: "投稿数", value: progressData.stats.postCount, icon: FileText, color: "text-primary" },
+          { title: "コメント数", value: progressData.stats.commentCount, icon: MessageSquare, color: "text-accent" },
+          { title: "投票数", value: progressData.stats.voteCount, icon: ThumbsUp, color: "text-[#00ba7c]" },
+          { title: "検証レポート", value: progressData.stats.verifiedPosts, icon: Target, color: "text-orange-500" },
         ].map((stat) => (
           <Card key={stat.title} className="glass">
             <CardContent className="p-6">
@@ -302,7 +336,7 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {progressData?.learningTopics.map((topic) => (
+            {progressData.learningTopics.map((topic) => (
               <div
                 key={topic.id}
                 className={`flex items-center gap-3 rounded-lg p-3 transition-colors ${
@@ -345,11 +379,7 @@ export default function DashboardPage() {
                   <span className="text-xs text-muted-foreground">{topic.viewCount}回閲覧</span>
                 )}
               </div>
-            )) ?? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-14 animate-pulse rounded-lg bg-muted/50" />
-              ))
-            )}
+            ))}
             <Link href="/dashboard/explore">
               <Button variant="outline" className="mt-2 w-full bg-transparent">
                 学習を続ける
@@ -369,7 +399,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-2">
-              {progressData?.achievements.map((achievement) => {
+              {progressData.achievements.map((achievement) => {
                 const tierColor = achievement.tier === "gold"
                   ? "border-yellow-500/40 bg-yellow-500/5"
                   : achievement.tier === "silver"
@@ -404,11 +434,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 );
-              }) ?? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-20 animate-pulse rounded-lg bg-muted/30" />
-                ))
-              )}
+              })}
             </div>
           </CardContent>
         </Card>
