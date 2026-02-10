@@ -27,6 +27,9 @@ import {
   Trophy,
   Shield,
   Smartphone,
+  Network,
+  Radio,
+  Layers,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -1051,6 +1054,365 @@ export default function ExplorePage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* ─── SimClusters Visualization ─────────────────────────────── */}
+      <section className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500 text-white">
+            <Network className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-foreground">
+              SimClusters — あなたの投稿はどこへ届く？
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              興味コミュニティの仕組みとコンテンツ波及を可視化
+            </p>
+          </div>
+        </div>
+
+        {/* ── Community Venn Diagram ──────────────────────────────────── */}
+        <Card className="glass overflow-hidden">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Layers className="h-5 w-5 text-indigo-400" />
+              興味コミュニティの重なり
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Xの全ユーザーは145,000の「興味コミュニティ」に自動分類されます。あなたは複数のコミュニティに同時に所属しています。
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col lg:flex-row items-center gap-8">
+              {/* SVG Venn Diagram with pulse animation */}
+              <div className="relative w-full max-w-md mx-auto lg:mx-0 aspect-square">
+                <style>{`
+                  @keyframes simclusters-pulse {
+                    0% { transform: scale(1); opacity: 0.6; }
+                    50% { transform: scale(1.08); opacity: 0.8; }
+                    100% { transform: scale(1); opacity: 0.6; }
+                  }
+                  @keyframes simclusters-ripple {
+                    0% { r: 6; opacity: 1; }
+                    100% { r: 40; opacity: 0; }
+                  }
+                  @keyframes simclusters-ripple-outer {
+                    0% { r: 6; opacity: 0.8; }
+                    100% { r: 60; opacity: 0; }
+                  }
+                  @keyframes simclusters-ripple-max {
+                    0% { r: 6; opacity: 0.6; }
+                    100% { r: 80; opacity: 0; }
+                  }
+                  .sc-community-tech { animation: simclusters-pulse 3s ease-in-out infinite 0s; }
+                  .sc-community-mkt  { animation: simclusters-pulse 3s ease-in-out infinite 0.6s; }
+                  .sc-community-ent  { animation: simclusters-pulse 3s ease-in-out infinite 1.2s; }
+                  .sc-community-biz  { animation: simclusters-pulse 3s ease-in-out infinite 1.8s; }
+                  .sc-community-news { animation: simclusters-pulse 3s ease-in-out infinite 2.4s; }
+                  .sc-ripple-1 { animation: simclusters-ripple 2.5s ease-out infinite; }
+                  .sc-ripple-2 { animation: simclusters-ripple-outer 2.5s ease-out infinite 0.5s; }
+                  .sc-ripple-3 { animation: simclusters-ripple-max 2.5s ease-out infinite 1.0s; }
+                `}</style>
+                <svg viewBox="0 0 300 300" className="w-full h-full">
+                  {/* Community circles (Venn-style overlapping) */}
+                  {/* Technology - Blue (top-left) */}
+                  <circle cx="120" cy="110" r="70" fill="#3B82F6" opacity="0.25" className="sc-community-tech" />
+                  <circle cx="120" cy="110" r="70" fill="none" stroke="#3B82F6" strokeWidth="1.5" opacity="0.5" />
+                  {/* Marketing - Green (top-right) */}
+                  <circle cx="185" cy="110" r="65" fill="#22C55E" opacity="0.25" className="sc-community-mkt" />
+                  <circle cx="185" cy="110" r="65" fill="none" stroke="#22C55E" strokeWidth="1.5" opacity="0.5" />
+                  {/* Entertainment - Purple (bottom-left) */}
+                  <circle cx="105" cy="185" r="62" fill="#A855F7" opacity="0.25" className="sc-community-ent" />
+                  <circle cx="105" cy="185" r="62" fill="none" stroke="#A855F7" strokeWidth="1.5" opacity="0.5" />
+                  {/* Business - Orange (bottom-right) */}
+                  <circle cx="195" cy="180" r="60" fill="#F97316" opacity="0.25" className="sc-community-biz" />
+                  <circle cx="195" cy="180" r="60" fill="none" stroke="#F97316" strokeWidth="1.5" opacity="0.5" />
+                  {/* News - Red (center-bottom) */}
+                  <circle cx="150" cy="200" r="55" fill="#EF4444" opacity="0.2" className="sc-community-news" />
+                  <circle cx="150" cy="200" r="55" fill="none" stroke="#EF4444" strokeWidth="1.5" opacity="0.5" />
+
+                  {/* Center: Your post (ripple origin) */}
+                  <circle cx="150" cy="150" r="6" fill="#FBBF24" opacity="1" />
+                  <circle cx="150" cy="150" r="6" fill="none" stroke="#FBBF24" strokeWidth="2" className="sc-ripple-1" />
+                  <circle cx="150" cy="150" r="6" fill="none" stroke="#FBBF24" strokeWidth="1.5" className="sc-ripple-2" />
+                  <circle cx="150" cy="150" r="6" fill="none" stroke="#FBBF24" strokeWidth="1" className="sc-ripple-3" />
+
+                  {/* Labels */}
+                  <text x="95" y="80" textAnchor="middle" fill="#3B82F6" fontSize="11" fontWeight="600">テクノロジー</text>
+                  <text x="210" y="75" textAnchor="middle" fill="#22C55E" fontSize="11" fontWeight="600">マーケティング</text>
+                  <text x="70" y="225" textAnchor="middle" fill="#A855F7" fontSize="11" fontWeight="600">エンタメ</text>
+                  <text x="230" y="225" textAnchor="middle" fill="#F97316" fontSize="11" fontWeight="600">ビジネス</text>
+                  <text x="150" y="265" textAnchor="middle" fill="#EF4444" fontSize="11" fontWeight="600">ニュース</text>
+
+                  {/* Center label */}
+                  <text x="150" y="135" textAnchor="middle" fill="#FBBF24" fontSize="10" fontWeight="bold">あなたの投稿</text>
+                </svg>
+              </div>
+
+              {/* Legend / explanation */}
+              <div className="flex-1 space-y-3">
+                <h4 className="font-semibold text-foreground">コミュニティの見方</h4>
+                <p className="text-sm text-muted-foreground">
+                  円が重なっている部分は、複数の興味を持つユーザーが集まるゾーン。あなたの投稿は、中心からパルスのように各コミュニティへ波及します。
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2">
+                  {[
+                    { name: "テクノロジー", color: "bg-blue-500" },
+                    { name: "マーケティング", color: "bg-green-500" },
+                    { name: "エンタメ", color: "bg-purple-500" },
+                    { name: "ビジネス", color: "bg-orange-500" },
+                    { name: "ニュース", color: "bg-red-500" },
+                  ].map((c) => (
+                    <div key={c.name} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className={cn("h-3 w-3 rounded-full", c.color)} />
+                      <span>{c.name}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="h-3 w-3 rounded-full bg-yellow-400" />
+                    <span>あなたの投稿</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ── How SimClusters Works (Explanation Cards) ───────────────── */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {/* Card 1: SimClusters とは */}
+          <Card className="glass overflow-hidden">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/20">
+                  <Users className="h-5 w-5 text-indigo-400" />
+                </div>
+                <h4 className="font-semibold text-foreground text-sm">
+                  興味コミュニティとは？
+                </h4>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                SimClusters は、Xの全ユーザーを<strong className="text-foreground">145,000の興味コミュニティ</strong>に自動分類するシステムです。
+                フォロー関係や「いいね」の傾向から、ユーザーの興味を多次元的に把握します。
+              </p>
+              <div className="mt-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20 p-3">
+                <p className="text-xs text-muted-foreground">
+                  💡 あなたは1つではなく、複数のコミュニティに同時に所属しています
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 2: How your post reaches beyond followers */}
+          <Card className="glass overflow-hidden">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/20">
+                  <Radio className="h-5 w-5 text-emerald-400" />
+                </div>
+                <h4 className="font-semibold text-foreground text-sm">
+                  フォロワー外に届く仕組み
+                </h4>
+              </div>
+              <ol className="text-sm text-muted-foreground space-y-3 leading-relaxed">
+                <li className="flex gap-2">
+                  <Badge variant="secondary" className="h-5 w-5 shrink-0 flex items-center justify-center rounded-full text-[10px] p-0">1</Badge>
+                  <span>あなたが<strong className="text-foreground">「テクノロジー × マーケティング」</strong>のコミュニティに分類される</span>
+                </li>
+                <li className="flex gap-2">
+                  <Badge variant="secondary" className="h-5 w-5 shrink-0 flex items-center justify-center rounded-full text-[10px] p-0">2</Badge>
+                  <span>同じコミュニティの他ユーザーのタイムラインに<strong className="text-foreground">表示候補</strong>になる</span>
+                </li>
+                <li className="flex gap-2">
+                  <Badge variant="secondary" className="h-5 w-5 shrink-0 flex items-center justify-center rounded-full text-[10px] p-0">3</Badge>
+                  <span>コミュニティが<strong className="text-foreground">重なっている部分</strong>のユーザーほど表示されやすい</span>
+                </li>
+              </ol>
+            </CardContent>
+          </Card>
+
+          {/* Card 3: CrMixer */}
+          <Card className="glass overflow-hidden">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500/20">
+                  <Sparkles className="h-5 w-5 text-orange-400" />
+                </div>
+                <h4 className="font-semibold text-foreground text-sm">
+                  興味が近い人のおすすめ
+                </h4>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                CrMixer は、興味コミュニティの情報を使って、あなたがフォローしていない人の投稿からおすすめを<strong className="text-foreground">最大400件</strong>取得するエンジンです。
+              </p>
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center justify-between rounded-lg bg-background/50 p-3">
+                  <span className="text-xs text-muted-foreground">取得上限</span>
+                  <span className="text-sm font-bold text-foreground">400件</span>
+                </div>
+                <div className="flex items-center justify-between rounded-lg bg-background/50 p-3">
+                  <span className="text-xs text-muted-foreground">データソース</span>
+                  <span className="text-sm font-bold text-foreground">SimClusters</span>
+                </div>
+                <div className="flex items-center justify-between rounded-lg bg-background/50 p-3">
+                  <span className="text-xs text-muted-foreground">対象</span>
+                  <span className="text-sm font-bold text-foreground">フォロー外</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* ── Ripple Propagation Animation ────────────────────────────── */}
+        <Card className="glass overflow-hidden">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Radio className="h-5 w-5 text-yellow-400" />
+              投稿の波及イメージ
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              あなたの投稿が興味コミュニティを通じてフォロワー外に広がっていく様子
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="relative w-full max-w-lg mx-auto aspect-[4/3]">
+              <style>{`
+                @keyframes sc-propagate-ring-1 {
+                  0%   { transform: scale(0.15); opacity: 1; }
+                  100% { transform: scale(1); opacity: 0; }
+                }
+                @keyframes sc-propagate-ring-2 {
+                  0%   { transform: scale(0.15); opacity: 0.8; }
+                  100% { transform: scale(1.2); opacity: 0; }
+                }
+                @keyframes sc-propagate-ring-3 {
+                  0%   { transform: scale(0.15); opacity: 0.6; }
+                  100% { transform: scale(1.4); opacity: 0; }
+                }
+                @keyframes sc-glow-center {
+                  0%, 100% { box-shadow: 0 0 8px 2px rgba(251,191,36,0.4); }
+                  50% { box-shadow: 0 0 20px 6px rgba(251,191,36,0.7); }
+                }
+                @keyframes sc-node-appear-1 {
+                  0%, 30% { opacity: 0; transform: scale(0.5); }
+                  50% { opacity: 1; transform: scale(1.1); }
+                  60%, 100% { opacity: 1; transform: scale(1); }
+                }
+                @keyframes sc-node-appear-2 {
+                  0%, 50% { opacity: 0; transform: scale(0.5); }
+                  70% { opacity: 1; transform: scale(1.1); }
+                  80%, 100% { opacity: 1; transform: scale(1); }
+                }
+                @keyframes sc-node-appear-3 {
+                  0%, 65% { opacity: 0; transform: scale(0.5); }
+                  85% { opacity: 1; transform: scale(1.1); }
+                  95%, 100% { opacity: 1; transform: scale(1); }
+                }
+                .sc-ring-1 { animation: sc-propagate-ring-1 3s ease-out infinite; }
+                .sc-ring-2 { animation: sc-propagate-ring-2 3s ease-out infinite 0.6s; }
+                .sc-ring-3 { animation: sc-propagate-ring-3 3s ease-out infinite 1.2s; }
+                .sc-center-glow { animation: sc-glow-center 2s ease-in-out infinite; }
+                .sc-appear-1 { animation: sc-node-appear-1 3s ease-out infinite; }
+                .sc-appear-2 { animation: sc-node-appear-2 3s ease-out infinite; }
+                .sc-appear-3 { animation: sc-node-appear-3 3s ease-out infinite; }
+              `}</style>
+
+              {/* Propagation rings */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="sc-ring-1 absolute w-full h-full rounded-full border-2 border-yellow-400/50" />
+                <div className="sc-ring-2 absolute w-full h-full rounded-full border border-blue-400/40" />
+                <div className="sc-ring-3 absolute w-full h-full rounded-full border border-purple-400/30" />
+              </div>
+
+              {/* Community nodes around the center */}
+              {/* Tech - top */}
+              <div className="sc-appear-1 absolute top-[8%] left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+                <div className="h-10 w-10 rounded-full bg-blue-500/30 border border-blue-500/50 flex items-center justify-center">
+                  <span className="text-xs">💻</span>
+                </div>
+                <span className="text-[10px] text-blue-400 font-medium">テクノロジー</span>
+              </div>
+              {/* Marketing - top-right */}
+              <div className="sc-appear-1 absolute top-[20%] right-[8%] flex flex-col items-center gap-1">
+                <div className="h-10 w-10 rounded-full bg-green-500/30 border border-green-500/50 flex items-center justify-center">
+                  <span className="text-xs">📢</span>
+                </div>
+                <span className="text-[10px] text-green-400 font-medium">マーケティング</span>
+              </div>
+              {/* Entertainment - bottom-right */}
+              <div className="sc-appear-2 absolute bottom-[18%] right-[10%] flex flex-col items-center gap-1">
+                <div className="h-10 w-10 rounded-full bg-purple-500/30 border border-purple-500/50 flex items-center justify-center">
+                  <span className="text-xs">🎬</span>
+                </div>
+                <span className="text-[10px] text-purple-400 font-medium">エンタメ</span>
+              </div>
+              {/* Business - bottom-left */}
+              <div className="sc-appear-2 absolute bottom-[18%] left-[10%] flex flex-col items-center gap-1">
+                <div className="h-10 w-10 rounded-full bg-orange-500/30 border border-orange-500/50 flex items-center justify-center">
+                  <span className="text-xs">💼</span>
+                </div>
+                <span className="text-[10px] text-orange-400 font-medium">ビジネス</span>
+              </div>
+              {/* News - top-left */}
+              <div className="sc-appear-3 absolute top-[20%] left-[8%] flex flex-col items-center gap-1">
+                <div className="h-10 w-10 rounded-full bg-red-500/30 border border-red-500/50 flex items-center justify-center">
+                  <span className="text-xs">📰</span>
+                </div>
+                <span className="text-[10px] text-red-400 font-medium">ニュース</span>
+              </div>
+
+              {/* Outer user nodes (reached users) */}
+              {[
+                { top: "2%", left: "30%", delay: "sc-appear-2" },
+                { top: "2%", right: "25%", delay: "sc-appear-3" },
+                { top: "40%", right: "2%", delay: "sc-appear-2" },
+                { bottom: "5%", right: "30%", delay: "sc-appear-3" },
+                { bottom: "5%", left: "30%", delay: "sc-appear-3" },
+                { top: "40%", left: "2%", delay: "sc-appear-2" },
+              ].map((pos, i) => (
+                <div
+                  key={i}
+                  className={cn("absolute flex items-center justify-center", pos.delay)}
+                  style={{ top: pos.top, left: pos.left, right: pos.right, bottom: pos.bottom }}
+                >
+                  <div className="h-6 w-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+                    <Users className="h-3 w-3 text-white/50" />
+                  </div>
+                </div>
+              ))}
+
+              {/* Center: Your post */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
+                <div className="sc-center-glow h-14 w-14 rounded-full bg-yellow-500/40 border-2 border-yellow-400 flex items-center justify-center">
+                  <Send className="h-6 w-6 text-yellow-300" />
+                </div>
+                <span className="text-xs font-bold text-yellow-300 whitespace-nowrap">あなたの投稿</span>
+              </div>
+            </div>
+
+            {/* Caption */}
+            <div className="mt-6 text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                💡 あなたの投稿は、まず所属するコミュニティ内で候補になり、次に重なるコミュニティへ広がります
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground pt-2">
+                <span className="flex items-center gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+                  あなたの投稿（発信源）
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full border border-yellow-400/50" />
+                  波及パルス
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full bg-white/10 border border-white/20" />
+                  フォロワー外のユーザー
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
     </div>
   );
 }
