@@ -194,13 +194,13 @@ function NotificationBell() {
 const navigation = [
   { name: "ダッシュボード", href: "/dashboard", icon: LayoutDashboard },
   { name: "フォーラム", href: "/dashboard/forum", icon: MessageCircle },
+  { name: "ランキング", href: "/dashboard/ranking", icon: Trophy },
   { name: "アナリティクス", href: "/dashboard/analytics", icon: Activity },
   { name: "パイプライン探索", href: "/dashboard/explore", icon: GitBranch },
   { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3 },
   { name: "TweepCredシミュレーター", href: "/dashboard/simulator", icon: Users },
   { name: "Deep AI検索", href: "/dashboard/deepwiki", icon: Search },
   { name: "用語集", href: "/dashboard/glossary", icon: BookOpen },
-  { name: "ランキング", href: "/dashboard/ranking", icon: Trophy },
   { name: "更新履歴", href: "/dashboard/updates", icon: History },
 ];
 

@@ -302,7 +302,7 @@ export default function UserProfilePage({
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="glass w-full overflow-x-auto flex justify-start sm:justify-center no-scrollbar">
+          <TabsList className="glass w-full overflow-x-auto overflow-y-hidden flex justify-start sm:justify-center no-scrollbar" style={{ touchAction: "pan-x", overscrollBehavior: "contain" }}>
             <TabsTrigger value="posts" className="shrink-0 gap-1.5">
               <FileText className="h-3.5 w-3.5" />
               投稿
