@@ -21,7 +21,7 @@ const ACHIEVEMENTS = [
   // 学習系
   { id: "pipeline_master", name: "パイプラインマスター", description: "パイプライン探索を全セクション閲覧", icon: "🔧", xp: 40, tier: "silver" },
   { id: "simulator_pro", name: "シミュレーター達人", description: "シミュレーターを5回以上使用", icon: "🧮", xp: 30, tier: "silver" },
-  { id: "deepwiki_seeker", name: "知識の探求者", description: "DeepWikiで10回以上検索", icon: "🔍", xp: 30, tier: "silver" },
+  { id: "deepwiki_seeker", name: "知識の探求者", description: "ディープAI検索で10回以上検索", icon: "🔍", xp: 30, tier: "silver" },
   { id: "algorithm_sage", name: "アルゴリズム賢者", description: "全トピックの学習を完了", icon: "🧠", xp: 100, tier: "gold" },
 ];
 

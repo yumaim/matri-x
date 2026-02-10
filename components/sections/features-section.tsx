@@ -38,7 +38,7 @@ const features = [
   },
   {
     icon: Bot,
-    title: "DeepWiki AI検索",
+    title: "ディープAI検索",
     description:
       "Xアルゴリズムのソースコードに対するチャット形式の検索。クイックサジェスト機能付き。",
     color: "text-orange-500",

@@ -54,7 +54,7 @@ const features = [
   },
   {
     icon: Search,
-    title: "DeepWiki AI検索",
+    title: "ディープAI検索",
     description: "アルゴリズムの疑問をAIに質問して即座に回答",
   },
   {
@@ -113,7 +113,7 @@ const pricingPlans = [
       "全機能アクセス",
       "TweepCredシミュレーター",
       "SimClusters詳細解説",
-      "DeepWiki AI検索(月50回)",
+      "ディープAI検索(月50回)",
       "リアルタイム更新通知",
     ],
     cta: "Coming Soon",
@@ -127,7 +127,7 @@ const pricingPlans = [
     description: "チームや代理店向けの高度な分析",
     features: [
       "Standard全機能",
-      "DeepWiki AI検索(無制限)",
+      "ディープAI検索(無制限)",
       "API アクセス",
       "チーム共有機能",
       "優先サポート",

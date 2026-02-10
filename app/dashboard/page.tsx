@@ -51,7 +51,7 @@ const quickActions = [
     color: "bg-[#00ba7c]",
   },
   {
-    title: "DeepWiki AI検索",
+    title: "ディープAI検索",
     description: "AIに質問してソースコードを探索",
     href: "/dashboard/deepwiki",
     icon: Search,

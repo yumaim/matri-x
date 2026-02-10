@@ -41,7 +41,7 @@ const plans = [
     description: "プロフェッショナル向けフル機能",
     features: [
       "Standardの全機能",
-      "DeepWiki AI検索（無制限）",
+      "ディープAI検索（無制限）",
       "週次レポート",
       "フォーラム投稿権限",
       "保護マトリックス",

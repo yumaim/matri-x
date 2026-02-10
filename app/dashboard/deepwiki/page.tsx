@@ -52,7 +52,7 @@ const initialMessages: Message[] = [
 
 export default function DeepWikiPage() {
   return (
-    <PlanGate requiredPlan="STANDARD" featureName="DeepWiki AI検索">
+    <PlanGate requiredPlan="STANDARD" featureName="ディープAI検索">
       <DeepWikiContent />
     </PlanGate>
   );
@@ -135,7 +135,7 @@ function DeepWikiContent() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
-          DeepWiki AI検索
+          ディープAI検索
         </h1>
         <p className="mt-1 text-muted-foreground">
           Xアルゴリズムのソースコードについて何でも質問してください

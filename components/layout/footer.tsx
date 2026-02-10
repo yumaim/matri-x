@@ -6,7 +6,7 @@ const footerLinks = {
     { name: "パイプライン探索", href: "/explore" },
     { name: "シミュレーター", href: "/simulator" },
     { name: "SimClusters", href: "/simclusters" },
-    { name: "DeepWiki", href: "/deepwiki" },
+    { name: "ディープAI検索", href: "/deepwiki" },
   ],
   resources: [
     { name: "更新履歴", href: "/updates" },
