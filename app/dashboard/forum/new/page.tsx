@@ -8,59 +8,28 @@ import {
   Send,
   Eye,
   Loader2,
-  BookOpen,
-  FlaskConical,
-  TrendingUp,
-  Flame,
-  HelpCircle,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { TagInput } from "@/components/forum/tag-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
-  {
-    value: "ALGORITHM",
-    label: "アルゴリズム解説",
-    icon: BookOpen,
-    description: "アルゴリズムの仕組みや分析結果を共有",
-    color: "border-blue-500/50 text-blue-400 hover:bg-blue-500/10",
-  },
-  {
-    value: "VERIFICATION",
-    label: "現場検証",
-    icon: FlaskConical,
-    description: "仮説を検証した結果やデータを投稿",
-    color: "border-purple-500/50 text-purple-400 hover:bg-purple-500/10",
-  },
-  {
-    value: "STRATEGY",
-    label: "戦略・Tips",
-    icon: TrendingUp,
-    description: "運用戦略やテクニックを共有",
-    color: "border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10",
-  },
-  {
-    value: "UPDATES",
-    label: "最新アップデート",
-    icon: Flame,
-    description: "アルゴリズムの変更情報を共有",
-    color: "border-orange-500/50 text-orange-400 hover:bg-orange-500/10",
-  },
-  {
-    value: "QUESTIONS",
-    label: "質問・相談",
-    icon: HelpCircle,
-    description: "コミュニティに質問や相談を投稿",
-    color: "border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10",
-  },
+  { value: "ALGORITHM", label: "アルゴリズム解説" },
+  { value: "VERIFICATION", label: "現場検証" },
+  { value: "STRATEGY", label: "戦略・Tips" },
+  { value: "UPDATES", label: "最新アップデート" },
+  { value: "QUESTIONS", label: "質問・相談" },
 ];
 
 export default function NewPostPage() {
@@ -71,7 +40,6 @@ export default function NewPostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = (): boolean => {
@@ -96,7 +64,7 @@ export default function NewPostPage() {
             title: title.trim(),
             content,
             category,
-            tags,
+            tags: [],
             status: "PUBLISHED",
           }),
         });
@@ -129,7 +97,7 @@ export default function NewPostPage() {
             title: title.trim(),
             content: content || " ",
             category: category || "QUESTIONS",
-            tags,
+            tags: [],
             status: "DRAFT",
           }),
         });
@@ -199,52 +167,36 @@ export default function NewPostPage() {
       )}
 
       <div className="space-y-6">
-        {/* Category Selection */}
-        <Card className="bg-card/50 border-border/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">カテゴリ</CardTitle>
-            {errors.category && (
-              <p className="text-xs text-destructive">{errors.category}</p>
-            )}
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.value}
-                  type="button"
-                  onClick={() => {
-                    setCategory(cat.value);
-                    setErrors((e) => {
-                      const { category: _, ...rest } = e;
-                      return rest;
-                    });
-                  }}
-                  className={cn(
-                    "flex items-start gap-3 p-3 rounded-lg border text-left transition-all",
-                    category === cat.value
-                      ? cn("ring-2 ring-primary bg-primary/5", cat.color)
-                      : "border-border/50 hover:border-border bg-card/30"
-                  )}
-                >
-                  <cat.icon className={cn("h-5 w-5 shrink-0 mt-0.5", category === cat.value ? "" : "text-muted-foreground")} />
-                  <div>
-                    <p className={cn("text-sm font-medium", category === cat.value ? "text-foreground" : "text-foreground/80")}>
-                      {cat.label}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {cat.description}
-                    </p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Title */}
+        {/* Title & Category */}
         <Card className="bg-card/50 border-border/50">
           <CardContent className="p-4 sm:p-6 space-y-4">
+            {/* Category */}
+            <div>
+              <Label className="text-sm font-medium">カテゴリ</Label>
+              <Select
+                value={category}
+                onValueChange={(val) => {
+                  setCategory(val);
+                  setErrors((e) => { const { category: _, ...rest } = e; return rest; });
+                }}
+              >
+                <SelectTrigger className={cn("mt-1.5 bg-muted/30 border-border/50", errors.category && "border-destructive")}>
+                  <SelectValue placeholder="カテゴリを選択..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.category && (
+                <p className="text-xs text-destructive mt-1">{errors.category}</p>
+              )}
+            </div>
+
+            {/* Title */}
             <div>
               <Label htmlFor="title" className="text-sm font-medium">
                 タイトル
@@ -268,14 +220,6 @@ export default function NewPostPage() {
               <p className="text-xs text-muted-foreground mt-1">
                 {title.length}/200
               </p>
-            </div>
-
-            {/* Tags */}
-            <div>
-              <Label className="text-sm font-medium">タグ</Label>
-              <div className="mt-1.5">
-                <TagInput value={tags} onChange={setTags} maxTags={10} />
-              </div>
             </div>
           </CardContent>
         </Card>
