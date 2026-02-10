@@ -178,7 +178,7 @@ const tips = [
 
 export default function EngagementPage() {
   return (
-    <div className="p-6 lg:p-8 space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 overflow-x-hidden">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
@@ -211,8 +211,8 @@ export default function EngagementPage() {
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-[350px] w-full overflow-hidden">
-                  <BarChart data={chartData} layout="vertical" margin={{ left: 10, right: 10, top: 5, bottom: 5 }}>
-                    <XAxis type="number" domain={[0, 80]} tickCount={5} allowDataOverflow />
+                  <BarChart data={chartData} layout="vertical" margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
+                    <XAxis type="number" domain={[0, 100]} tickCount={6} allowDataOverflow />
                     <YAxis
                       type="category"
                       dataKey="name"

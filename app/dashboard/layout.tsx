@@ -383,7 +383,7 @@ export default function DashboardLayout({
       {/* Main Content */}
       <main
         className={cn(
-          "min-h-screen pt-16 transition-all duration-300 lg:pt-0",
+          "min-h-screen pt-16 transition-all duration-300 lg:pt-0 overflow-x-hidden",
           collapsed ? "lg:pl-[72px]" : "lg:pl-64"
         )}
       >
