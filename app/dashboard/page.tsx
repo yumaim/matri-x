@@ -17,6 +17,7 @@ import {
   Trophy,
   Star,
   CheckCircle2,
+  Circle,
   Flame,
   Target,
   Lock,
@@ -145,10 +146,10 @@ const DEFAULT_PROGRESS: ProgressData = {
     { id: "engagement", name: "エンゲージメント重み付け", description: "いいね・リプライ・リポストの重み", completed: false, viewCount: 0, plan: "FREE" },
     { id: "velocity", name: "加速度とバイラル", description: "30分ウィンドウと拡散の仕組み", completed: false, viewCount: 0, plan: "FREE" },
     { id: "filters", name: "フィルタリング", description: "安全性・多様性・品質フィルター", completed: false, viewCount: 0, plan: "FREE" },
-    { id: "heavy_ranker", name: "Heavy Ranker", description: "AIスコアリングの仕組み", completed: false, viewCount: 0, plan: "STANDARD" },
-    { id: "tweepcred", name: "TweepCred", description: "アカウント信頼度スコア", completed: false, viewCount: 0, plan: "STANDARD" },
-    { id: "simclusters", name: "SimClusters", description: "興味コミュニティの分類", completed: false, viewCount: 0, plan: "STANDARD" },
-    { id: "grok", name: "Grok統合", description: "AI品質評価と配信判定", completed: false, viewCount: 0, plan: "STANDARD" },
+    { id: "heavy_ranker", name: "Heavy Ranker", description: "AIスコアリングの仕組み", completed: false, viewCount: 0, plan: "PRO" },
+    { id: "tweepcred", name: "TweepCred", description: "アカウント信頼度スコア", completed: false, viewCount: 0, plan: "PRO" },
+    { id: "simclusters", name: "SimClusters", description: "興味コミュニティの分類", completed: false, viewCount: 0, plan: "PRO" },
+    { id: "grok", name: "Grok統合", description: "AI品質評価と配信判定", completed: false, viewCount: 0, plan: "PRO" },
   ],
   stats: { postCount: 0, commentCount: 0, voteCount: 0, simCount: 0, verifiedPosts: 0 },
   newAchievements: [],
@@ -406,34 +407,58 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {progressData.learningTopics.map((topic) => (
-              <Link
-                key={topic.id}
-                href={topic.plan === "STANDARD" ? "#" : (TOPIC_LINKS[topic.id] ?? "#")}
-                className="block"
-              >
+            {progressData.learningTopics.map((topic) => {
+              const isLocked = topic.plan === "STANDARD";
+              return (
               <div
-                className={`flex items-center gap-3 rounded-lg p-3 transition-colors cursor-pointer ${
+                key={topic.id}
+                onClick={async () => {
+                  if (isLocked) return;
+                  const newCompleted = !topic.completed;
+                  // Optimistic update
+                  setProgressData((prev) => ({
+                    ...prev,
+                    learningTopics: prev.learningTopics.map((t) =>
+                      t.id === topic.id ? { ...t, completed: newCompleted } : t
+                    ),
+                  }));
+                  try {
+                    await fetch("/api/users/progress/track", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ topicId: topic.id, completed: newCompleted }),
+                    });
+                  } catch {
+                    // Revert on error
+                    setProgressData((prev) => ({
+                      ...prev,
+                      learningTopics: prev.learningTopics.map((t) =>
+                        t.id === topic.id ? { ...t, completed: !newCompleted } : t
+                      ),
+                    }));
+                  }
+                }}
+                className={`flex items-center gap-3 rounded-lg p-3 transition-colors ${
                   topic.completed
-                    ? "bg-primary/5 border border-primary/20"
-                    : topic.plan === "STANDARD"
+                    ? "bg-primary/5 border border-primary/20 cursor-pointer"
+                    : isLocked
                       ? "bg-muted/30 opacity-70 cursor-not-allowed"
-                      : "bg-muted/50 hover:bg-muted"
+                      : "bg-muted/50 hover:bg-muted cursor-pointer"
                 }`}
               >
-                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
                   topic.completed
                     ? "bg-primary text-white"
-                    : topic.plan === "STANDARD"
+                    : isLocked
                       ? "bg-yellow-500/10 text-yellow-500"
-                      : "bg-muted-foreground/10 text-muted-foreground"
+                      : "bg-muted-foreground/10 text-muted-foreground hover:bg-primary/20 hover:text-primary"
                 }`}>
                   {topic.completed ? (
                     <CheckCircle2 className="h-4 w-4" />
-                  ) : topic.plan === "STANDARD" ? (
+                  ) : isLocked ? (
                     <Lock className="h-3.5 w-3.5" />
                   ) : (
-                    <span className="text-xs font-medium">{topic.viewCount}</span>
+                    <Circle className="h-4 w-4" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -441,20 +466,20 @@ export default function DashboardPage() {
                     <p className={`text-sm font-medium ${topic.completed ? "text-primary" : "text-foreground"}`}>
                       {topic.name}
                     </p>
-                    {topic.plan === "STANDARD" && (
+                    {isLocked && (
                       <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-yellow-500/40 text-yellow-500">
-                        Standard
+                        Pro
                       </Badge>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground truncate">{topic.description}</p>
                 </div>
-                {topic.viewCount > 0 && !topic.completed && topic.plan !== "STANDARD" && (
-                  <span className="text-xs text-muted-foreground">{topic.viewCount}回閲覧</span>
+                {!isLocked && !topic.completed && (
+                  <span className="text-[10px] text-muted-foreground/60 shrink-0">タップで完了</span>
                 )}
               </div>
-              </Link>
-            ))}
+              );
+            })}
             <Link href="/dashboard/explore">
               <Button variant="outline" className="mt-2 w-full bg-transparent">
                 学習を続ける

@@ -32,10 +32,10 @@ const LEARNING_TOPICS = [
   { id: "velocity", name: "加速度とバイラル", description: "30分ウィンドウと拡散の仕組み", plan: "FREE" },
   { id: "filters", name: "フィルタリング", description: "安全性・多様性・品質フィルター", plan: "FREE" },
   // Standard tier topics
-  { id: "heavy_ranker", name: "Heavy Ranker", description: "AIスコアリングの仕組み", plan: "STANDARD" },
-  { id: "tweepcred", name: "TweepCred", description: "アカウント信頼度スコア", plan: "STANDARD" },
-  { id: "simclusters", name: "SimClusters", description: "興味コミュニティの分類", plan: "STANDARD" },
-  { id: "grok", name: "Grok統合", description: "AI品質評価と配信判定", plan: "STANDARD" },
+  { id: "heavy_ranker", name: "Heavy Ranker", description: "AIスコアリングの仕組み", plan: "PRO" },
+  { id: "tweepcred", name: "TweepCred", description: "アカウント信頼度スコア", plan: "PRO" },
+  { id: "simclusters", name: "SimClusters", description: "興味コミュニティの分類", plan: "PRO" },
+  { id: "grok", name: "Grok統合", description: "AI品質評価と配信判定", plan: "PRO" },
 ];
 
 export async function GET() {
