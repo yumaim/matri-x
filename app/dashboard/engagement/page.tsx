@@ -491,6 +491,37 @@ export default function EngagementPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Important Note */}
+          <Card className="glass border-orange-500/30 bg-orange-500/5">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10">
+                  <AlertTriangle className="h-5 w-5 text-orange-500" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">
+                    ⚠️ 「初速30分」の誤解に注意
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    ソースコードの <code className="text-xs bg-muted px-1 py-0.5 rounded">author_aggregate (real_time)</code> の
+                    <span className="font-bold text-orange-500">30分ウィンドウはローリング集計</span>です。
+                    「投稿してから30分間」ではなく、「<span className="font-bold text-foreground">直近30分間の著者全体のエンゲージメント</span>」を計測しています。
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    つまり、投稿直後ではなく<span className="font-bold text-foreground">エンゲージメントが集中し始めたタイミングからの30分</span>が重要。
+                    Grok導入後は、投稿直後はGrokによる品質評価→初期配信判定が行われ、
+                    エンゲージメントはその後の配信拡大フェーズで本格的に発生します。
+                  </p>
+                  <div className="mt-3 rounded-lg bg-muted/50 p-3">
+                    <p className="text-xs font-mono text-muted-foreground">
+                      投稿 → Grok品質評価 → 初期配信 → EG開始 → <span className="text-orange-500 font-bold">★ここからの30分ウィンドウが本番</span> → 加速度上昇 → 配信拡大
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Media Boost Tab */}
