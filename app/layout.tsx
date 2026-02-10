@@ -20,11 +20,20 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Matri-X",
     url: "https://matri-x.jp",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Matri-X - Xアルゴリズム解析プラットフォーム",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Matri-X | X(Twitter)アルゴリズム解析プラットフォーム",
     description: "Xの推薦アルゴリズムをソースコードレベルで解析するプラットフォーム",
+    images: ["/twitter-image"],
   },
   robots: {
     index: true,

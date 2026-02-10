@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   BookOpen,
   Check,
-  Twitter,
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -183,6 +182,37 @@ const pipelineSteps = [
     desc: "広告やおすすめユーザーと組み合わせて、タイムラインが完成します",
     color: "bg-orange-500",
     tags: ["最終50件を表示"],
+  },
+];
+
+const personas = [
+  {
+    icon: "🎨",
+    title: "クリエイター",
+    subtitle: "Xを健全に伸ばしたいクリエイター",
+    description:
+      "ソースコードに基づいた正しい運用知識で、BAN・シャドウバンのリスクを回避",
+  },
+  {
+    icon: "🏢",
+    title: "マーケティング企業",
+    subtitle: "アルゴトレンドをキャッチし続けたいマーケティング企業",
+    description:
+      "アルゴリズム変更を即座にキャッチ、データドリブンな戦略立案",
+  },
+  {
+    icon: "📊",
+    title: "X運用代行",
+    subtitle: "技術力を評価され案件獲得したいX運用代行",
+    description:
+      "ソースコード解析という差別化要素で、クライアントに根拠ある提案",
+  },
+  {
+    icon: "⚡",
+    title: "Xディープ界隈",
+    subtitle: "インプレッションを効率的に出したいXディープ層",
+    description:
+      "重み付け係数や信頼度スコアの仕組みを理解して、最小労力で最大効果",
   },
 ];
 
@@ -396,6 +426,49 @@ function EngagementSection() {
   );
 }
 
+function PersonaSection() {
+  return (
+    <section id="persona" className="py-24 bg-muted/30">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <span className="text-gradient">こんな方におすすめ</span>
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Matri-Xはこんな方の課題を解決します
+          </p>
+        </div>
+
+        <div className="mx-auto mt-16 grid max-w-5xl gap-6 sm:grid-cols-2">
+          {personas.map((persona) => (
+            <div
+              key={persona.title}
+              className="glass group rounded-2xl p-6 transition-all hover:glow-primary"
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-3xl transition-colors group-hover:bg-primary/20">
+                  {persona.icon}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">
+                    {persona.title}
+                  </h3>
+                  <p className="mt-1 text-sm font-medium text-primary">
+                    {persona.subtitle}
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                    {persona.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function PricingSection() {
   return (
     <section id="pricing" className="py-24">
@@ -523,13 +596,20 @@ function Footer() {
           </nav>
           <div className="flex items-center gap-4">
             <Link
-              href="https://x.com"
+              href="https://x.com/hubz_yuma"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center h-10 w-10 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
               aria-label="X (Twitter) 公式アカウント"
             >
-              <Twitter className="h-5 w-5" aria-hidden="true" />
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
             </Link>
           </div>
         </div>
@@ -548,6 +628,7 @@ export default function Home() {
       <HeroSection />
       <FeaturesSection />
       <EngagementSection />
+      <PersonaSection />
       <PricingSection />
       <CTASection />
       <Footer />

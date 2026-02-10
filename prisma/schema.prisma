@@ -1,5 +1,5 @@
 // matri-x Prisma Schema
-// Dev: SQLite | Prod: PostgreSQL
+// Dev: SQLite | Prod: PostgreSQL (Supabase)
 
 generator client {
   provider = "prisma-client-js"
