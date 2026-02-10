@@ -28,6 +28,7 @@ import {
   ThumbsUp,
   Info,
   Activity,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -198,6 +199,7 @@ const navigation = [
   { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3 },
   { name: "TweepCredシミュレーター", href: "/dashboard/simulator", icon: Users },
   { name: "Deep AI検索", href: "/dashboard/deepwiki", icon: Search },
+  { name: "用語集", href: "/dashboard/glossary", icon: BookOpen },
   { name: "ランキング", href: "/dashboard/ranking", icon: Trophy },
   { name: "更新履歴", href: "/dashboard/updates", icon: History },
 ];
