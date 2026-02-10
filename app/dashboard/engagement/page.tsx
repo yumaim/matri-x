@@ -199,14 +199,14 @@ export default function EngagementPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={chartConfig} className="h-[350px]">
-                  <BarChart data={chartData} layout="vertical">
-                    <XAxis type="number" />
+                <ChartContainer config={chartConfig} className="h-[350px] w-full overflow-hidden">
+                  <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 20, top: 5, bottom: 5 }}>
+                    <XAxis type="number" domain={[0, 'auto']} />
                     <YAxis
                       type="category"
                       dataKey="name"
-                      width={160}
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+                      width={140}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
                     />
                     <ChartTooltip
                       content={<ChartTooltipContent />}

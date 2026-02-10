@@ -607,23 +607,23 @@ export default function ExplorePage() {
               </defs>
 
               {/* Level 1 → Level 2 (4 sources converge to pool) */}
-              <path d="M 195 75 C 280 75, 320 190, 390 190" stroke="url(#grad-blue-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '0.8s' }} />
-              <path d="M 195 185 C 280 185, 320 200, 390 200" stroke="url(#grad-purple-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '0.9s' }} />
-              <path d="M 195 300 C 280 300, 320 210, 390 210" stroke="url(#grad-cyan-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '1.0s' }} />
-              <path d="M 195 410 C 280 410, 320 220, 390 220" stroke="url(#grad-pink-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '1.1s' }} />
+              <path d="M 192 60 C 280 60, 280 220, 360 230" stroke="url(#grad-blue-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '0.8s' }} />
+              <path d="M 192 180 C 270 180, 280 235, 360 240" stroke="url(#grad-purple-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '0.9s' }} />
+              <path d="M 192 310 C 270 310, 280 255, 360 260" stroke="url(#grad-cyan-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '1.0s' }} />
+              <path d="M 192 430 C 280 430, 280 270, 360 270" stroke="url(#grad-pink-indigo)" strokeWidth="2.5" className={edgeClass(1, 2)} style={{ animationDelay: '1.1s' }} />
 
               {/* Level 2 → Level 3 (pool to scorer) */}
-              <path d="M 530 210 C 580 210, 600 250, 640 250" stroke="url(#grad-indigo-violet)" strokeWidth="3" className={edgeSlowClass(2, 3)} style={{ animationDelay: '1.4s' }} />
+              <path d="M 456 250 C 480 250, 500 250, 504 250" stroke="url(#grad-indigo-violet)" strokeWidth="3" className={edgeSlowClass(2, 3)} style={{ animationDelay: '1.4s' }} />
 
               {/* Level 3 → Level 4 (scorer fans out to 3 filters) */}
-              <path d="M 810 230 C 870 230, 870 145, 910 145" stroke="url(#grad-violet-green)" strokeWidth="2.5" className={edgeClass(3, 4)} style={{ animationDelay: '1.8s' }} />
-              <path d="M 810 250 C 870 250, 870 250, 910 250" stroke="url(#grad-violet-teal)" strokeWidth="2.5" className={edgeClass(3, 4)} style={{ animationDelay: '1.9s' }} />
-              <path d="M 810 270 C 870 270, 870 355, 910 355" stroke="url(#grad-violet-emerald)" strokeWidth="2.5" className={edgeClass(3, 4)} style={{ animationDelay: '2.0s' }} />
+              <path d="M 768 230 C 800 230, 810 100, 816 100" stroke="url(#grad-violet-green)" strokeWidth="2.5" className={edgeClass(3, 4)} style={{ animationDelay: '1.8s' }} />
+              <path d="M 768 250 C 800 250, 810 250, 816 250" stroke="url(#grad-violet-teal)" strokeWidth="2.5" className={edgeClass(3, 4)} style={{ animationDelay: '1.9s' }} />
+              <path d="M 768 270 C 800 270, 810 400, 816 400" stroke="url(#grad-violet-emerald)" strokeWidth="2.5" className={edgeClass(3, 4)} style={{ animationDelay: '2.0s' }} />
 
               {/* Level 4 → Level 5 (3 filters converge to timeline) */}
-              <path d="M 1010 145 C 1060 145, 1060 230, 1100 230" stroke="url(#grad-green-amber)" strokeWidth="2.5" className={edgeClass(4, 5)} style={{ animationDelay: '2.3s' }} />
-              <path d="M 1010 250 C 1060 250, 1060 250, 1100 250" stroke="url(#grad-teal-amber)" strokeWidth="2.5" className={edgeClass(4, 5)} style={{ animationDelay: '2.4s' }} />
-              <path d="M 1010 355 C 1060 355, 1060 270, 1100 270" stroke="url(#grad-emerald-amber)" strokeWidth="2.5" className={edgeClass(4, 5)} style={{ animationDelay: '2.5s' }} />
+              <path d="M 984 100 C 1010 100, 1010 230, 1020 230" stroke="url(#grad-green-amber)" strokeWidth="2.5" className={edgeClass(4, 5)} style={{ animationDelay: '2.3s' }} />
+              <path d="M 984 250 C 1010 250, 1010 250, 1020 250" stroke="url(#grad-teal-amber)" strokeWidth="2.5" className={edgeClass(4, 5)} style={{ animationDelay: '2.4s' }} />
+              <path d="M 984 400 C 1010 400, 1010 270, 1020 270" stroke="url(#grad-emerald-amber)" strokeWidth="2.5" className={edgeClass(4, 5)} style={{ animationDelay: '2.5s' }} />
             </svg>
 
             {/* Nodes Layer */}
