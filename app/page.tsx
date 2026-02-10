@@ -159,14 +159,14 @@ function TypewriterText() {
       timerRef.current = setTimeout(() => {
         setDisplayText(currentLine.slice(0, charIndex));
         setCharIndex((c) => c + 1);
-      }, 60);
+      }, 100);
     } else if (!isDeleting && charIndex > currentLine.length) {
-      timerRef.current = setTimeout(() => setIsDeleting(true), 2500);
+      timerRef.current = setTimeout(() => setIsDeleting(true), 3500);
     } else if (isDeleting && charIndex > 0) {
       timerRef.current = setTimeout(() => {
         setCharIndex((c) => c - 1);
         setDisplayText(currentLine.slice(0, charIndex - 1));
-      }, 30);
+      }, 50);
     } else if (isDeleting && charIndex === 0) {
       setIsDeleting(false);
       setLineIndex((i) => (i + 1) % heroLines.length);

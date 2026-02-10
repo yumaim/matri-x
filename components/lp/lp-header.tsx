@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 const navigation = [
@@ -80,14 +82,17 @@ export function LPHeader() {
             <div className="-my-6 divide-y divide-border">
               <div className="space-y-2 py-6">
                 {navigation.map((item) => (
-                  <label key={item.name} htmlFor="mobile-menu-toggle" className="block">
-                    <Link
-                      href={item.href}
-                      className="block rounded-lg px-3 py-2 text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                    >
-                      {item.name}
-                    </Link>
-                  </label>
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="block rounded-lg px-3 py-2 text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    onClick={() => {
+                      const cb = document.getElementById("mobile-menu-toggle") as HTMLInputElement;
+                      if (cb) cb.checked = false;
+                    }}
+                  >
+                    {item.name}
+                  </a>
                 ))}
               </div>
               <div className="py-6 space-y-3">
