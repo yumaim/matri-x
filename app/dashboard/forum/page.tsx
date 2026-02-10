@@ -19,6 +19,8 @@ import {
   Users,
   AlertCircle,
   FileEdit,
+  Palette,
+  Check,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { HEADER_COLORS, getBanner } from "@/lib/header-colors";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -106,7 +109,7 @@ export default function ForumPage() {
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
   const [profileTab, setProfileTab] = useState<"posts" | "bookmarks">("posts");
-  const [myUser, setMyUser] = useState<{ name: string | null; image: string | null; community: string | null; level: number; xp: number; postCount: number; commentCount: number } | null>(null);
+  const [myUser, setMyUser] = useState<{ name: string | null; image: string | null; community: string | null; level: number; xp: number; postCount: number; commentCount: number; headerColor: string | null } | null>(null);
 
   useEffect(() => {
     fetch("/api/users/me")
@@ -119,6 +122,7 @@ export default function ForumPage() {
         xp: data.xp ?? 0,
         postCount: data._count?.posts ?? 0,
         commentCount: data._count?.comments ?? 0,
+        headerColor: data.headerColor ?? "blue",
       }))
       .catch(() => {});
   }, []);
@@ -353,7 +357,7 @@ export default function ForumPage() {
           {/* Profile Preview (X-style) */}
           <Card className="bg-card/50 border-border/50 overflow-hidden">
             {/* Banner */}
-            <div className="h-16 bg-gradient-to-r from-indigo-600/40 via-violet-600/40 to-purple-600/40" />
+            <div className={cn("h-16 bg-gradient-to-r", getBanner(myUser?.headerColor))} />
             <CardContent className="px-4 pb-4 -mt-6">
               {/* Avatar */}
               <Avatar className="h-14 w-14 border-4 border-background">
@@ -365,11 +369,40 @@ export default function ForumPage() {
               <div className="mt-2">
                 <div className="flex items-center justify-between">
                   <div className="font-semibold text-foreground text-sm">{myUser?.name ?? "匿名"}</div>
-                  <Link href="/dashboard/profile">
-                    <Button variant="outline" size="sm" className="text-[10px] h-6 px-2">
-                      編集
-                    </Button>
-                  </Link>
+                  <div className="flex items-center gap-1">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                          <Palette className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-36">
+                        {HEADER_COLORS.map((color) => (
+                          <DropdownMenuItem
+                            key={color.id}
+                            onClick={async () => {
+                              await fetch("/api/users/me", {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ headerColor: color.id }),
+                              });
+                              setMyUser((prev) => prev ? { ...prev, headerColor: color.id } : prev);
+                            }}
+                            className="gap-2 cursor-pointer"
+                          >
+                            <div className={cn("h-3 w-3 rounded-full shrink-0", color.preview)} />
+                            <span className="text-xs flex-1">{color.label}</span>
+                            {myUser?.headerColor === color.id && <Check className="h-3 w-3 text-primary" />}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Link href="/dashboard/profile">
+                      <Button variant="outline" size="sm" className="text-[10px] h-6 px-2">
+                        編集
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
                 {myUser?.community && (
                   <div className="text-xs text-muted-foreground">@{myUser.community}</div>
