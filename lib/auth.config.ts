@@ -64,6 +64,7 @@ export const authConfig: NextAuthConfig = {
       if (
         pathname.startsWith("/_next") ||
         pathname.startsWith("/api/auth") ||
+        pathname.startsWith("/api/debug") ||
         pathname.includes(".")
       ) {
         return true;
