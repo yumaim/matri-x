@@ -111,7 +111,7 @@ function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000);
+    const interval = setInterval(fetchNotifications, 180000); // 3分おき
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 
