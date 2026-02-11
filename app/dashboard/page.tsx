@@ -435,15 +435,6 @@ export default function DashboardPage() {
                 </div>
                 <div className="relative">
                   <Progress value={xpProgress} className="h-3" />
-                  {xpProgress > 0 && (
-                    <div
-                      className="absolute inset-0 rounded-full pointer-events-none"
-                      style={{
-                        boxShadow: "0 0 12px rgba(29, 155, 240, 0.5), 0 0 24px rgba(29, 155, 240, 0.2)",
-                        animation: "pulse-glow 3s ease-in-out infinite",
-                      }}
-                    />
-                  )}
                 </div>
                 <p className="mt-1.5 text-xs text-muted-foreground">
                   次のレベルまであと <span className="text-primary font-semibold">{progressData.nextLevelXp - progressData.totalXp} XP</span>
