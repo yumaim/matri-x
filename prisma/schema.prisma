@@ -1,13 +1,14 @@
 // matri-x Prisma Schema
-// Dev: SQLite | Prod: PostgreSQL (Supabase)
+// Production: PostgreSQL (Supabase)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -46,12 +47,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -77,9 +78,9 @@ model VerificationToken {
 model ForumPost {
   id         String   @id @default(cuid())
   title      String
-  content    String
+  content    String   @db.Text
   category   String   // ALGORITHM | VERIFICATION | STRATEGY | UPDATES | QUESTIONS
-  tags       String   @default("[]") // JSON array stored as string (SQLite compat)
+  tags       String   @default("[]") // JSON array stored as string
   authorId   String
   isPinned   Boolean  @default(false)
   isVerified Boolean  @default(false)
@@ -97,7 +98,7 @@ model ForumPost {
 
 model Comment {
   id        String   @id @default(cuid())
-  content   String
+  content   String   @db.Text
   authorId  String
   postId    String
   parentId  String?
@@ -132,10 +133,10 @@ model Evidence {
   id          String   @id @default(cuid())
   postId      String
   type        String   // IMPRESSION_TEST | ENGAGEMENT_TEST | TIMING_TEST | CONTENT_TEST | HASHTAG_TEST | OTHER
-  description String
-  beforeData  String?  // JSON string (SQLite compat)
-  afterData   String?  // JSON string (SQLite compat)
-  conclusion  String?
+  description String   @db.Text
+  beforeData  String?  @db.Text // JSON string
+  afterData   String?  @db.Text // JSON string
+  conclusion  String?  @db.Text
   createdAt   DateTime @default(now())
 
   post ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -144,7 +145,7 @@ model Evidence {
 model Simulation {
   id        String   @id @default(cuid())
   userId    String
-  inputs    String   // JSON string (SQLite compat)
+  inputs    String   @db.Text // JSON string
   result    Float
   createdAt DateTime @default(now())
 
@@ -167,7 +168,7 @@ model Notification {
   id        String   @id @default(cuid())
   userId    String
   type      String   // COMMENT, VOTE, SYSTEM
-  message   String
+  message   String   @db.Text
   postId    String?
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -177,7 +178,7 @@ model Notification {
 model AlgorithmUpdate {
   id          String   @id @default(cuid())
   title       String
-  description String
+  description String   @db.Text
   source      String?
   impact      String   // CRITICAL | HIGH | MEDIUM | LOW
   category    String
