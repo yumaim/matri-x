@@ -70,7 +70,10 @@ export default function ProfilePage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "保存に失敗しました");
+        const detailMsg = data.details?.fieldErrors
+          ? Object.entries(data.details.fieldErrors).map(([k, v]) => `${k}: ${(v as string[]).join(", ")}`).join("; ")
+          : "";
+        throw new Error(detailMsg || data.error || "保存に失敗しました");
       }
       const updated = await res.json();
       setProfile(updated);

@@ -5,7 +5,7 @@ export const updateProfileSchema = z.object({
   company: z.string().max(100).optional().or(z.literal("")),
   community: z.string().max(100).optional().or(z.literal("")),
   bio: z.string().max(500).optional().or(z.literal("")),
-  website: z.string().url().optional().or(z.literal("")),
+  website: z.string().max(200).optional().or(z.literal("")),
   xHandle: z.string().max(50).optional().or(z.literal("")),
   image: z.string().max(200000).optional().or(z.literal("")),
 });
