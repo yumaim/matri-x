@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { signOut } from "next-auth/react";
 import { OnboardingProvider } from "@/components/onboarding";
 import Link from "next/link";
+import { getInitials } from "@/lib/format-utils";
 import { usePathname } from "next/navigation";
 import {
   Zap,
@@ -94,21 +95,23 @@ function NotificationBell() {
   const [open, setOpen] = useState(false);
 
   const fetchNotifications = useCallback(async () => {
+    if (document.visibilityState === "hidden") return;
     try {
       const res = await fetch("/api/notifications");
+      if (res.status === 401) return; // signed out
       if (res.ok) {
         const data = await res.json();
         setNotifications(data.notifications);
         setUnreadCount(data.unreadCount);
       }
     } catch {
-      /* ignore */
+      /* network error */
     }
   }, []);
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
+    const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 
@@ -239,7 +242,7 @@ function SidebarContent({
   const userName = user?.name ?? "ユーザー";
   const userId = user?.id ?? null;
   const userImage = user?.image ?? null;
-  const userInitial = userName[0]?.toUpperCase() ?? "U";
+  const userInitial = getInitials(userName);
   return (
     <>
       {/* Logo */}
@@ -356,6 +359,9 @@ export default function DashboardLayout({
   const [myUserImage, setMyUserImage] = useState<string | null>(null);
   const [myUserName, setMyUserName] = useState<string | null>(null);
 
+  // Close mobile menu on route change
+  useEffect(() => { setMobileMenuOpen(false); }, [pathname]);
+
   useEffect(() => {
     fetch("/api/users/me").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.id) setMyUserId(d.id);
@@ -412,7 +418,7 @@ export default function DashboardLayout({
             <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
               {myUserImage && <AvatarImage src={myUserImage} alt={myUserName ?? "ユーザー"} />}
               <AvatarFallback className="bg-primary/20 text-primary text-sm">
-                {myUserName ? myUserName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "MX"}
+                {getInitials(myUserName)}
               </AvatarFallback>
             </Avatar>
           </Link>

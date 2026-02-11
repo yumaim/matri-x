@@ -126,7 +126,19 @@ function renderMarkdown(content: string): React.ReactNode[] {
       const linkMatch = remaining.match(/^(.*?)\[([^\]]+)\]\(([^)]+)\)(.*)$/);
       if (linkMatch) {
         if (linkMatch[1]) parts.push(linkMatch[1]);
-        parts.push(<a key={`l${key++}`} href={linkMatch[3]} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80">{linkMatch[2]}</a>);
+        // Validate URL protocol to prevent javascript: XSS
+        let safeHref: string | null = null;
+        try {
+          const parsed = new URL(linkMatch[3], window.location.origin);
+          if (["http:", "https:"].includes(parsed.protocol)) {
+            safeHref = parsed.href;
+          }
+        } catch { /* invalid URL */ }
+        if (safeHref) {
+          parts.push(<a key={`l${key++}`} href={safeHref} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80">{linkMatch[2]}</a>);
+        } else {
+          parts.push(<span key={`l${key++}`} className="text-muted-foreground">{linkMatch[2]}</span>);
+        }
         remaining = linkMatch[4];
         continue;
       }

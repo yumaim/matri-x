@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TicketPlus, Bug, Lightbulb, Sparkles, FileText, Clock, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/format-utils";
 
 interface Ticket {
   id: string;
@@ -95,11 +96,6 @@ export default function TicketsPage() {
     }
   };
 
-  const formatDate = (s: string) => {
-    const d = new Date(s);
-    return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
-  };
-
   return (
     <div className="p-4 sm:p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-2">
@@ -141,6 +137,8 @@ export default function TicketsPage() {
                   <button
                     key={cat.value}
                     onClick={() => setCategory(cat.value)}
+                    aria-pressed={category === cat.value}
+                    aria-label={cat.label}
                     className={cn(
                       "flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all text-sm",
                       category === cat.value
@@ -177,7 +175,7 @@ export default function TicketsPage() {
               <p className="text-xs text-muted-foreground text-right">{description.length}/5000</p>
             </div>
             {error && (
-              <p className="text-sm text-red-400">{error}</p>
+              <p role="alert" className="text-sm text-red-400">{error}</p>
             )}
             <Button onClick={handleSubmit} disabled={submitting} className="w-full gap-2">
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <TicketPlus className="h-4 w-4" />}

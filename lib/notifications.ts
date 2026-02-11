@@ -18,7 +18,7 @@ export async function createNotification({
 }) {
   try {
     await prisma.notification.create({
-      data: { userId, type, message, postId, link },
+      data: { userId, type, message: message.slice(0, 200), postId, link },
     });
   } catch (error) {
     console.error("Failed to create notification:", error);
@@ -116,7 +116,7 @@ export async function notifyOnPostVote({
 }
 
 /**
- * Notify all users about an algorithm update
+ * Notify all users about an algorithm update (batched)
  */
 export async function notifyAlgorithmUpdate({
   title,
@@ -127,18 +127,31 @@ export async function notifyAlgorithmUpdate({
   impact: string;
   updateId: string;
 }) {
-  const users = await prisma.user.findMany({
-    select: { id: true },
-  });
-
   const impactLabel = impact === "CRITICAL" ? "🔴 緊急" : impact === "HIGH" ? "🟠 重要" : impact === "MEDIUM" ? "🟡 注意" : "🟢 軽微";
+  const message = `${impactLabel} アルゴリズム更新: ${title}`;
+  const link = `/dashboard/updates#${updateId}`;
 
-  await prisma.notification.createMany({
-    data: users.map((u) => ({
-      userId: u.id,
-      type: "ALGORITHM_UPDATE",
-      message: `${impactLabel} アルゴリズム更新: ${title}`,
-      link: `/dashboard/updates#${updateId}`,
-    })),
-  });
+  const BATCH_SIZE = 500;
+  let skip = 0;
+
+  while (true) {
+    const users = await prisma.user.findMany({
+      select: { id: true },
+      take: BATCH_SIZE,
+      skip,
+    });
+    if (users.length === 0) break;
+
+    await prisma.notification.createMany({
+      data: users.map((u) => ({
+        userId: u.id,
+        type: "ALGORITHM_UPDATE",
+        message,
+        link,
+      })),
+    });
+
+    if (users.length < BATCH_SIZE) break;
+    skip += BATCH_SIZE;
+  }
 }
