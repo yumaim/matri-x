@@ -47,9 +47,9 @@ export function VoteButton({
 
     startTransition(async () => {
       try {
-        const endpoint = postId
-          ? `/api/forum/posts/${postId}/vote`
-          : `/api/forum/posts/${commentId}/vote`;
+        const endpoint = commentId
+          ? `/api/forum/comments/${commentId}/vote`
+          : `/api/forum/posts/${postId}/vote`;
 
         const res = await fetch(endpoint, {
           method: "POST",
