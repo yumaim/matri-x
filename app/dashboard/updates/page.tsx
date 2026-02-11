@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTrackLearning } from "@/lib/use-track-learning";
 import {
   GitCommit,
   GitBranch,
@@ -252,6 +253,7 @@ const impactConfig: Record<string, { label: string; color: string }> = {
 };
 
 export default function UpdatesPage() {
+  useTrackLearning("grok");
   const [selectedType, setSelectedType] = useState<UpdateType | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);

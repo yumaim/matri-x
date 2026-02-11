@@ -584,42 +584,17 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {progressData.learningTopics.map((topic) => {
-              const isLocked = topic.plan === "STANDARD";
+              const isLocked = topic.plan === "PRO";
+              const href = isLocked ? "#" : (TOPIC_LINKS[topic.id] ?? "#");
               return (
+              <Link key={topic.id} href={href} className="block">
               <div
-                key={topic.id}
-                onClick={async () => {
-                  if (isLocked) return;
-                  const newCompleted = !topic.completed;
-                  // Optimistic update
-                  setProgressData((prev) => ({
-                    ...prev,
-                    learningTopics: prev.learningTopics.map((t) =>
-                      t.id === topic.id ? { ...t, completed: newCompleted } : t
-                    ),
-                  }));
-                  try {
-                    await fetch("/api/users/progress/track", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ topicId: topic.id, completed: newCompleted }),
-                    });
-                  } catch {
-                    // Revert on error
-                    setProgressData((prev) => ({
-                      ...prev,
-                      learningTopics: prev.learningTopics.map((t) =>
-                        t.id === topic.id ? { ...t, completed: !newCompleted } : t
-                      ),
-                    }));
-                  }
-                }}
                 className={`flex items-center gap-3 rounded-xl p-3 transition-all duration-200 ${
                   topic.completed
-                    ? "bg-primary/5 border border-primary/20 cursor-pointer"
+                    ? "bg-primary/5 border border-primary/20"
                     : isLocked
                       ? "bg-muted/30 opacity-60 cursor-not-allowed"
-                      : "bg-muted/50 hover:bg-muted/80 cursor-pointer active:scale-[0.98]"
+                      : "bg-muted/50 hover:bg-muted/80 active:scale-[0.98]"
                 }`}
               >
                 <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
@@ -634,7 +609,7 @@ export default function DashboardPage() {
                   ) : isLocked ? (
                     <Lock className="h-3.5 w-3.5" />
                   ) : (
-                    <Circle className="h-4 w-4" />
+                    <ChevronRight className="h-4 w-4" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -651,9 +626,10 @@ export default function DashboardPage() {
                   <p className="text-xs text-muted-foreground truncate">{topic.description}</p>
                 </div>
                 {!isLocked && !topic.completed && (
-                  <span className="text-[10px] text-muted-foreground/60 shrink-0 hidden sm:block">タップで完了</span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground/40 shrink-0" />
                 )}
               </div>
+              </Link>
               );
             })}
             <Link href="/dashboard/explore">

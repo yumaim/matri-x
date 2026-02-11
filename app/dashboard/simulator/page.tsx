@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTrackLearning } from "@/lib/use-track-learning";
 import { PlanGate } from "@/components/plan-gate";
 import {
   Users,
@@ -88,6 +89,7 @@ function getScoreLevel(score: number) {
 }
 
 export default function SimulatorPage() {
+  useTrackLearning("tweepcred");
   return (
     <PlanGate requiredPlan="STANDARD" featureName="TweepCredシミュレーター">
       <SimulatorContent />

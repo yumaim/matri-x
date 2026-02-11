@@ -1,5 +1,6 @@
 "use client";
 
+import { useTrackLearning } from "@/lib/use-track-learning";
 import {
   MessageSquare,
   Heart,
@@ -177,6 +178,7 @@ const tips = [
 ];
 
 export default function EngagementPage() {
+  useTrackLearning("engagement", "velocity");
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 overflow-x-hidden">
       {/* Header */}

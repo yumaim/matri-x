@@ -356,7 +356,7 @@ export default function ForumPage() {
         <div className="lg:col-span-3 space-y-4 sm:space-y-6 min-w-0">
           {/* Category Tabs — pill style with scroll indicator */}
           <div className="relative">
-            <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1" style={{ touchAction: "pan-x" }}>
+            <div className="flex gap-1.5 overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide -mx-1 px-1" style={{ touchAction: "pan-x" }}>
               {categories.map((category) => {
                 const isActive = selectedCategory === category.id;
                 return (
@@ -364,7 +364,7 @@ export default function ForumPage() {
                     key={category.id}
                     onClick={() => handleCategoryChange(category.id)}
                     className={cn(
-                      "flex items-center gap-2 rounded-xl px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap border relative overflow-hidden",
+                      "flex items-center gap-2 rounded-xl px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap shrink-0 border relative overflow-hidden",
                       isActive
                         ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 border-primary/50 scale-[1.02]"
                         : "bg-card/60 text-muted-foreground hover:bg-muted/50 hover:text-foreground border-border/30 hover:border-border/60"

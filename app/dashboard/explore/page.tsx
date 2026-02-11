@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTrackLearning } from "@/lib/use-track-learning";
 import {
   Database,
   Send,
@@ -301,6 +302,7 @@ const sourceTypes = [
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function ExplorePage() {
+  useTrackLearning("pipeline", "filters", "heavy_ranker", "simclusters");
   const [expandedStage, _setExpandedStage] = useState<string | null>(null);
 
   // ─── Pipeline Play/Reset Animation State ──────────────────────────────────
