@@ -224,7 +224,7 @@ function StatCard({ title, value, icon: Icon, color, bgColor, borderColor, delay
       className={`transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      <Card className={`glass ${borderColor} group transition-all duration-300 hover:scale-[1.03] hover:shadow-lg`}>
+      <Card className={`glass ${borderColor} group hover:scale-[1.05] hover:shadow-xl hover:-translate-y-1`} style={{ transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)" }}>
         <CardContent className="p-4 sm:p-5">
           <div className="flex items-center justify-between">
             <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${bgColor} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
@@ -350,7 +350,7 @@ export default function DashboardPage() {
       {/* Hero Header — animated gradient mesh background */}
       <div
         ref={heroReveal.ref}
-        className={`relative overflow-hidden rounded-2xl border border-border/50 p-6 sm:p-8 transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+        className={`relative overflow-hidden rounded-2xl border border-border/50 p-6 sm:p-8 transition-all duration-700 bg-gradient-to-br from-primary/10 via-accent/5 to-[#00ba7c]/10 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
       >
         {/* Animated gradient orbs */}
         <div className="absolute inset-0 overflow-hidden">
@@ -418,6 +418,15 @@ export default function DashboardPage() {
                 </div>
                 <div className="relative">
                   <Progress value={xpProgress} className="h-3" />
+                  {xpProgress > 0 && (
+                    <div
+                      className="absolute inset-0 rounded-full pointer-events-none"
+                      style={{
+                        boxShadow: "0 0 12px rgba(29, 155, 240, 0.5), 0 0 24px rgba(29, 155, 240, 0.2)",
+                        animation: "pulse-glow 3s ease-in-out infinite",
+                      }}
+                    />
+                  )}
                 </div>
                 <p className="mt-1.5 text-xs text-muted-foreground">
                   次のレベルまであと <span className="text-primary font-semibold">{progressData.nextLevelXp - progressData.totalXp} XP</span>
@@ -513,7 +522,7 @@ export default function DashboardPage() {
             <Link key={action.title} href={action.href}>
               <Card
                 className="glass group h-full transition-all duration-300 hover:glow-primary hover:scale-[1.02] hover:border-primary/30"
-                style={{ animationDelay: `${i * 80}ms` }}
+                style={{ animation: `fadeInUp 0.5s ease-out ${i * 100}ms both` }}
               >
                 <CardContent className="p-5 sm:p-6 relative overflow-hidden">
                   {/* Subtle background glow on hover */}
@@ -682,20 +691,25 @@ export default function DashboardPage() {
                   : achievement.tier === "silver"
                     ? "border-slate-400/40 bg-slate-400/5"
                     : "border-amber-700/30 bg-amber-700/5";
+                const tierGlow = achievement.tier === "gold"
+                  ? "shadow-yellow-500/20"
+                  : achievement.tier === "silver"
+                    ? "shadow-slate-400/15"
+                    : "shadow-amber-700/10";
                 return (
                 <div
                   key={achievement.id}
                   className={`flex items-center gap-2.5 rounded-xl p-3 transition-all duration-300 ${
                     achievement.unlocked
-                      ? `${tierColor} hover:scale-[1.02]`
+                      ? `${tierColor} hover:scale-[1.04] shadow-md ${tierGlow} hover:shadow-lg`
                       : "bg-muted/30 opacity-40 border border-transparent"
                   } ${achievement.unlocked ? "border" : ""}`}
                 >
-                  <span className={`text-xl shrink-0 ${!achievement.unlocked && "grayscale"}`}>
+                  <span className={`text-xl shrink-0 transition-transform duration-300 ${achievement.unlocked ? "hover:scale-110" : "grayscale"}`}>
                     {achievement.icon}
                   </span>
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold text-foreground truncate">
+                    <p className={`text-xs font-semibold truncate ${achievement.unlocked ? "text-foreground" : "text-muted-foreground"}`}>
                       {achievement.name}
                     </p>
                     <p className="text-[10px] text-muted-foreground truncate">
