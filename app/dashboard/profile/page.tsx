@@ -128,19 +128,36 @@ export default function ProfilePage() {
               onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (!file) return;
-                if (file.size > 2 * 1024 * 1024) {
-                  setError("画像は2MB以下にしてください");
-                  return;
-                }
                 setAvatarUploading(true);
                 try {
-                  const reader = new FileReader();
-                  reader.onload = (ev) => {
-                    const dataUrl = ev.target?.result as string;
+                  // Compress image client-side
+                  const img = new Image();
+                  const objectUrl = URL.createObjectURL(file);
+                  img.onload = () => {
+                    URL.revokeObjectURL(objectUrl);
+                    const canvas = document.createElement("canvas");
+                    const MAX_SIZE = 400;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > h) {
+                      if (w > MAX_SIZE) { h = h * MAX_SIZE / w; w = MAX_SIZE; }
+                    } else {
+                      if (h > MAX_SIZE) { w = w * MAX_SIZE / h; h = MAX_SIZE; }
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext("2d")!;
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
                     setAvatarUrl(dataUrl);
                     setAvatarUploading(false);
                   };
-                  reader.readAsDataURL(file);
+                  img.onerror = () => {
+                    URL.revokeObjectURL(objectUrl);
+                    setError("画像の読み込みに失敗しました");
+                    setAvatarUploading(false);
+                  };
+                  img.src = objectUrl;
                 } catch {
                   setError("画像のアップロードに失敗しました");
                   setAvatarUploading(false);
@@ -159,7 +176,7 @@ export default function ProfilePage() {
                 {profile?.plan} プラン
               </span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">画像をクリックして変更（2MB以下）</p>
+            <p className="text-xs text-muted-foreground mt-1">画像をクリックして変更（自動圧縮）</p>
           </div>
         </CardContent>
       </Card>
