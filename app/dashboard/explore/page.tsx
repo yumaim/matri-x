@@ -666,7 +666,7 @@ export default function ExplorePage() {
               </div>
 
               {/* ── Column 2: Candidate Pool (1 node, vertically centered) ── */}
-              <div data-stage="2" className={`absolute top-1/2 -translate-y-1/2 node-graph-node ${nodeClass(2)}`} style={{ left: '22%', width: '16%', animationDelay: '0.6s' }}>
+              <div data-stage="2" className={`absolute node-graph-node ${nodeClass(2)}`} style={{ left: '22%', top: '38%', transform: 'translateY(-50%)', width: '16%', animationDelay: '0.6s' }}>
                 <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-sm p-4 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">🔄</span>
@@ -679,7 +679,7 @@ export default function ExplorePage() {
               </div>
 
               {/* ── Column 3: Heavy Ranker (1 large node, vertically centered) ── */}
-              <div data-stage="3" className={`absolute top-1/2 -translate-y-1/2 node-graph-node ${nodeClass(3)}`} style={{ left: '42%', width: '22%', animationDelay: '1.0s' }}>
+              <div data-stage="3" className={`absolute node-graph-node ${nodeClass(3)}`} style={{ left: '42%', top: '38%', transform: 'translateY(-50%)', width: '22%', animationDelay: '1.0s' }}>
                 <div className="rounded-xl border-2 border-violet-500/40 bg-violet-500/10 backdrop-blur-sm p-5 text-center shadow-lg shadow-violet-500/5">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-3xl">🧠</span>
@@ -717,7 +717,7 @@ export default function ExplorePage() {
               </div>
 
               {/* ── Column 5: Timeline Output (1 node, vertically centered, right edge) ── */}
-              <div data-stage="5" className={`absolute top-1/2 -translate-y-1/2 node-graph-node ${nodeClass(5)}`} style={{ left: '85%', width: '14.5%', animationDelay: '1.8s' }}>
+              <div data-stage="5" className={`absolute node-graph-node ${nodeClass(5)}`} style={{ left: '85%', top: '38%', transform: 'translateY(-50%)', width: '14.5%', animationDelay: '1.8s' }}>
                 <div className="rounded-xl border-2 border-amber-500/30 bg-amber-500/10 backdrop-blur-sm p-4 text-center shadow-lg shadow-amber-500/5">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">📱</span>

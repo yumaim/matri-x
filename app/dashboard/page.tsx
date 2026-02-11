@@ -290,9 +290,26 @@ export default function DashboardPage() {
     fetch("/api/analytics?period=30d")
       .then(r => r.ok ? r.json() : null)
       .then(d => {
-        if (d?.dailyActivity) setActivityData(d.dailyActivity);
+        if (d?.dailyActivity?.length > 0) {
+          setActivityData(d.dailyActivity);
+        } else {
+          // Initialize with empty 30 days
+          const empty = [];
+          for (let i = 29; i >= 0; i--) {
+            const dt = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+            empty.push({ date: dt.toISOString().slice(0, 10), posts: 0, comments: 0 });
+          }
+          setActivityData(empty);
+        }
       })
-      .catch(() => {});
+      .catch(() => {
+        const empty = [];
+        for (let i = 29; i >= 0; i--) {
+          const dt = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+          empty.push({ date: dt.toISOString().slice(0, 10), posts: 0, comments: 0 });
+        }
+        setActivityData(empty);
+      });
   }, []);
 
   const xpProgress = progressData
@@ -451,7 +468,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Activity Graph */}
-      {activityData.length > 0 && (
+      {activityData.length >= 0 && (
         <div
           ref={activityReveal.ref}
           className={`transition-all duration-700 ${activityReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
