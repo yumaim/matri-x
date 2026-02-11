@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { createCommentSchema } from "@/lib/validations/forum";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { notifyOnComment, notifyOnReply } from "@/lib/notifications";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -165,6 +166,30 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
+    // Fire-and-forget notifications
+    const postForNotif = await prisma.forumPost.findUnique({
+      where: { id },
+      select: { title: true },
+    });
+    if (postForNotif) {
+      const authorName = comment.author?.name ?? "ユーザー";
+      if (data.parentId) {
+        notifyOnReply({
+          postId: id,
+          parentCommentId: data.parentId,
+          replyAuthorId: session.user.id,
+          replyAuthorName: authorName,
+        }).catch(() => {});
+      } else {
+        notifyOnComment({
+          postId: id,
+          commentAuthorId: session.user.id,
+          commentAuthorName: authorName,
+          postTitle: postForNotif.title,
+        }).catch(() => {});
+      }
+    }
+
     return NextResponse.json(
       {
         ...comment,
@@ -175,6 +200,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
       { status: 201 }
     );
+
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json({ error: "バリデーションエラー", details: error }, { status: 400 });

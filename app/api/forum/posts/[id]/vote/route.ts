@@ -3,6 +3,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { voteSchema } from "@/lib/validations/forum";
+import { notifyOnPostVote } from "@/lib/notifications";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -82,6 +83,27 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
       select: { value: true },
     });
+
+    // Notify on upvote (fire-and-forget)
+    if (action === "created" && value > 0) {
+      const postForNotif = await prisma.forumPost.findUnique({
+        where: { id },
+        select: { title: true },
+      });
+      const voter = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { name: true },
+      });
+      if (postForNotif) {
+        notifyOnPostVote({
+          postId: id,
+          voterId: session.user.id,
+          voterName: voter?.name ?? "ユーザー",
+          postTitle: postForNotif.title,
+          value,
+        }).catch(() => {});
+      }
+    }
 
     return NextResponse.json({
       action,

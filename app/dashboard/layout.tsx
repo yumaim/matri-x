@@ -29,6 +29,7 @@ import {
   Info,
   Activity,
   BookOpen,
+  TicketPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,7 @@ interface Notification {
   type: string;
   message: string;
   postId: string | null;
+  link: string | null;
   isRead: boolean;
   createdAt: string;
 }
@@ -63,6 +65,10 @@ function NotificationIcon({ type }: { type: string }) {
       return <MessageSquare className="h-4 w-4 text-blue-400" />;
     case "VOTE":
       return <ThumbsUp className="h-4 w-4 text-emerald-400" />;
+    case "TICKET":
+      return <Info className="h-4 w-4 text-purple-400" />;
+    case "ALGORITHM_UPDATE":
+      return <Activity className="h-4 w-4 text-red-400" />;
     default:
       return <Info className="h-4 w-4 text-orange-400" />;
   }
@@ -158,7 +164,7 @@ function NotificationBell() {
               {notifications.map((n) => (
                 <Link
                   key={n.id}
-                  href={n.postId ? `/dashboard/forum/${n.postId}` : "/dashboard"}
+                  href={n.link || (n.postId ? `/dashboard/forum/${n.postId}` : "/dashboard")}
                   onClick={() => setOpen(false)}
                   className={cn(
                     "flex gap-3 px-4 py-3 transition-colors hover:bg-muted/50",
@@ -201,6 +207,7 @@ const navigation = [
   { name: "TweepCredシミュレーター", href: "/dashboard/simulator", icon: Users },
   { name: "Deep AI検索", href: "/dashboard/deepwiki", icon: Search },
   { name: "用語集", href: "/dashboard/glossary", icon: BookOpen },
+  { name: "開発チケット", href: "/dashboard/tickets", icon: TicketPlus },
   { name: "更新履歴", href: "/dashboard/updates", icon: History },
 ];
 

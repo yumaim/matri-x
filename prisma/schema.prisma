@@ -39,6 +39,7 @@ model User {
   notifications Notification[]
   achievements  UserAchievement[]
   progress      LearningProgress[]
+  tickets       Ticket[]
 }
 
 model Account {
@@ -167,12 +168,28 @@ model Bookmark {
 model Notification {
   id        String   @id @default(cuid())
   userId    String
-  type      String   // COMMENT, VOTE, SYSTEM
+  type      String   // COMMENT, VOTE, SYSTEM, TICKET, ALGORITHM_UPDATE
   message   String   @db.Text
   postId    String?
+  link      String?  // optional deep link path
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Ticket {
+  id          String   @id @default(cuid())
+  userId      String
+  category    String   // FEATURE_REQUEST | BUG_REPORT | IMPROVEMENT | OTHER
+  title       String
+  description String   @db.Text
+  status      String   @default("OPEN") // OPEN | IN_PROGRESS | RESOLVED | CLOSED
+  priority    String   @default("MEDIUM") // LOW | MEDIUM | HIGH | CRITICAL
+  adminNote   String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AlgorithmUpdate {
