@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useTransition } from "react";
+import { useState, useEffect, useCallback, useTransition, useRef } from "react";
 import Link from "next/link";
 import {
   MessageCircle,
@@ -21,6 +21,10 @@ import {
   FileEdit,
   Palette,
   Check,
+  Sparkles,
+  X,
+  ChevronRight,
+  Zap,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -193,37 +197,86 @@ export default function ForumPage() {
     });
   };
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [searchFocused, setSearchFocused] = useState(false);
+
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 overflow-x-hidden">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
-            フォーラム
-          </h1>
-          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
-            アルゴリズムについてコミュニティと議論しましょう
-          </p>
+    <div className="p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-6 overflow-x-hidden">
+      {/* ─── Hero Header ─────────────────────────── */}
+      <div className="relative overflow-hidden rounded-2xl border border-border/30 bg-gradient-to-br from-primary/10 via-card/60 to-accent/10 p-5 sm:p-7 backdrop-blur-xl">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(29,155,240,0.08),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(120,86,255,0.06),transparent_60%)]" />
+        {/* Animated orbs */}
+        <div className="absolute -top-8 -right-8 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-accent/10 rounded-full blur-2xl animate-float" style={{ animationDelay: "1.5s" }} />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 border border-primary/20 shadow-[0_0_20px_rgba(29,155,240,0.2)]">
+              <MessageCircle className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gradient">
+                フォーラム
+              </h1>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                アルゴリズムについてコミュニティと議論しましょう
+              </p>
+            </div>
+          </div>
+          <Link href="/dashboard/forum/new">
+            <Button className="gap-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] transition-all duration-200">
+              <Plus className="h-4 w-4" />
+              新規投稿
+            </Button>
+          </Link>
         </div>
-        <Link href="/dashboard/forum/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            新規投稿
-          </Button>
-        </Link>
+        {/* Stats bar */}
+        {pagination && (
+          <div className="relative mt-4 pt-3 border-t border-border/20 flex items-center gap-6 text-xs text-muted-foreground animate-in fade-in duration-500">
+            <span className="flex items-center gap-1.5">
+              <MessageCircle className="h-3.5 w-3.5" />
+              <span className="font-semibold text-foreground tabular-nums">{pagination.total}</span> 件の投稿
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5" />
+              コミュニティ
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Search & Sort */}
+      {/* ─── Search & Sort Bar ─────────────────── */}
       <div className="flex flex-col gap-3 sm:flex-row">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <div className={cn(
+          "relative flex-1 transition-all duration-200",
+          searchFocused && "ring-1 ring-primary/40 rounded-md"
+        )}>
+          <Search className={cn(
+            "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors",
+            searchFocused ? "text-primary" : "text-muted-foreground"
+          )} />
           <Input
+            ref={searchInputRef}
             placeholder="トピックを検索..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={handleSearchKeyDown}
-            className="pl-10 bg-muted/30 border-border/50"
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+            className="pl-10 pr-10 bg-muted/30 border-border/50"
           />
+          {searchInput && (
+            <button
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => {
+                setSearchInput("");
+                setSearchQuery("");
+                searchInputRef.current?.focus();
+              }}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
         <div className="flex gap-2">
           <DropdownMenu>
@@ -238,8 +291,12 @@ export default function ForumPage() {
                 <DropdownMenuItem
                   key={opt.id}
                   onClick={() => setSortBy(opt.id)}
-                  className={cn(sortBy === opt.id && "bg-accent")}
+                  className={cn(
+                    "gap-2",
+                    sortBy === opt.id && "bg-accent"
+                  )}
                 >
+                  {sortBy === opt.id && <Check className="h-3 w-3 text-primary" />}
                   {opt.label}
                 </DropdownMenuItem>
               ))}
@@ -250,7 +307,12 @@ export default function ForumPage() {
             variant={showBookmarked ? "default" : "outline"}
             size="icon"
             onClick={() => setShowBookmarked(!showBookmarked)}
-            className={cn(!showBookmarked && "bg-transparent")}
+            className={cn(
+              "transition-all",
+              showBookmarked
+                ? "shadow-md shadow-primary/20"
+                : "bg-transparent"
+            )}
             title="ブックマーク済み"
           >
             <Bookmark className="h-4 w-4" />
@@ -258,47 +320,93 @@ export default function ForumPage() {
         </div>
       </div>
 
+      {/* Active filters indicator */}
+      {(searchQuery || selectedCategory !== "all" || showBookmarked) && (
+        <div className="flex items-center gap-2 flex-wrap text-xs animate-in fade-in slide-in-from-top-2 duration-200">
+          <span className="text-muted-foreground">フィルタ:</span>
+          {searchQuery && (
+            <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-destructive/20 transition-colors" onClick={() => { setSearchInput(""); setSearchQuery(""); }}>
+              検索: {searchQuery}
+              <X className="h-2.5 w-2.5" />
+            </Badge>
+          )}
+          {selectedCategory !== "all" && (
+            <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-destructive/20 transition-colors" onClick={() => setSelectedCategory("all")}>
+              {categories.find(c => c.id === selectedCategory)?.name}
+              <X className="h-2.5 w-2.5" />
+            </Badge>
+          )}
+          {showBookmarked && (
+            <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-destructive/20 transition-colors" onClick={() => setShowBookmarked(false)}>
+              ブックマーク
+              <X className="h-2.5 w-2.5" />
+            </Badge>
+          )}
+          <button
+            className="text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+            onClick={() => { setSearchInput(""); setSearchQuery(""); setSelectedCategory("all"); setShowBookmarked(false); }}
+          >
+            すべてクリア
+          </button>
+        </div>
+      )}
+
       <div className="grid gap-6 lg:gap-8 lg:grid-cols-4 min-w-0">
         {/* Main Content */}
         <div className="lg:col-span-3 space-y-4 sm:space-y-6 min-w-0">
-          {/* Category Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => handleCategoryChange(category.id)}
-                className={cn(
-                  "flex items-center gap-2 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all whitespace-nowrap",
-                  selectedCategory === category.id
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
-                    : "bg-muted/30 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-                )}
-              >
-                <category.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                {category.name}
-              </button>
-            ))}
+          {/* Category Tabs — pill style with scroll indicator */}
+          <div className="relative">
+            <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1" style={{ touchAction: "pan-x" }}>
+              {categories.map((category) => {
+                const isActive = selectedCategory === category.id;
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => handleCategoryChange(category.id)}
+                    className={cn(
+                      "flex items-center gap-2 rounded-xl px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap border relative overflow-hidden",
+                      isActive
+                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 border-primary/50 scale-[1.02]"
+                        : "bg-card/60 text-muted-foreground hover:bg-muted/50 hover:text-foreground border-border/30 hover:border-border/60"
+                    )}
+                  >
+                    {isActive && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
+                    )}
+                    <category.icon className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4 relative", isActive && "animate-in zoom-in-50 duration-200")} />
+                    <span className="relative">{category.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {/* Scroll fade hint */}
+            <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none sm:hidden" />
           </div>
 
           {/* Posts List */}
           {loading ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="bg-card/50 border-border/50">
-                  <CardContent className="p-5">
-                    <div className="flex gap-4">
-                      <div className="hidden sm:flex flex-col items-center gap-2">
-                        <Skeleton className="h-9 w-9 rounded-full" />
-                        <Skeleton className="h-4 w-6" />
-                        <Skeleton className="h-9 w-9 rounded-full" />
-                      </div>
+                <Card key={i} className="glass border-border/30 overflow-hidden">
+                  <CardContent className="p-4 sm:p-5">
+                    <div className="flex gap-3">
+                      <Skeleton className="h-10 w-10 rounded-full shrink-0" />
                       <div className="flex-1 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Skeleton className="h-4 w-20" />
+                          <Skeleton className="h-3 w-14" />
+                        </div>
+                        <div className="flex gap-1.5">
+                          <Skeleton className="h-5 w-20 rounded-lg" />
+                          <Skeleton className="h-5 w-14 rounded-lg" />
+                        </div>
                         <Skeleton className="h-5 w-3/4" />
                         <Skeleton className="h-4 w-full" />
                         <Skeleton className="h-4 w-2/3" />
-                        <div className="flex gap-2">
-                          <Skeleton className="h-5 w-16 rounded-full" />
-                          <Skeleton className="h-5 w-16 rounded-full" />
+                        <div className="flex gap-3 pt-1">
+                          <Skeleton className="h-7 w-20 rounded-lg" />
+                          <Skeleton className="h-7 w-16 rounded-lg" />
+                          <Skeleton className="h-7 w-14 rounded-lg" />
                         </div>
                       </div>
                     </div>
@@ -307,44 +415,101 @@ export default function ForumPage() {
               ))}
             </div>
           ) : posts.length === 0 ? (
-            <Card className="bg-card/50 border-border/50">
-              <CardContent className="py-8 sm:py-12 text-center">
-                <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                <p className="text-muted-foreground">
-                  {searchQuery || selectedCategory !== "all" || showBookmarked
-                    ? "条件に一致する投稿が見つかりませんでした"
-                    : "まだ投稿がありません。最初の投稿を作成しましょう！"}
-                </p>
-                {!searchQuery && selectedCategory === "all" && !showBookmarked && (
-                  <Link href="/dashboard/forum/new">
-                    <Button className="mt-4 gap-2">
-                      <Plus className="h-4 w-4" />
-                      最初の投稿を作成
-                    </Button>
-                  </Link>
-                )}
+            <Card className="glass border-border/30 overflow-hidden">
+              <CardContent className="py-16 sm:py-20 text-center relative">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(29,155,240,0.06),transparent_60%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(120,86,255,0.04),transparent_50%)]" />
+                <div className="relative">
+                  {searchQuery || selectedCategory !== "all" || showBookmarked ? (
+                    <>
+                      <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-muted/30 border border-border/30 mx-auto mb-5 animate-empty-bounce">
+                        <Search className="h-8 w-8 text-muted-foreground/40" />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground mb-2">
+                        一致する投稿がありません
+                      </h3>
+                      <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                        検索条件やフィルタを変更して、もう一度お試しください。
+                        <br />別のカテゴリも覗いてみましょう。
+                      </p>
+                      <Button
+                        variant="outline"
+                        className="mt-5 gap-2 bg-transparent hover:bg-muted/30"
+                        onClick={() => { setSearchInput(""); setSearchQuery(""); setSelectedCategory("all"); setShowBookmarked(false); }}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                        フィルタをリセット
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="relative mx-auto mb-6 w-fit">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 border border-primary/20 mx-auto shadow-[0_0_40px_rgba(29,155,240,0.15)] animate-empty-bounce">
+                          <Sparkles className="h-9 w-9 text-primary" />
+                        </div>
+                        <div className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center animate-float" style={{ animationDelay: "0.5s" }}>
+                          <MessageCircle className="h-3 w-3 text-accent" />
+                        </div>
+                        <div className="absolute -bottom-1 -left-3 h-5 w-5 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center animate-float" style={{ animationDelay: "1s" }}>
+                          <FlaskConical className="h-2.5 w-2.5 text-emerald-500" />
+                        </div>
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground mb-2">
+                        最初の投稿を作成しましょう！
+                      </h3>
+                      <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                        コミュニティに参加して、アルゴリズムの知見を共有したり、
+                        <br />質問を投げかけましょう。あなたの一歩が議論の始まりです。
+                      </p>
+                      <div className="flex items-center justify-center gap-3 mt-6">
+                        <Link href="/dashboard/forum/new">
+                          <Button className="gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">
+                            <Plus className="h-4 w-4" />
+                            投稿を作成
+                          </Button>
+                        </Link>
+                        <Link href={`/dashboard/forum/new?category=QUESTIONS&title=${encodeURIComponent("【質問】")}`}>
+                          <Button variant="outline" className="gap-2 bg-transparent hover:bg-muted/30">
+                            <HelpCircle className="h-4 w-4" />
+                            質問する
+                          </Button>
+                        </Link>
+                      </div>
+                    </>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ) : (
             <div className="space-y-3">
-              {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {posts.map((post, idx) => (
+                <div
+                  key={post.id}
+                  className="animate-in fade-in slide-in-from-bottom-2 duration-300 fill-mode-both"
+                  style={{ animationDelay: `${Math.min(idx * 50, 300)}ms` }}
+                >
+                  <PostCard post={post} />
+                </div>
               ))}
             </div>
           )}
 
           {/* Load More */}
           {pagination && pagination.page < pagination.totalPages && (
-            <div className="text-center">
+            <div className="text-center pt-4">
               <Button
                 variant="outline"
-                className="bg-transparent gap-2"
+                className="bg-card/50 gap-2 hover:border-primary/40 hover:bg-card/80 transition-all group px-6"
                 onClick={handleLoadMore}
                 disabled={isPending}
               >
-                {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 rotate-90 group-hover:translate-y-0.5 transition-transform" />
+                )}
                 もっと見る
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground tabular-nums ml-1">
                   ({pagination.page}/{pagination.totalPages})
                 </span>
               </Button>
@@ -355,7 +520,7 @@ export default function ForumPage() {
         {/* Sidebar */}
         <div className="hidden lg:block space-y-6">
           {/* Profile Preview (X-style) */}
-          <Card className="bg-card/50 border-border/50 overflow-hidden">
+          <Card className="glass border-border/30 overflow-hidden">
             {/* Banner */}
             <div className={cn("h-16 bg-gradient-to-r", getBanner(myUser?.headerColor))} />
             <CardContent className="px-4 pb-4 -mt-6">
@@ -476,7 +641,7 @@ export default function ForumPage() {
           </Card>
 
           {/* 投稿テンプレート */}
-          <Card className="bg-card/50 border-border/50 overflow-hidden">
+          <Card className="glass border-border/30 overflow-hidden">
             <div className="bg-gradient-to-r from-primary/10 to-primary/5 px-4 py-3 border-b border-border/30">
               <h4 className="font-semibold text-foreground text-sm flex items-center gap-2">
                 <FileEdit className="h-4 w-4 text-primary" />
@@ -561,15 +726,15 @@ export default function ForumPage() {
           </Card>
 
           {/* Trending Tags */}
-          <Card className="bg-card/50 border-border/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
+          <Card className="glass border-border/30 overflow-hidden">
+            <div className="bg-gradient-to-r from-orange-500/10 to-amber-500/5 px-4 py-3 border-b border-border/30">
+              <h4 className="font-semibold text-foreground text-sm flex items-center gap-2">
                 <Flame className="h-4 w-4 text-orange-500" />
                 トレンドタグ
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
+              </h4>
+            </div>
+            <CardContent className="p-3">
+              <div className="flex flex-wrap gap-1.5">
                 {[
                   "Heavy Ranker",
                   "リプライ重み",
@@ -585,7 +750,12 @@ export default function ForumPage() {
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="cursor-pointer hover:bg-primary/20 transition-colors text-xs"
+                    className={cn(
+                      "cursor-pointer transition-all text-xs border border-transparent",
+                      searchQuery === tag
+                        ? "bg-primary/20 text-primary border-primary/30"
+                        : "hover:bg-primary/10 hover:text-primary hover:border-primary/20"
+                    )}
                     onClick={() => {
                       setSearchInput(tag);
                       setSearchQuery(tag);
@@ -599,32 +769,29 @@ export default function ForumPage() {
           </Card>
 
           {/* Guidelines */}
-          <Card className="bg-card/50 border-border/50 border-l-4 border-l-primary">
-            <CardContent className="p-4">
-              <h4 className="font-medium text-foreground text-sm">
+          <Card className="glass border-border/30 overflow-hidden">
+            <div className="bg-gradient-to-r from-primary/10 to-accent/5 px-4 py-3 border-b border-border/30">
+              <h4 className="font-semibold text-foreground text-sm flex items-center gap-2">
+                <Zap className="h-4 w-4 text-primary" />
                 コミュニティガイドライン
               </h4>
-              <ul className="mt-2 space-y-1.5 text-xs text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  建設的な議論を心がけましょう
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  情報源を明記しましょう
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  他のユーザーを尊重しましょう
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  検証データを添えると信頼性が上がります
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  Before/Afterデータ付きレポートが最も評価されます
-                </li>
+            </div>
+            <CardContent className="p-3">
+              <ul className="space-y-2 text-xs text-muted-foreground">
+                {[
+                  "建設的な議論を心がけましょう",
+                  "情報源を明記しましょう",
+                  "他のユーザーを尊重しましょう",
+                  "検証データを添えると信頼性UP",
+                  "Before/Afterデータが最も高評価",
+                ].map((guideline, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary/10 text-primary text-[9px] font-bold shrink-0 mt-0.5">
+                      {i + 1}
+                    </span>
+                    {guideline}
+                  </li>
+                ))}
               </ul>
             </CardContent>
           </Card>

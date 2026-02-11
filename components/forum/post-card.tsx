@@ -22,15 +22,16 @@ import { PostReactions } from "@/components/forum/post-reactions";
 import { cn } from "@/lib/utils";
 import { useState, useTransition } from "react";
 
-const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
-  ALGORITHM: { label: "アルゴリズム解説", color: "border-blue-500/50 text-blue-400" },
-  VERIFICATION: { label: "現場検証", color: "border-purple-500/50 text-purple-400" },
-  HEAVY_RANKER: { label: "Heavy Ranker", color: "border-cyan-500/50 text-cyan-400" },
-  SIMCLUSTERS: { label: "SimClusters", color: "border-indigo-500/50 text-indigo-400" },
-  TWEEPCRED: { label: "TweepCred", color: "border-pink-500/50 text-pink-400" },
-  STRATEGY: { label: "戦略・Tips", color: "border-emerald-500/50 text-emerald-400" },
-  UPDATES: { label: "最新アップデート", color: "border-orange-500/50 text-orange-400" },
-  QUESTIONS: { label: "質問・相談", color: "border-yellow-500/50 text-yellow-400" },
+const CATEGORY_LABELS: Record<string, { label: string; color: string; bg: string }> = {
+  ALGORITHM: { label: "アルゴリズム解説", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/30" },
+  VERIFICATION: { label: "現場検証", color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/30" },
+  HEAVY_RANKER: { label: "Heavy Ranker", color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/30" },
+  SIMCLUSTERS: { label: "SimClusters", color: "text-indigo-400", bg: "bg-indigo-500/10 border-indigo-500/30" },
+  TWEEPCRED: { label: "TweepCred", color: "text-pink-400", bg: "bg-pink-500/10 border-pink-500/30" },
+  STRATEGY: { label: "戦略・Tips", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" },
+  UPDATES: { label: "最新アップデート", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/30" },
+  QUESTIONS: { label: "質問・相談", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30" },
+  BUGS: { label: "不具合・エラー", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" },
 };
 
 interface PostCardProps {
@@ -124,10 +125,14 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <Card
       className={cn(
-        "bg-card/50 border-border/50 transition-all duration-200 hover:border-primary/30 hover:bg-card/80",
-        post.isPinned && "ring-1 ring-primary/30 bg-primary/[0.02]"
+        "bg-card/50 border-border/40 transition-all duration-300 hover:border-primary/30 hover:bg-card/80 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-[1px] group/card",
+        post.isPinned && "ring-1 ring-primary/20 bg-primary/[0.03] border-primary/20"
       )}
     >
+      {/* Pinned indicator bar */}
+      {post.isPinned && (
+        <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+      )}
       <CardContent className="p-4 sm:p-5">
         <div className="flex gap-3">
           {/* Avatar column (X-style) */}
@@ -176,7 +181,7 @@ export function PostCard({ post }: PostCardProps) {
             {/* Category + Tags line */}
             <div className="mt-1 flex items-center gap-1.5 flex-wrap">
               {cat && (
-                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", cat.color)}>
+                <Badge variant="outline" className={cn("text-[10px] px-2 py-0.5 font-medium border", cat.bg, cat.color)}>
                   {cat.label}
                 </Badge>
               )}
