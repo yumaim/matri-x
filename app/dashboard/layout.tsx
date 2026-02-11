@@ -165,7 +165,18 @@ function NotificationBell() {
                 <Link
                   key={n.id}
                   href={n.link || (n.postId ? `/dashboard/forum/${n.postId}` : "/dashboard")}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false);
+                    if (!n.isRead) {
+                      fetch("/api/notifications", {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ notificationIds: [n.id] }),
+                      }).catch(() => {});
+                      setNotifications(prev => prev.map(x => x.id === n.id ? { ...x, isRead: true } : x));
+                      setUnreadCount(prev => Math.max(0, prev - 1));
+                    }
+                  }}
                   className={cn(
                     "flex gap-3 px-4 py-3 transition-colors hover:bg-muted/50",
                     !n.isRead && "bg-primary/5"
@@ -219,20 +230,15 @@ const bottomNavigation = [
 function SidebarContent({
   collapsed,
   pathname,
+  user,
 }: {
   collapsed: boolean;
   pathname: string;
+  user: { name: string; id: string | null; image: string | null } | null;
 }) {
-  const [userName, setUserName] = useState("ユーザー");
-  const [userId, setUserId] = useState<string | null>(null);
-  const [userImage, setUserImage] = useState<string | null>(null);
-  useEffect(() => {
-    fetch("/api/users/me").then(r => r.ok ? r.json() : null).then(d => {
-      if (d?.name) setUserName(d.name);
-      if (d?.id) setUserId(d.id);
-      if (d?.image) setUserImage(d.image);
-    }).catch(() => {});
-  }, []);
+  const userName = user?.name ?? "ユーザー";
+  const userId = user?.id ?? null;
+  const userImage = user?.image ?? null;
   const userInitial = userName[0]?.toUpperCase() ?? "U";
   return (
     <>
@@ -298,7 +304,7 @@ function SidebarContent({
               )}
             >
               <Avatar className="h-8 w-8 shrink-0">
-                {userImage && <AvatarImage src={userImage} />}
+                {userImage && <AvatarImage src={userImage} alt={userName} />}
                 <AvatarFallback className="bg-primary/20 text-primary text-sm">
                   {userInitial}
                 </AvatarFallback>
@@ -367,7 +373,7 @@ export default function DashboardLayout({
           collapsed ? "w-[72px]" : "w-64"
         )}
       >
-        <SidebarContent collapsed={collapsed} pathname={pathname} />
+        <SidebarContent collapsed={collapsed} pathname={pathname} user={myUserName ? { name: myUserName, id: myUserId, image: myUserImage } : null} />
         
         {/* Collapse Button */}
         <button
@@ -394,7 +400,7 @@ export default function DashboardLayout({
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-0" aria-label="ナビゲーションメニュー">
               <div className="flex h-full flex-col" onClick={() => setMobileMenuOpen(false)}>
-                <SidebarContent collapsed={false} pathname={pathname} />
+                <SidebarContent collapsed={false} pathname={pathname} user={myUserName ? { name: myUserName, id: myUserId, image: myUserImage } : null} />
               </div>
             </SheetContent>
           </Sheet>
@@ -404,7 +410,7 @@ export default function DashboardLayout({
           <NotificationBell />
           <Link href={myUserId ? `/dashboard/users/${myUserId}` : "/dashboard/profile"}>
             <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
-              {myUserImage && <AvatarImage src={myUserImage} />}
+              {myUserImage && <AvatarImage src={myUserImage} alt={myUserName ?? "ユーザー"} />}
               <AvatarFallback className="bg-primary/20 text-primary text-sm">
                 {myUserName ? myUserName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "MX"}
               </AvatarFallback>

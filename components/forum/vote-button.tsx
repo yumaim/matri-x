@@ -97,6 +97,7 @@ export function VoteButton({
         )}
         onClick={() => handleVote(1)}
         disabled={isPending}
+        aria-label={`賛成${userVote === 1 ? "（投票済み）" : ""}`}
       >
         <ThumbsUp className={iconSize} />
       </Button>
@@ -128,6 +129,7 @@ export function VoteButton({
         )}
         onClick={() => handleVote(-1)}
         disabled={isPending}
+        aria-label={`反対${userVote === -1 ? "（投票済み）" : ""}`}
       >
         <ThumbsDown className={iconSize} />
       </Button>

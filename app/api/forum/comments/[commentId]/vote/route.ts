@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { voteSchema } from "@/lib/validations/forum";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 type RouteParams = { params: Promise<{ commentId: string }> };
 
@@ -12,6 +13,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { allowed } = checkRateLimit(`comment-vote:${session.user.id}`, 60, 60000);
+    if (!allowed) {
+      return NextResponse.json({ error: "リクエストが多すぎます" }, { status: 429 });
     }
 
     const body = await request.json();

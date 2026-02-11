@@ -16,6 +16,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { allowed } = checkRateLimit(`post-vote:${session.user.id}`, 60, 60000);
+    if (!allowed) {
+      return NextResponse.json({ error: "リクエストが多すぎます" }, { status: 429 });
+    }
+
     const body = await request.json();
     const { value } = voteSchema.parse(body);
 

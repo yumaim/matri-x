@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, handleApiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const createTicketSchema = z.object({
   category: z.enum(["FEATURE_REQUEST", "BUG_REPORT", "IMPROVEMENT", "OTHER"]),
@@ -31,6 +32,12 @@ export async function POST(request: NextRequest) {
     const session = await requireAuth();
     const body = await request.json();
     const data = createTicketSchema.parse(body);
+
+    // Rate limit: 5 tickets per 5 minutes
+    const { allowed } = checkRateLimit(`ticket:${session.user.id}`, 5, 300000);
+    if (!allowed) {
+      return NextResponse.json({ error: "リクエストが多すぎます。少し待ってからお試しください。" }, { status: 429 });
+    }
 
     const ticket = await prisma.ticket.create({
       data: {

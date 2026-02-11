@@ -747,26 +747,33 @@ export default function PostDetailPage() {
               <div className="space-y-1.5">
                 {post.author?.xHandle && (
                   <a
-                    href={`https://x.com/${post.author.xHandle.replace(/^@/, "")}`}
+                    href={`https://x.com/${post.author.xHandle.replace(/^@+/, "")}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
                     <span className="font-bold text-sm">𝕏</span>
-                    <span>@{post.author.xHandle.replace(/^@/, "")}</span>
+                    <span>@{post.author.xHandle.replace(/^@+/, "")}</span>
                   </a>
                 )}
-                {post.author?.website && (
-                  <a
-                    href={post.author.website.startsWith("http") ? post.author.website : `https://${post.author.website}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors truncate"
-                  >
-                    <span>🔗</span>
-                    <span className="truncate">{post.author.website.replace(/^https?:\/\//, "")}</span>
-                  </a>
-                )}
+                {post.author?.website && (() => {
+                  try {
+                    const raw = post.author.website;
+                    const parsed = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+                    if (!["http:", "https:"].includes(parsed.protocol)) return null;
+                    return (
+                      <a
+                        href={parsed.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors truncate"
+                      >
+                        <span>🔗</span>
+                        <span className="truncate">{parsed.host}</span>
+                      </a>
+                    );
+                  } catch { return null; }
+                })()}
                 {(post.author?.company || post.author?.community) && (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span>🏢</span>

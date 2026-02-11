@@ -102,7 +102,7 @@ export default function TicketsPage() {
 
   return (
     <div className="p-4 sm:p-6 max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <TicketPlus className="h-6 w-6 text-primary" />
@@ -123,7 +123,7 @@ export default function TicketsPage() {
       </div>
 
       {success && (
-        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4 text-emerald-400 text-sm">
+        <div role="status" aria-live="polite" className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4 text-emerald-400 text-sm">
           ✅ チケットを送信しました！開発チームに通知されました。
         </div>
       )}
