@@ -722,7 +722,9 @@ export default function PostDetailPage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-foreground">{post.author?.name ?? "匿名"}</p>
+                  <Link href={`/dashboard/users/${post.author?.id}`} className="font-medium text-foreground hover:text-primary transition-colors">
+                    {post.author?.name ?? "匿名"}
+                  </Link>
                   {post.author?.role !== "USER" && (
                     <Badge
                       variant="outline"
@@ -741,6 +743,37 @@ export default function PostDetailPage() {
               {post.author?.bio && (
                 <p className="text-xs text-muted-foreground">{post.author.bio}</p>
               )}
+              {/* Links */}
+              <div className="space-y-1.5">
+                {post.author?.xHandle && (
+                  <a
+                    href={`https://x.com/${post.author.xHandle.replace(/^@/, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <span className="font-bold text-sm">𝕏</span>
+                    <span>@{post.author.xHandle.replace(/^@/, "")}</span>
+                  </a>
+                )}
+                {post.author?.website && (
+                  <a
+                    href={post.author.website.startsWith("http") ? post.author.website : `https://${post.author.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors truncate"
+                  >
+                    <span>🔗</span>
+                    <span className="truncate">{post.author.website.replace(/^https?:\/\//, "")}</span>
+                  </a>
+                )}
+                {(post.author?.company || post.author?.community) && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>🏢</span>
+                    <span>{post.author.company || post.author.community}</span>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 

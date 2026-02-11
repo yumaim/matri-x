@@ -23,6 +23,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             role: true,
             bio: true,
             xHandle: true,
+            website: true,
+            company: true,
+            community: true,
           },
         },
         evidence: {
