@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
@@ -218,10 +218,12 @@ function SidebarContent({
 }) {
   const [userName, setUserName] = useState("ユーザー");
   const [userId, setUserId] = useState<string | null>(null);
+  const [userImage, setUserImage] = useState<string | null>(null);
   useEffect(() => {
     fetch("/api/users/me").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.name) setUserName(d.name);
       if (d?.id) setUserId(d.id);
+      if (d?.image) setUserImage(d.image);
     }).catch(() => {});
   }, []);
   const userInitial = userName[0]?.toUpperCase() ?? "U";
@@ -289,6 +291,7 @@ function SidebarContent({
               )}
             >
               <Avatar className="h-8 w-8 shrink-0">
+                {userImage && <AvatarImage src={userImage} />}
                 <AvatarFallback className="bg-primary/20 text-primary text-sm">
                   {userInitial}
                 </AvatarFallback>
@@ -337,10 +340,14 @@ export default function DashboardLayout({
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [myUserId, setMyUserId] = useState<string | null>(null);
+  const [myUserImage, setMyUserImage] = useState<string | null>(null);
+  const [myUserName, setMyUserName] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/users/me").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.id) setMyUserId(d.id);
+      if (d?.image) setMyUserImage(d.image);
+      if (d?.name) setMyUserName(d.name);
     }).catch(() => {});
   }, []);
 
@@ -390,8 +397,9 @@ export default function DashboardLayout({
           <NotificationBell />
           <Link href={myUserId ? `/dashboard/users/${myUserId}` : "/dashboard/profile"}>
             <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+              {myUserImage && <AvatarImage src={myUserImage} />}
               <AvatarFallback className="bg-primary/20 text-primary text-sm">
-                MX
+                {myUserName ? myUserName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "MX"}
               </AvatarFallback>
             </Avatar>
           </Link>
