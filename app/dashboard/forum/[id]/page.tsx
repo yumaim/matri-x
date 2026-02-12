@@ -737,20 +737,7 @@ export default function PostDetailPage() {
                   <Link href={`/dashboard/users/${post.author?.id}`} className="font-medium text-foreground hover:text-primary transition-colors">
                     {post.author?.name ?? "匿名"}
                   </Link>
-                  {post.author?.role !== "USER" && (
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "text-xs",
-                        post.author?.role === "ADMIN"
-                          ? "border-red-500/50 text-red-400"
-                          : "border-yellow-500/50 text-yellow-400"
-                      )}
-                    >
-                      {post.author?.role === "ADMIN" ? "管理者" : "モデレーター"}
-                    </Badge>
-                  )}
-                </div>
+                  </div>
               </div>
               {post.author?.bio && (
                 <p className="text-xs text-muted-foreground">{post.author.bio}</p>

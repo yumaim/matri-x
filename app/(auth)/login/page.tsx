@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -22,6 +22,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasGoogle, setHasGoogle] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/providers").then(r => r.json()).then(p => {
+      if (p?.google) setHasGoogle(true);
+    }).catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +87,8 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Google sign-in */}
+      {/* Google sign-in — only show if Google provider is available */}
+      {hasGoogle && (
       <Button
         variant="outline"
         className="w-full h-12 text-sm font-medium border-border hover:bg-muted"
@@ -107,6 +115,7 @@ export default function LoginPage() {
         </svg>
         Googleでログイン
       </Button>
+      )}
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">

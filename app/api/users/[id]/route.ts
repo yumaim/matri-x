@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth";
 
 export async function GET(
   _request: NextRequest,
@@ -7,6 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const session = await auth();
 
     const user = await prisma.user.findUnique({
       where: { id },
@@ -110,7 +112,7 @@ export async function GET(
         id: user.id,
         name: user.name,
         image: user.image,
-        role: user.role,
+        role: session?.user?.id === user.id ? user.role : "USER",
         plan: user.plan,
         company: user.company,
         bio: user.bio,

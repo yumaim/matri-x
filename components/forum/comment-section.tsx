@@ -58,20 +58,9 @@ function timeAgo(dateStr: string): string {
 }
 
 function RoleBadge({ role }: { role: string }) {
-  if (role === "USER") return null;
-  return (
-    <Badge
-      variant="outline"
-      className={cn(
-        "text-[10px] px-1.5 py-0",
-        role === "ADMIN"
-          ? "border-red-500/50 text-red-400"
-          : "border-yellow-500/50 text-yellow-400"
-      )}
-    >
-      {role === "ADMIN" ? "管理者" : "モデレーター"}
-    </Badge>
-  );
+  // Hide admin/mod badges in public areas for security
+  void role;
+  return null;
 }
 
 function CommentItem({

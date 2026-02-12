@@ -238,7 +238,7 @@ export default function UserProfilePage({
                 <h1 className="text-xl sm:text-2xl font-bold">
                   {user.name ?? "匿名ユーザー"}
                 </h1>
-                {user.role !== "USER" && (
+                {isOwnPage && user.role !== "USER" && (
                 <Badge
                   variant="outline"
                   className={cn(
