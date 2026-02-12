@@ -249,10 +249,12 @@ function SidebarContent({
   collapsed,
   pathname,
   user,
+  onNavClick,
 }: {
   collapsed: boolean;
   pathname: string;
   user: { name: string; id: string | null; image: string | null } | null;
+  onNavClick?: () => void;
 }) {
   const userName = user?.name ?? "ユーザー";
   const userId = user?.id ?? null;
@@ -266,12 +268,19 @@ function SidebarContent({
     toolsNavigation.some((item) => pathname === item.href)
   );
 
+  // Auto-expand accordion when navigating to a child page
+  useEffect(() => {
+    if (learningNavigation.some((item) => pathname === item.href)) setLearningOpen(true);
+    if (toolsNavigation.some((item) => pathname === item.href)) setToolsOpen(true);
+  }, [pathname]);
+
   const renderNavItem = (item: { name: string; href: string; icon: React.ComponentType<{ className?: string }> }, nested = false) => {
     const isActive = pathname === item.href;
     return (
       <Link
         key={item.name}
         href={item.href}
+        onClick={onNavClick}
         className={cn(
           "flex items-center gap-3 rounded-lg text-sm font-medium transition-all",
           nested ? "px-3 py-2 pl-9" : "px-3 py-2.5",
@@ -293,6 +302,7 @@ function SidebarContent({
     isOpen: boolean,
     setOpen: (v: boolean) => void
   ) => {
+    const panelId = `sidebar-${label}-panel`;
     if (collapsed) {
       return items.map((item) => renderNavItem(item));
     }
@@ -300,6 +310,8 @@ function SidebarContent({
       <div>
         <button
           onClick={() => setOpen(!isOpen)}
+          aria-expanded={isOpen}
+          aria-controls={panelId}
           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all w-full"
         >
           {icon}
@@ -307,7 +319,7 @@ function SidebarContent({
           <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
         </button>
         {isOpen && (
-          <div className="space-y-0.5 mt-0.5">
+          <div id={panelId} role="region" aria-label={label} className="space-y-0.5 mt-0.5">
             {items.map((item) => renderNavItem(item, true))}
           </div>
         )}
@@ -524,8 +536,8 @@ export default function DashboardLayout({
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-0" aria-label="ナビゲーションメニュー">
-              <div className="flex h-full flex-col" onClick={() => setMobileMenuOpen(false)}>
-                <SidebarContent collapsed={false} pathname={pathname} user={myUserName ? { name: myUserName, id: myUserId, image: myUserImage } : null} />
+              <div className="flex h-full flex-col">
+                <SidebarContent collapsed={false} pathname={pathname} user={myUserName ? { name: myUserName, id: myUserId, image: myUserImage } : null} onNavClick={() => setMobileMenuOpen(false)} />
               </div>
             </SheetContent>
           </Sheet>
