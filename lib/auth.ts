@@ -35,6 +35,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
+        // Block banned users
+        if (user.banned) {
+          return null;
+        }
+
         const isPasswordValid = await compare(password, user.password);
         if (!isPasswordValid) {
           return null;
@@ -58,4 +63,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         ]
       : []),
   ],
+  callbacks: {
+    async signIn({ user }) {
+      if (!user?.email) return true;
+      const dbUser = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { banned: true },
+      });
+      if (dbUser?.banned) return false;
+      return true;
+    },
+  },
 });

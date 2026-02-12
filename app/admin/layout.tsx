@@ -1,135 +1,140 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
-  MessageSquare,
-  FileText,
-  Settings,
+  TicketPlus,
+  Bell,
+  Activity,
+  Shield,
+  ChevronLeft,
+  LogOut,
   Menu,
   X,
-  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
-const sidebarLinks = [
-  { href: "/admin", label: "ダッシュボード", icon: LayoutDashboard },
-  { href: "/admin/users", label: "ユーザー管理", icon: Users },
-  { href: "/admin/posts", label: "投稿管理", icon: MessageSquare },
-  { href: "/admin/content", label: "コンテンツ管理", icon: FileText },
-  { href: "/admin/settings", label: "設定", icon: Settings },
+const adminNav = [
+  { name: "概要", href: "/admin", icon: LayoutDashboard },
+  { name: "ユーザー管理", href: "/admin/users", icon: Users },
+  { name: "チケット管理", href: "/admin/tickets", icon: TicketPlus },
+  { name: "更新通知", href: "/admin/updates", icon: Bell },
+  { name: "ヘルスチェック", href: "/admin/health", icon: Activity },
+  { name: "チーム管理", href: "/admin/team", icon: Shield },
 ];
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/users/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.role === "ADMIN") {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+          router.push("/dashboard");
+        }
+      })
+      .catch(() => {
+        setIsAdmin(false);
+        router.push("/dashboard");
+      });
+  }, [router]);
+
+  useEffect(() => { setMobileOpen(false); }, [pathname]);
+
+  if (isAdmin === null) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">認証確認中...</div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) return null;
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+    <div className="min-h-screen bg-background">
+      {/* Mobile Header */}
+      <div className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-card/50">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-red-400" />
+          <span className="font-bold text-gradient">Admin</span>
+        </div>
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2">
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
+
+      {/* Mobile Nav */}
+      {mobileOpen && (
+        <div className="lg:hidden border-b border-border bg-card/80 p-2">
+          {adminNav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
+                pathname === item.href
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              )}
+            >
+              <item.icon className="h-4 w-4" />
+              {item.name}
+            </Link>
+          ))}
+        </div>
       )}
 
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-card transition-transform duration-300 lg:static lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        {/* Sidebar Header */}
-        <div className="flex h-16 items-center gap-3 border-b border-border px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-            <Shield className="h-5 w-5 text-primary" />
+      <div className="flex">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:flex flex-col w-60 border-r border-border bg-card/30 min-h-screen">
+          <div className="flex items-center gap-2 p-4 border-b border-border">
+            <Shield className="h-5 w-5 text-red-400" />
+            <span className="font-bold text-gradient">Admin Panel</span>
           </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-tight">matri-x</h1>
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-              管理画面
-            </p>
+          <nav className="flex-1 p-3 space-y-1">
+            {adminNav.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
+                    isActive
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="p-3 border-t border-border space-y-1">
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              ダッシュボードへ戻る
+            </Link>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="ml-auto lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
+        </aside>
 
-        {/* Navigation */}
-        <nav className="flex-1 space-y-1 px-3 py-4">
-          {sidebarLinks.map((link) => {
-            const isActive =
-              link.href === "/admin"
-                ? pathname === "/admin"
-                : pathname.startsWith(link.href);
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setSidebarOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                )}
-              >
-                <link.icon className="h-4 w-4" />
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Sidebar Footer */}
-        <div className="border-t border-border px-4 py-3">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            ← ユーザー画面に戻る
-          </Link>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Top Header */}
-        <header className="flex h-16 items-center gap-4 border-b border-border px-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <h2 className="text-lg font-semibold">
-            {sidebarLinks.find((l) =>
-              l.href === "/admin"
-                ? pathname === "/admin"
-                : pathname.startsWith(l.href)
-            )?.label ?? "管理画面"}
-          </h2>
-        </header>
-
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        {/* Main Content */}
+        <main className="flex-1 min-h-screen">{children}</main>
       </div>
     </div>
   );

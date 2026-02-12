@@ -6,37 +6,38 @@ export async function GET() {
   try {
     await requireAdmin();
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const [userCount, postCount, commentCount, todayUsers, recentPosts, categoryStats] =
+    const [totalUsers, bannedUsers, totalPosts, totalComments, totalVotes, openTickets, totalTickets, recentSignups] =
       await Promise.all([
         prisma.user.count(),
+        prisma.user.count({ where: { banned: true } }),
         prisma.forumPost.count(),
         prisma.comment.count(),
-        prisma.user.count({ where: { createdAt: { gte: today } } }),
-        prisma.forumPost.findMany({
-          where: { status: "FLAGGED" },
-          include: { author: { select: { name: true, email: true } } },
-          orderBy: { updatedAt: "desc" },
-          take: 5,
-        }),
-        prisma.forumPost.groupBy({
-          by: ["category"],
-          _count: { id: true },
+        prisma.vote.count(),
+        prisma.ticket.count({ where: { status: "OPEN" } }),
+        prisma.ticket.count(),
+        prisma.user.findMany({
+          orderBy: { createdAt: "desc" },
+          take: 10,
+          select: { id: true, name: true, email: true, createdAt: true },
         }),
       ]);
 
+    // Active users = logged in within 30 days
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const activeUsers = await prisma.user.count({
+      where: { updatedAt: { gte: thirtyDaysAgo } },
+    });
+
     return NextResponse.json({
-      userCount,
-      postCount,
-      commentCount,
-      todayUsers,
-      flaggedPosts: recentPosts,
-      categoryStats: categoryStats.map((c) => ({
-        category: c.category,
-        count: c._count.id,
-      })),
+      totalUsers,
+      activeUsers,
+      bannedUsers,
+      totalPosts,
+      totalComments,
+      totalVotes,
+      openTickets,
+      totalTickets,
+      recentSignups,
     });
   } catch (error) {
     return handleApiError(error);
