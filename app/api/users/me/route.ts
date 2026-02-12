@@ -25,7 +25,15 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: USER_SELECT,
+      select: {
+        ...USER_SELECT,
+        _count: {
+          select: {
+            posts: true,
+            comments: true,
+          },
+        },
+      },
     });
 
     if (!user) {
