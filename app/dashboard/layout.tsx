@@ -18,6 +18,7 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
+  ChevronDown,
   Bell,
   Menu,
   MessageCircle,
@@ -216,16 +217,25 @@ function NotificationBell() {
   );
 }
 
-const navigation = [
+const mainNavigation = [
   { name: "ダッシュボード", href: "/dashboard", icon: LayoutDashboard },
   { name: "フォーラム", href: "/dashboard/forum", icon: MessageCircle },
   { name: "ランキング", href: "/dashboard/ranking", icon: Trophy },
   { name: "アナリティクス", href: "/dashboard/analytics", icon: Activity },
+];
+
+const learningNavigation = [
   { name: "パイプライン探索", href: "/dashboard/explore", icon: GitBranch },
   { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3 },
+  { name: "用語集", href: "/dashboard/glossary", icon: BookOpen },
+];
+
+const toolsNavigation = [
   { name: "TweepCredシミュレーター", href: "/dashboard/simulator", icon: Users },
   { name: "Deep AI検索", href: "/dashboard/deepwiki", icon: Search },
-  { name: "用語集", href: "/dashboard/glossary", icon: BookOpen },
+];
+
+const extraNavigation = [
   { name: "開発チケット", href: "/dashboard/tickets", icon: TicketPlus },
   { name: "更新履歴", href: "/dashboard/updates", icon: History },
 ];
@@ -248,6 +258,63 @@ function SidebarContent({
   const userId = user?.id ?? null;
   const userImage = user?.image ?? null;
   const userInitial = getInitials(userName);
+
+  const [learningOpen, setLearningOpen] = useState(() =>
+    learningNavigation.some((item) => pathname === item.href)
+  );
+  const [toolsOpen, setToolsOpen] = useState(() =>
+    toolsNavigation.some((item) => pathname === item.href)
+  );
+
+  const renderNavItem = (item: { name: string; href: string; icon: React.ComponentType<{ className?: string }> }, nested = false) => {
+    const isActive = pathname === item.href;
+    return (
+      <Link
+        key={item.name}
+        href={item.href}
+        className={cn(
+          "flex items-center gap-3 rounded-lg text-sm font-medium transition-all",
+          nested ? "px-3 py-2 pl-9" : "px-3 py-2.5",
+          isActive
+            ? "bg-primary/10 text-primary"
+            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+        )}
+      >
+        <item.icon className={cn("shrink-0", nested ? "h-4 w-4" : "h-5 w-5")} />
+        {!collapsed && <span>{item.name}</span>}
+      </Link>
+    );
+  };
+
+  const renderAccordion = (
+    label: string,
+    icon: React.ReactNode,
+    items: typeof learningNavigation,
+    isOpen: boolean,
+    setOpen: (v: boolean) => void
+  ) => {
+    if (collapsed) {
+      return items.map((item) => renderNavItem(item));
+    }
+    return (
+      <div>
+        <button
+          onClick={() => setOpen(!isOpen)}
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all w-full"
+        >
+          {icon}
+          <span className="flex-1 text-left">{label}</span>
+          <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
+        </button>
+        {isOpen && (
+          <div className="space-y-0.5 mt-0.5">
+            {items.map((item) => renderNavItem(item, true))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
       {/* Logo */}
@@ -258,25 +325,32 @@ function SidebarContent({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 p-3">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              <item.icon className="h-5 w-5 shrink-0" />
-              {!collapsed && <span>{item.name}</span>}
-            </Link>
-          );
-        })}
+      <nav className="flex-1 space-y-1 p-3 overflow-y-auto">
+        {mainNavigation.map((item) => renderNavItem(item))}
+
+        <div className="pt-1">
+          {renderAccordion(
+            "学習",
+            <BookOpen className="h-5 w-5 shrink-0" />,
+            learningNavigation,
+            learningOpen,
+            setLearningOpen
+          )}
+        </div>
+
+        <div className="pt-1">
+          {renderAccordion(
+            "ツール",
+            <Zap className="h-5 w-5 shrink-0" />,
+            toolsNavigation,
+            toolsOpen,
+            setToolsOpen
+          )}
+        </div>
+
+        <div className="border-t border-border/50 pt-2 mt-2 space-y-0.5">
+          {extraNavigation.map((item) => renderNavItem(item))}
+        </div>
       </nav>
 
       {/* Bottom Navigation */}
