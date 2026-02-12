@@ -42,7 +42,7 @@ export default function AdminTicketsPage() {
 
   const fetchTickets = useCallback(async () => {
     setLoading(true);
-    const url = filter ? `/api/admin/tickets?status=${filter}` : "/api/admin/tickets";
+    const url = filter ? `/api/architect/tickets?status=${filter}` : "/api/architect/tickets";
     try {
       const res = await fetch(url);
       if (res.ok) {
@@ -58,7 +58,7 @@ export default function AdminTicketsPage() {
   const updateTicket = async (ticketId: string, updates: Record<string, string | undefined>) => {
     setActionLoading(ticketId);
     try {
-      const res = await fetch("/api/admin/tickets", {
+      const res = await fetch("/api/architect/tickets", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ticketId, ...updates }),

@@ -21,7 +21,7 @@ export default function AdminOverview() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/admin/stats")
+    fetch("/api/architect/stats")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => setStats(d))
       .catch(() => {})

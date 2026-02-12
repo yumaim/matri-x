@@ -100,7 +100,7 @@ export default function AdminContentPage() {
         page: String(page),
         limit: "20",
       });
-      const res = await fetch(`/api/admin/content?${params}`);
+      const res = await fetch(`/api/architect/content?${params}`);
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setItems(data.items);
@@ -122,7 +122,7 @@ export default function AdminContentPage() {
 
     setSubmitting(true);
     try {
-      const res = await fetch("/api/admin/content", {
+      const res = await fetch("/api/architect/content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -145,7 +145,7 @@ export default function AdminContentPage() {
     if (!confirm("このアルゴリズムアップデートを削除しますか？")) return;
     setDeleting(id);
     try {
-      const res = await fetch(`/api/admin/content?id=${id}`, {
+      const res = await fetch(`/api/architect/content?id=${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete");

@@ -34,7 +34,7 @@ export default function AdminUpdatesPage() {
     setSubmitting(true);
     setError("");
     try {
-      const res = await fetch("/api/admin/updates", {
+      const res = await fetch("/api/architect/updates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, description, source: source || undefined, impact, category: category || undefined }),

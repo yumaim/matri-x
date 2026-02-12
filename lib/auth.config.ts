@@ -71,7 +71,7 @@ export const authConfig: NextAuthConfig = {
       }
 
       // Admin
-      if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
+      if (pathname.startsWith("/architect") || pathname.startsWith("/api/architect")) {
         if (!isLoggedIn) return false; // will redirect to signIn page
         if (role !== "ADMIN") {
           return Response.redirect(new URL("/dashboard", nextUrl));

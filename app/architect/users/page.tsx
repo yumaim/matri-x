@@ -34,7 +34,7 @@ export default function AdminUsersPage() {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/users?page=${page}&search=${encodeURIComponent(search)}`);
+      const res = await fetch(`/api/architect/users?page=${page}&search=${encodeURIComponent(search)}`);
       if (res.ok) {
         const data = await res.json();
         setUsers(data.users);
@@ -50,7 +50,7 @@ export default function AdminUsersPage() {
   const handleAction = async (userId: string, action: string, extra?: Record<string, string>) => {
     setActionLoading(userId);
     try {
-      const res = await fetch("/api/admin/users", {
+      const res = await fetch("/api/architect/users", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, action, ...extra }),

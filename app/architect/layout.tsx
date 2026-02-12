@@ -18,12 +18,12 @@ import {
 import { cn } from "@/lib/utils";
 
 const adminNav = [
-  { name: "概要", href: "/admin", icon: LayoutDashboard },
-  { name: "ユーザー管理", href: "/admin/users", icon: Users },
-  { name: "チケット管理", href: "/admin/tickets", icon: TicketPlus },
-  { name: "更新通知", href: "/admin/updates", icon: Bell },
-  { name: "ヘルスチェック", href: "/admin/health", icon: Activity },
-  { name: "チーム管理", href: "/admin/team", icon: Shield },
+  { name: "概要", href: "/architect", icon: LayoutDashboard },
+  { name: "ユーザー管理", href: "/architect/users", icon: Users },
+  { name: "チケット管理", href: "/architect/tickets", icon: TicketPlus },
+  { name: "更新通知", href: "/architect/updates", icon: Bell },
+  { name: "ヘルスチェック", href: "/architect/health", icon: Activity },
+  { name: "チーム管理", href: "/architect/team", icon: Shield },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

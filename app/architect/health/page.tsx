@@ -22,7 +22,7 @@ export default function AdminHealthPage() {
   const fetchHealth = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/health");
+      const res = await fetch("/api/architect/health");
       if (res.ok) setHealth(await res.json());
     } catch { /* */ }
     setLoading(false);

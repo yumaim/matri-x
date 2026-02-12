@@ -32,6 +32,7 @@ import {
   Activity,
   BookOpen,
   TicketPlus,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -253,13 +254,14 @@ function SidebarContent({
 }: {
   collapsed: boolean;
   pathname: string;
-  user: { name: string; id: string | null; image: string | null } | null;
+  user: { name: string; id: string | null; image: string | null; role: string | null } | null;
   onNavClick?: () => void;
 }) {
   const userName = user?.name ?? "ユーザー";
   const userId = user?.id ?? null;
   const userImage = user?.image ?? null;
   const userInitial = getInitials(userName);
+  const userRole = user?.role ?? null;
 
   const [learningOpen, setLearningOpen] = useState(() =>
     learningNavigation.some((item) => pathname === item.href)
@@ -467,6 +469,17 @@ function SidebarContent({
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+            {userRole === "ADMIN" && (
+              <>
+                <DropdownMenuItem asChild>
+                  <Link href="/architect">
+                    <Shield className="mr-2 h-4 w-4" />
+                    管理パネル
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
             <DropdownMenuItem className="text-destructive" onClick={() => signOut({ callbackUrl: "/" })}>
               <LogOut className="mr-2 h-4 w-4" />
               ログアウト
@@ -489,6 +502,7 @@ export default function DashboardLayout({
   const [myUserId, setMyUserId] = useState<string | null>(null);
   const [myUserImage, setMyUserImage] = useState<string | null>(null);
   const [myUserName, setMyUserName] = useState<string | null>(null);
+  const [myUserRole, setMyUserRole] = useState<string | null>(null);
 
   // Close mobile menu on route change
   useEffect(() => { setMobileMenuOpen(false); }, [pathname]);
@@ -498,6 +512,7 @@ export default function DashboardLayout({
       if (d?.id) setMyUserId(d.id);
       if (d?.image) setMyUserImage(d.image);
       if (d?.name) setMyUserName(d.name);
+      if (d?.role) setMyUserRole(d.role);
     }).catch(() => {});
   }, []);
 
@@ -510,7 +525,7 @@ export default function DashboardLayout({
           collapsed ? "w-[72px]" : "w-64"
         )}
       >
-        <SidebarContent collapsed={collapsed} pathname={pathname} user={myUserName ? { name: myUserName, id: myUserId, image: myUserImage } : null} />
+        <SidebarContent collapsed={collapsed} pathname={pathname} user={myUserName ? { name: myUserName, id: myUserId, image: myUserImage, role: myUserRole } : null} />
         
         {/* Collapse Button */}
         <button
@@ -537,7 +552,7 @@ export default function DashboardLayout({
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-0" aria-label="ナビゲーションメニュー">
               <div className="flex h-full flex-col">
-                <SidebarContent collapsed={false} pathname={pathname} user={myUserName ? { name: myUserName, id: myUserId, image: myUserImage } : null} onNavClick={() => setMobileMenuOpen(false)} />
+                <SidebarContent collapsed={false} pathname={pathname} user={myUserName ? { name: myUserName, id: myUserId, image: myUserImage, role: myUserRole } : null} onNavClick={() => setMobileMenuOpen(false)} />
               </div>
             </SheetContent>
           </Sheet>

@@ -26,7 +26,7 @@ export default function AdminTeamPage() {
   const fetchTeam = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/users?search=");
+      const res = await fetch("/api/architect/users?search=");
       if (res.ok) {
         const data = await res.json();
         const all: TeamMember[] = data.users;
@@ -42,7 +42,7 @@ export default function AdminTeamPage() {
   const changeRole = async (userId: string, role: string) => {
     setActionLoading(userId);
     try {
-      const res = await fetch("/api/admin/users", {
+      const res = await fetch("/api/architect/users", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, action: "changeRole", role }),

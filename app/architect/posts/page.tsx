@@ -84,7 +84,7 @@ export default function AdminPostsPage() {
         if (tab === "flagged") params.set("status", "FLAGGED");
         if (tab === "removed") params.set("status", "REMOVED");
 
-        const res = await fetch(`/api/admin/posts?${params}`);
+        const res = await fetch(`/api/architect/posts?${params}`);
         if (!res.ok) throw new Error("Failed to fetch posts");
         const data = await res.json();
         setPosts(data.posts);
@@ -108,7 +108,7 @@ export default function AdminPostsPage() {
   ) => {
     setActionLoading(postId);
     try {
-      const res = await fetch(`/api/admin/posts/${postId}`, {
+      const res = await fetch(`/api/architect/posts/${postId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
