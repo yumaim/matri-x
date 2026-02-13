@@ -28,6 +28,18 @@ export async function GET() {
       where: { updatedAt: { gte: thirtyDaysAgo } },
     });
 
+    // Time-series: signups per day for the last 30 days
+    const signupsByDay = await getSignupsByDay(30);
+
+    // Time-series: posts per day for the last 30 days
+    const postsByDay = await getPostsByDay(30);
+
+    // Plan distribution
+    const planDistribution = await prisma.user.groupBy({
+      by: ["plan"],
+      _count: true,
+    });
+
     return NextResponse.json({
       totalUsers,
       activeUsers,
@@ -38,8 +50,56 @@ export async function GET() {
       openTickets,
       totalTickets,
       recentSignups,
+      signupsByDay,
+      postsByDay,
+      planDistribution: planDistribution.map((p: { plan: string; _count: number }) => ({
+        plan: p.plan,
+        count: p._count,
+      })),
     });
   } catch (error) {
     return handleApiError(error);
   }
+}
+
+async function getSignupsByDay(days: number) {
+  const result: { date: string; count: number }[] = [];
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const dayStart = new Date(now);
+    dayStart.setDate(dayStart.getDate() - i);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+
+    const count = await prisma.user.count({
+      where: { createdAt: { gte: dayStart, lt: dayEnd } },
+    });
+    result.push({
+      date: dayStart.toISOString().slice(5, 10), // MM-DD
+      count,
+    });
+  }
+  return result;
+}
+
+async function getPostsByDay(days: number) {
+  const result: { date: string; count: number }[] = [];
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const dayStart = new Date(now);
+    dayStart.setDate(dayStart.getDate() - i);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+
+    const count = await prisma.forumPost.count({
+      where: { createdAt: { gte: dayStart, lt: dayEnd } },
+    });
+    result.push({
+      date: dayStart.toISOString().slice(5, 10),
+      count,
+    });
+  }
+  return result;
 }

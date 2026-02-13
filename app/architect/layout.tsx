@@ -10,8 +10,8 @@ import {
   Bell,
   Activity,
   Shield,
+  ScrollText,
   ChevronLeft,
-  LogOut,
   Menu,
   X,
 } from "lucide-react";
@@ -24,6 +24,7 @@ const adminNav = [
   { name: "更新通知", href: "/architect/updates", icon: Bell },
   { name: "ヘルスチェック", href: "/architect/health", icon: Activity },
   { name: "チーム管理", href: "/architect/team", icon: Shield },
+  { name: "監査ログ", href: "/architect/audit", icon: ScrollText },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

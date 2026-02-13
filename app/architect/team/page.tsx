@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Shield, Crown, UserCog, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format-utils";
@@ -23,10 +24,21 @@ export default function AdminTeamPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // Confirm dialog state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState<{
+    title: string;
+    description: string;
+    variant: "default" | "destructive";
+    confirmLabel: string;
+    onConfirm: () => void;
+  } | null>(null);
+
   const fetchTeam = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/architect/users?search=");
+      // Fix: Use role filter to fetch only ADMIN and MODERATOR users
+      const res = await fetch("/api/architect/users?role=ADMIN,MODERATOR");
       if (res.ok) {
         const data = await res.json();
         const all: TeamMember[] = data.users;
@@ -50,10 +62,33 @@ export default function AdminTeamPage() {
       if (res.ok) fetchTeam();
       else {
         const err = await res.json();
-        alert(err.error || "エラー");
+        console.error("Team role change error:", err.error);
       }
-    } catch { alert("通信エラー"); }
+    } catch {
+      console.error("Network error");
+    }
     setActionLoading(null);
+  };
+
+  const showConfirm = (config: NonNullable<typeof confirmConfig>) => {
+    setConfirmConfig(config);
+    setConfirmOpen(true);
+  };
+
+  const handleRoleChange = (member: TeamMember, newRole: string) => {
+    const isDowngrade = (member.role === "ADMIN" && newRole !== "ADMIN") || (member.role === "MODERATOR" && newRole === "USER");
+    showConfirm({
+      title: `${member.name ?? "名前未設定"} のロール変更`,
+      description: isDowngrade
+        ? `${member.role} → ${newRole} に変更します。管理権限が剥奪されます。`
+        : `${member.role} → ${newRole} に昇格します。`,
+      variant: isDowngrade ? "destructive" : "default",
+      confirmLabel: "変更する",
+      onConfirm: () => {
+        changeRole(member.id, newRole);
+        setConfirmOpen(false);
+      },
+    });
   };
 
   const roleIcon = (role: string) => {
@@ -79,23 +114,34 @@ export default function AdminTeamPage() {
                   {member.role}
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground">{member.email}</p>
+              <p className="text-xs text-muted-foreground">
+                {member.email ? member.email.replace(/^(.{2}).*@/, "$1•••@") : "—"}
+              </p>
               <p className="text-xs text-muted-foreground">参加: {formatDate(member.createdAt)}</p>
             </div>
           </div>
           <div className="flex gap-1 shrink-0">
             {member.role === "MODERATOR" && (
               <>
-                <Button size="sm" variant="outline" className="text-xs" onClick={() => changeRole(member.id, "ADMIN")} disabled={actionLoading === member.id}>
+                <Button size="sm" variant="outline" className="text-xs"
+                  onClick={() => handleRoleChange(member, "ADMIN")}
+                  disabled={actionLoading === member.id}
+                >
                   ADMINに昇格
                 </Button>
-                <Button size="sm" variant="outline" className="text-xs text-muted-foreground" onClick={() => changeRole(member.id, "USER")} disabled={actionLoading === member.id}>
+                <Button size="sm" variant="outline" className="text-xs text-muted-foreground"
+                  onClick={() => handleRoleChange(member, "USER")}
+                  disabled={actionLoading === member.id}
+                >
                   解除
                 </Button>
               </>
             )}
             {member.role === "ADMIN" && (
-              <Button size="sm" variant="outline" className="text-xs text-muted-foreground" onClick={() => changeRole(member.id, "USER")} disabled={actionLoading === member.id}>
+              <Button size="sm" variant="outline" className="text-xs text-muted-foreground"
+                onClick={() => handleRoleChange(member, "USER")}
+                disabled={actionLoading === member.id}
+              >
                 ADMIN解除
               </Button>
             )}
@@ -137,6 +183,20 @@ export default function AdminTeamPage() {
             ) : mods.map(renderMember)}
           </div>
         </>
+      )}
+
+      {/* Confirmation Dialog */}
+      {confirmConfig && (
+        <ConfirmDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title={confirmConfig.title}
+          description={confirmConfig.description}
+          variant={confirmConfig.variant}
+          confirmLabel={confirmConfig.confirmLabel}
+          onConfirm={confirmConfig.onConfirm}
+          loading={actionLoading !== null}
+        />
       )}
     </div>
   );

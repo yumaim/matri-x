@@ -229,3 +229,17 @@ model UserAchievement {
 
   @@unique([userId, achievementId])
 }
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  action     String   // BAN, UNBAN, CHANGE_ROLE, CHANGE_PLAN, UPDATE_TICKET, CREATE_UPDATE, DELETE_UPDATE
+  targetId   String?
+  targetType String?  // USER, TICKET, UPDATE, POST
+  details    String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+}

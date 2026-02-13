@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Search, Ban, ShieldCheck, UserCog, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format-utils";
@@ -31,10 +32,35 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // Confirm dialog state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState<{
+    title: string;
+    description: string;
+    variant: "default" | "destructive";
+    confirmLabel: string;
+    inputLabel?: string;
+    inputPlaceholder?: string;
+    onConfirm: (inputValue?: string) => void;
+  } | null>(null);
+
+  // Search debounce
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [search]);
+
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/architect/users?page=${page}&search=${encodeURIComponent(search)}`);
+      const res = await fetch(`/api/architect/users?page=${page}&search=${encodeURIComponent(debouncedSearch)}`);
       if (res.ok) {
         const data = await res.json();
         setUsers(data.users);
@@ -43,7 +69,7 @@ export default function AdminUsersPage() {
       }
     } catch { /* */ }
     setLoading(false);
-  }, [page, search]);
+  }, [page, debouncedSearch]);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
@@ -58,10 +84,77 @@ export default function AdminUsersPage() {
       if (res.ok) fetchUsers();
       else {
         const err = await res.json();
-        alert(err.error || "エラーが発生しました");
+        // Use toast-style inline error instead of alert()
+        console.error("Admin action error:", err.error);
       }
-    } catch { alert("通信エラー"); }
+    } catch {
+      console.error("Network error");
+    }
     setActionLoading(null);
+  };
+
+  const showConfirm = (config: NonNullable<typeof confirmConfig>) => {
+    setConfirmConfig(config);
+    setConfirmOpen(true);
+  };
+
+  const handleBan = (user: UserRow) => {
+    showConfirm({
+      title: `${user.name ?? "名前未設定"} をBANしますか？`,
+      description: "このユーザーはサービスにログインできなくなります。この操作は後で取り消せます。",
+      variant: "destructive",
+      confirmLabel: "BANする",
+      inputLabel: "BAN理由（任意）",
+      inputPlaceholder: "利用規約違反など...",
+      onConfirm: (reason) => {
+        handleAction(user.id, "ban", { reason: reason ?? "" });
+        setConfirmOpen(false);
+      },
+    });
+  };
+
+  const handleUnban = (user: UserRow) => {
+    showConfirm({
+      title: `${user.name ?? "名前未設定"} のBANを解除しますか？`,
+      description: "このユーザーは再びサービスを利用できるようになります。",
+      variant: "default",
+      confirmLabel: "BAN解除",
+      onConfirm: () => {
+        handleAction(user.id, "unban");
+        setConfirmOpen(false);
+      },
+    });
+  };
+
+  const handleRoleChange = (user: UserRow, newRole: string) => {
+    if (newRole === user.role) return;
+    const isDowngrade = user.role === "ADMIN" && newRole !== "ADMIN";
+    showConfirm({
+      title: `ロール変更: ${user.role} → ${newRole}`,
+      description: isDowngrade
+        ? `⚠️ ${user.name ?? "名前未設定"} の管理者権限を剥奪します。本当によろしいですか？`
+        : `${user.name ?? "名前未設定"} のロールを ${newRole} に変更します。`,
+      variant: isDowngrade ? "destructive" : "default",
+      confirmLabel: "変更する",
+      onConfirm: () => {
+        handleAction(user.id, "changeRole", { role: newRole });
+        setConfirmOpen(false);
+      },
+    });
+  };
+
+  const handlePlanChange = (user: UserRow, newPlan: string) => {
+    if (newPlan === user.plan) return;
+    showConfirm({
+      title: `プラン変更: ${user.plan} → ${newPlan}`,
+      description: `${user.name ?? "名前未設定"} のプランを ${newPlan} に変更します。`,
+      variant: "default",
+      confirmLabel: "変更する",
+      onConfirm: () => {
+        handleAction(user.id, "changePlan", { plan: newPlan });
+        setConfirmOpen(false);
+      },
+    });
   };
 
   const roleBadge = (role: string) => {
@@ -82,6 +175,15 @@ export default function AdminUsersPage() {
     return <Badge variant="outline" className={cn("text-xs", colors[plan] ?? colors.FREE)}>{plan}</Badge>;
   };
 
+  // Mask email for display
+  const maskEmail = (email: string | null) => {
+    if (!email) return "—";
+    const [local, domain] = email.split("@");
+    if (!domain) return email;
+    const masked = local.length <= 2 ? local : local.slice(0, 2) + "•".repeat(Math.min(local.length - 2, 5));
+    return `${masked}@${domain}`;
+  };
+
   return (
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
@@ -96,7 +198,7 @@ export default function AdminUsersPage() {
         <Input
           placeholder="名前またはメールで検索..."
           value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
         />
       </div>
@@ -116,7 +218,7 @@ export default function AdminUsersPage() {
                       {planBadge(u.plan)}
                       {u.banned && <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/30 text-xs">BAN</Badge>}
                     </div>
-                    <p className="text-xs text-muted-foreground">{u.email}</p>
+                    <p className="text-xs text-muted-foreground">{maskEmail(u.email)}</p>
                     <div className="flex gap-3 text-xs text-muted-foreground">
                       <span>投稿: {u._count.posts}</span>
                       <span>コメント: {u._count.comments}</span>
@@ -129,7 +231,7 @@ export default function AdminUsersPage() {
                     {u.banned ? (
                       <Button
                         size="sm" variant="outline"
-                        onClick={() => handleAction(u.id, "unban")}
+                        onClick={() => handleUnban(u)}
                         disabled={actionLoading === u.id}
                         className="text-xs gap-1"
                       >
@@ -138,10 +240,7 @@ export default function AdminUsersPage() {
                     ) : (
                       <Button
                         size="sm" variant="outline"
-                        onClick={() => {
-                          const reason = prompt("BAN理由を入力（任意）:");
-                          if (reason !== null) handleAction(u.id, "ban", { reason });
-                        }}
+                        onClick={() => handleBan(u)}
                         disabled={actionLoading === u.id}
                         className="text-xs gap-1 text-red-400 hover:text-red-300"
                       >
@@ -151,7 +250,7 @@ export default function AdminUsersPage() {
                     <select
                       className="text-xs bg-background border border-border rounded px-2 py-1"
                       value={u.role}
-                      onChange={(e) => handleAction(u.id, "changeRole", { role: e.target.value })}
+                      onChange={(e) => handleRoleChange(u, e.target.value)}
                       disabled={actionLoading === u.id}
                     >
                       <option value="USER">USER</option>
@@ -161,7 +260,7 @@ export default function AdminUsersPage() {
                     <select
                       className="text-xs bg-background border border-border rounded px-2 py-1"
                       value={u.plan}
-                      onChange={(e) => handleAction(u.id, "changePlan", { plan: e.target.value })}
+                      onChange={(e) => handlePlanChange(u, e.target.value)}
                       disabled={actionLoading === u.id}
                     >
                       <option value="FREE">FREE</option>
@@ -186,6 +285,22 @@ export default function AdminUsersPage() {
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
+      )}
+
+      {/* Confirmation Dialog */}
+      {confirmConfig && (
+        <ConfirmDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title={confirmConfig.title}
+          description={confirmConfig.description}
+          variant={confirmConfig.variant}
+          confirmLabel={confirmConfig.confirmLabel}
+          inputLabel={confirmConfig.inputLabel}
+          inputPlaceholder={confirmConfig.inputPlaceholder}
+          onConfirm={confirmConfig.onConfirm}
+          loading={actionLoading !== null}
+        />
       )}
     </div>
   );
