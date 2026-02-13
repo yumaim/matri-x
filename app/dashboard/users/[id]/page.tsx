@@ -217,13 +217,13 @@ export default function UserProfilePage({
   const currentGradient = HEADER_COLORS.find((c) => c.id === headerColor)?.gradient || HEADER_COLORS[0].gradient;
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden relative">
       {/* Cover Gradient Header */}
       <div className={cn("relative h-32 sm:h-44 bg-gradient-to-r", currentGradient)}>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
       </div>
 
-      <div className="p-4 sm:p-6 lg:p-8 -mt-16 sm:-mt-20 space-y-6">
+      <div className="px-4 sm:px-6 lg:px-8 -mt-16 sm:-mt-20 pb-6 space-y-6 relative z-10">
         {/* Profile Header */}
         <div className="flex flex-col sm:flex-row items-start gap-4">
           <Avatar className="h-20 w-20 sm:h-24 sm:w-24 ring-4 ring-background shrink-0">
