@@ -75,6 +75,14 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "自分自身をBANすることはできません" }, { status: 400 });
     }
 
+    // Prevent banning ADMIN users
+    if (data.action === "ban") {
+      const targetUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { role: true } });
+      if (targetUser?.role === "ADMIN") {
+        return NextResponse.json({ error: "管理者ユーザーをBANすることはできません" }, { status: 403 });
+      }
+    }
+
     // Prevent self-demotion
     if (data.userId === session.user.id && data.action === "changeRole" && data.role !== "ADMIN") {
       return NextResponse.json({ error: "自分自身の管理者権限を変更することはできません" }, { status: 400 });

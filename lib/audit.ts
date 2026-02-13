@@ -8,7 +8,10 @@ export type AuditAction =
   | "UPDATE_TICKET"
   | "CREATE_UPDATE"
   | "DELETE_UPDATE"
-  | "UPDATE_POST";
+  | "UPDATE_POST"
+  | "DELETE_POST"
+  | "DELETE_COMMENT"
+  | "MODERATOR_ALERT";
 
 export async function logAudit(params: {
   actorId: string;

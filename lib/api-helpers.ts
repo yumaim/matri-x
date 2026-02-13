@@ -29,6 +29,18 @@ export async function requireAdmin() {
   return session;
 }
 
+export async function requireAdminOrModerator() {
+  const session = await requireAuth();
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true },
+  });
+  if (!user || (user.role !== "ADMIN" && user.role !== "MODERATOR")) {
+    throw new ApiError(403, "管理者またはモデレーター権限が必要です");
+  }
+  return { ...session, userRole: user.role };
+}
+
 export async function requirePlan(minPlan: "STANDARD" | "PRO") {
   const session = await requireAuth();
   const user = await prisma.user.findUnique({

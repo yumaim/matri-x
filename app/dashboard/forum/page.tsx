@@ -109,26 +109,31 @@ export default function ForumPage() {
   const [searchInput, setSearchInput] = useState("");
   const [sortBy, setSortBy] = useState("latest");
   const [showBookmarked, setShowBookmarked] = useState(false);
+  const [showMyPosts, setShowMyPosts] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
   const [profileTab, setProfileTab] = useState<"posts" | "bookmarks">("posts");
+  const [myUserId, setMyUserId] = useState<string | null>(null);
   const [myUser, setMyUser] = useState<{ name: string | null; image: string | null; community: string | null; level: number; xp: number; postCount: number; commentCount: number; headerColor: string | null } | null>(null);
 
   useEffect(() => {
     fetch("/api/users/me")
       .then((r) => r.json())
-      .then((data) => setMyUser({
-        name: data.name ?? "匿名",
-        image: data.image ?? null,
-        community: data.community ?? null,
-        level: data.level ?? 1,
-        xp: data.xp ?? 0,
-        postCount: data._count?.posts ?? 0,
-        commentCount: data._count?.comments ?? 0,
-        headerColor: data.headerColor ?? "blue",
-      }))
+      .then((data) => {
+        setMyUserId(data.id ?? null);
+        setMyUser({
+          name: data.name ?? "匿名",
+          image: data.image ?? null,
+          community: data.community ?? null,
+          level: data.level ?? 1,
+          xp: data.xp ?? 0,
+          postCount: data._count?.posts ?? 0,
+          commentCount: data._count?.comments ?? 0,
+          headerColor: data.headerColor ?? "blue",
+        });
+      })
       .catch(() => { });
   }, []);
 
@@ -143,6 +148,7 @@ export default function ForumPage() {
         if (selectedCategory !== "all") params.set("category", selectedCategory);
         if (searchQuery) params.set("search", searchQuery);
         if (showBookmarked) params.set("bookmarked", "true");
+        if (showMyPosts && myUserId) params.set("authorId", myUserId);
 
         const res = await fetch(`/api/forum/posts?${params}`);
         if (!res.ok) throw new Error("Failed to fetch posts");
@@ -156,7 +162,7 @@ export default function ForumPage() {
         setLoading(false);
       }
     },
-    [selectedCategory, searchQuery, sortBy, showBookmarked]
+    [selectedCategory, searchQuery, sortBy, showBookmarked, showMyPosts, myUserId]
   );
 
   useEffect(() => {
@@ -186,6 +192,7 @@ export default function ForumPage() {
         if (selectedCategory !== "all") params.set("category", selectedCategory);
         if (searchQuery) params.set("search", searchQuery);
         if (showBookmarked) params.set("bookmarked", "true");
+        if (showMyPosts && myUserId) params.set("authorId", myUserId);
 
         const res = await fetch(`/api/forum/posts?${params}`);
         if (!res.ok) throw new Error("Failed");
@@ -322,7 +329,7 @@ export default function ForumPage() {
       </div>
 
       {/* Active filters indicator */}
-      {(searchQuery || selectedCategory !== "all" || showBookmarked) && (
+      {(searchQuery || selectedCategory !== "all" || showBookmarked || showMyPosts) && (
         <div className="flex items-center gap-2 flex-wrap text-xs animate-in fade-in slide-in-from-top-2 duration-200">
           <span className="text-muted-foreground">フィルタ:</span>
           {searchQuery && (
@@ -343,9 +350,15 @@ export default function ForumPage() {
               <X className="h-2.5 w-2.5" />
             </Badge>
           )}
+          {showMyPosts && (
+            <Badge variant="secondary" className="gap-1 cursor-pointer hover:bg-destructive/20 transition-colors" onClick={() => setShowMyPosts(false)}>
+              自分の投稿
+              <X className="h-2.5 w-2.5" />
+            </Badge>
+          )}
           <button
             className="text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
-            onClick={() => { setSearchInput(""); setSearchQuery(""); setSelectedCategory("all"); setShowBookmarked(false); }}
+            onClick={() => { setSearchInput(""); setSearchQuery(""); setSelectedCategory("all"); setShowBookmarked(false); setShowMyPosts(false); }}
           >
             すべてクリア
           </button>
@@ -616,19 +629,25 @@ export default function ForumPage() {
               {/* Tab Content */}
               <div className="mt-3 space-y-2">
                 {profileTab === "posts" ? (
-                  <Link href="/dashboard/forum?filter=my">
-                    <Button variant="outline" size="sm" className="w-full bg-transparent text-xs gap-1.5 justify-start">
-                      <MessageSquare className="h-3.5 w-3.5" />
-                      自分の投稿を見る
-                    </Button>
-                  </Link>
+                  <Button
+                    variant={showMyPosts ? "default" : "outline"}
+                    size="sm"
+                    className={cn("w-full text-xs gap-1.5 justify-start", !showMyPosts && "bg-transparent")}
+                    onClick={() => { setShowMyPosts(!showMyPosts); setShowBookmarked(false); }}
+                  >
+                    <MessageSquare className="h-3.5 w-3.5" />
+                    {showMyPosts ? "フィルタ解除" : "自分の投稿を見る"}
+                  </Button>
                 ) : (
-                  <Link href="/dashboard/forum?filter=bookmarks">
-                    <Button variant="outline" size="sm" className="w-full bg-transparent text-xs gap-1.5 justify-start">
-                      <Bookmark className="h-3.5 w-3.5" />
-                      ブックマーク一覧
-                    </Button>
-                  </Link>
+                  <Button
+                    variant={showBookmarked ? "default" : "outline"}
+                    size="sm"
+                    className={cn("w-full text-xs gap-1.5 justify-start", !showBookmarked && "bg-transparent")}
+                    onClick={() => { setShowBookmarked(!showBookmarked); setShowMyPosts(false); }}
+                  >
+                    <Bookmark className="h-3.5 w-3.5" />
+                    {showBookmarked ? "フィルタ解除" : "ブックマーク一覧"}
+                  </Button>
                 )}
               </div>
               {/* New Post */}

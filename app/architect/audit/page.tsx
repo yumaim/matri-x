@@ -27,6 +27,9 @@ const ACTION_LABELS: Record<string, { label: string; color: string }> = {
   CREATE_UPDATE: { label: "更新作成", color: "bg-purple-500/10 text-purple-400 border-purple-500/30" },
   DELETE_UPDATE: { label: "更新削除", color: "bg-red-500/10 text-red-400 border-red-500/30" },
   UPDATE_POST: { label: "投稿操作", color: "bg-muted text-muted-foreground border-border" },
+  DELETE_POST: { label: "投稿削除", color: "bg-red-500/10 text-red-400 border-red-500/30" },
+  DELETE_COMMENT: { label: "コメント削除", color: "bg-red-500/10 text-red-400 border-red-500/30" },
+  MODERATOR_ALERT: { label: "モデ通知", color: "bg-amber-500/10 text-amber-400 border-amber-500/30" },
 };
 
 export default function AuditLogPage() {

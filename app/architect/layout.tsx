@@ -14,53 +14,69 @@ import {
   ChevronLeft,
   Menu,
   X,
+  MessageCircleWarning,
+  GitBranch,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const adminNav = [
   { name: "概要", href: "/architect", icon: LayoutDashboard },
   { name: "ユーザー管理", href: "/architect/users", icon: Users },
+  { name: "コンテンツ管理", href: "/architect/moderation", icon: MessageCircleWarning },
   { name: "チケット管理", href: "/architect/tickets", icon: TicketPlus },
   { name: "更新通知", href: "/architect/updates", icon: Bell },
   { name: "ヘルスチェック", href: "/architect/health", icon: Activity },
   { name: "チーム管理", href: "/architect/team", icon: Shield },
   { name: "監査ログ", href: "/architect/audit", icon: ScrollText },
+  { name: "バージョン", href: "/architect/changelog", icon: GitBranch },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Items restricted to ADMIN only
+  const restrictedForModerator = ["/architect/users"];
+
+  const filteredNav = userRole === "MODERATOR"
+    ? adminNav.filter((item) => !restrictedForModerator.includes(item.href))
+    : adminNav;
 
   useEffect(() => {
     fetch("/api/users/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (d?.role === "ADMIN") {
-          setIsAdmin(true);
+        if (d?.role === "ADMIN" || d?.role === "MODERATOR") {
+          setUserRole(d.role);
         } else {
-          setIsAdmin(false);
+          setUserRole(null);
           router.push("/dashboard");
         }
       })
       .catch(() => {
-        setIsAdmin(false);
+        setUserRole(null);
         router.push("/dashboard");
       });
   }, [router]);
 
+  // Block MODERATOR from accessing restricted pages
+  useEffect(() => {
+    if (userRole === "MODERATOR" && restrictedForModerator.some((p) => pathname.startsWith(p))) {
+      router.push("/architect");
+    }
+  }, [userRole, pathname, router]);
+
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
-  if (isAdmin === null) {
+  if (userRole === null) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">認証確認中...</div>
       </div>
     );
   }
-
-  if (!isAdmin) return null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -78,7 +94,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Mobile Nav */}
       {mobileOpen && (
         <div className="lg:hidden border-b border-border bg-card/80 p-2">
-          {adminNav.map((item) => (
+          {filteredNav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -104,7 +120,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="font-bold text-gradient">Admin Panel</span>
           </div>
           <nav className="flex-1 p-3 space-y-1">
-            {adminNav.map((item) => {
+            {filteredNav.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
