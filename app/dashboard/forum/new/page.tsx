@@ -35,6 +35,7 @@ const CATEGORIES = [
   { value: "HEAVY_RANKER", label: "Heavy Ranker" },
   { value: "SIMCLUSTERS", label: "SimClusters" },
   { value: "TWEEPCRED", label: "TweepCred" },
+  { value: "MURMUR", label: "つぶやき" },
 ];
 
 export default function NewPostPageWrapper() {
@@ -76,7 +77,9 @@ function NewPostPage() {
     const errs: Record<string, string> = {};
     if (title.trim().length < 3) errs.title = "タイトルは3文字以上で入力してください";
     if (title.length > 200) errs.title = "タイトルは200文字以内で入力してください";
-    if (content.trim().length < 10) errs.content = "内容は10文字以上で入力してください";
+    const minContent = category === "MURMUR" ? 1 : 10;
+    if (content.trim().length < minContent)
+      errs.content = category === "MURMUR" ? "内容を入力してください" : "内容は10文字以上で入力してください";
     if (!category) errs.category = "カテゴリを選択してください";
     setErrors(errs);
     return Object.keys(errs).length === 0;

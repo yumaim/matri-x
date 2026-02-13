@@ -339,7 +339,7 @@ export default function UpdatesPage() {
                 <Clock className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">3日前</p>
+                <p className="text-2xl font-bold text-foreground">{(() => { const d = new Date(updates[0].date); const now = new Date(); const diff = Math.floor((now.getTime() - d.getTime()) / 86400000); if (diff === 0) return "今日"; if (diff === 1) return "昨日"; if (diff < 30) return diff + "日前"; if (diff < 365) return Math.floor(diff / 30) + "ヶ月前"; return Math.floor(diff / 365) + "年前"; })()}</p>
                 <p className="text-xs text-muted-foreground">最終更新</p>
               </div>
             </div>

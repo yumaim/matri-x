@@ -6,6 +6,7 @@ export const POST_CATEGORIES = [
   "STRATEGY",
   "UPDATES",
   "QUESTIONS",
+  "MURMUR",
 ] as const;
 
 export const EVIDENCE_TYPES = [
@@ -33,7 +34,7 @@ export const createPostSchema = z.object({
     .max(200, "タイトルは200文字以内で入力してください"),
   content: z
     .string()
-    .min(10, "内容は10文字以上で入力してください")
+    .min(1, "内容を入力してください")
     .max(50000, "内容は50000文字以内で入力してください"),
   category: z.enum(POST_CATEGORIES, {
     errorMap: () => ({ message: "カテゴリを選択してください" }),

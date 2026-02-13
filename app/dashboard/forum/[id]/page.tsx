@@ -61,6 +61,7 @@ const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
   STRATEGY: { label: "戦略・Tips", color: "border-emerald-500/50 text-emerald-400" },
   UPDATES: { label: "最新アップデート", color: "border-orange-500/50 text-orange-400" },
   QUESTIONS: { label: "質問・相談", color: "border-yellow-500/50 text-yellow-400" },
+  MURMUR: { label: "つぶやき", color: "border-violet-500/50 text-violet-400" },
 };
 
 const EVIDENCE_TYPES = [
@@ -737,7 +738,7 @@ export default function PostDetailPage() {
                   <Link href={`/dashboard/users/${post.author?.id}`} className="font-medium text-foreground hover:text-primary transition-colors">
                     {post.author?.name ?? "匿名"}
                   </Link>
-                  </div>
+                </div>
               </div>
               {post.author?.bio && (
                 <p className="text-xs text-muted-foreground">{post.author.bio}</p>

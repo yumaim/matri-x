@@ -173,6 +173,28 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = createPostSchema.parse(body);
 
+    // MURMUR (つぶやき): 1 post per user per day (JST)
+    if (data.category === "MURMUR") {
+      const jstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
+      const todayStart = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate());
+      const todayStartUTC = new Date(todayStart.getTime() - 9 * 60 * 60 * 1000);
+      const todayEndUTC = new Date(todayStartUTC.getTime() + 24 * 60 * 60 * 1000);
+      const existing = await prisma.forumPost.count({
+        where: {
+          authorId: session.user.id,
+          category: "MURMUR",
+          createdAt: { gte: todayStartUTC, lt: todayEndUTC },
+          status: { not: "REMOVED" },
+        },
+      });
+      if (existing > 0) {
+        return NextResponse.json(
+          { error: "つぶやきは1日1回までです。明日またお待ちしています！" },
+          { status: 429 }
+        );
+      }
+    }
+
     // Sanitize user content (H-7)
     const { sanitizeContent } = await import("@/lib/sanitize");
 

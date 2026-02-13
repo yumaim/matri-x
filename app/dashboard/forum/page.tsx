@@ -59,6 +59,7 @@ const categories = [
   { id: "HEAVY_RANKER", name: "Heavy Ranker", icon: TrendingUp },
   { id: "SIMCLUSTERS", name: "SimClusters", icon: Users },
   { id: "TWEEPCRED", name: "TweepCred", icon: Award },
+  { id: "MURMUR", name: "つぶやき", icon: MessageSquare },
 ];
 
 const sortOptions = [
@@ -128,7 +129,7 @@ export default function ForumPage() {
         commentCount: data._count?.comments ?? 0,
         headerColor: data.headerColor ?? "blue",
       }))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const fetchPosts = useCallback(
@@ -655,18 +656,26 @@ export default function ForumPage() {
               {/* よく使うテンプレート */}
               <div className="space-y-1.5 mb-2">
                 {[
-                  { id: "VERIFICATION", name: "現場検証", icon: FlaskConical, color: "text-emerald-500", desc: "Before/Afterデータ付き",
+                  {
+                    id: "VERIFICATION", name: "現場検証", icon: FlaskConical, color: "text-emerald-500", desc: "Before/Afterデータ付き",
                     title: "【検証】",
-                    template: "## 仮説\n\n\n## 検証期間\nYYYY/MM/DD 〜 YYYY/MM/DD（◯日間）\n\n## Before（変更前のデータ）\n- インプレッション: \n- エンゲージメント率: \n- フォロワー増減: \n\n## After（変更後のデータ）\n- インプレッション: \n- エンゲージメント率: \n- フォロワー増減: \n\n## 変化率\n\n\n## 考察・結論\n\n\n## 補足・注意点\n" },
-                  { id: "QUESTIONS", name: "質問・相談", icon: HelpCircle, color: "text-blue-500", desc: "気軽に聞いてみよう",
+                    template: "## 仮説\n\n\n## 検証期間\nYYYY/MM/DD 〜 YYYY/MM/DD（◯日間）\n\n## Before（変更前のデータ）\n- インプレッション: \n- エンゲージメント率: \n- フォロワー増減: \n\n## After（変更後のデータ）\n- インプレッション: \n- エンゲージメント率: \n- フォロワー増減: \n\n## 変化率\n\n\n## 考察・結論\n\n\n## 補足・注意点\n"
+                  },
+                  {
+                    id: "QUESTIONS", name: "質問・相談", icon: HelpCircle, color: "text-blue-500", desc: "気軽に聞いてみよう",
                     title: "【質問】",
-                    template: "## 質問内容\n\n\n## 背景・状況\n- アカウント歴: \n- フォロワー数: 約◯人\n- 普段の投稿ジャンル: \n\n## 試したこと\n\n\n## 期待していること\n" },
-                  { id: "STRATEGY", name: "戦略・Tips", icon: TrendingUp, color: "text-amber-500", desc: "試した結果を共有",
+                    template: "## 質問内容\n\n\n## 背景・状況\n- アカウント歴: \n- フォロワー数: 約◯人\n- 普段の投稿ジャンル: \n\n## 試したこと\n\n\n## 期待していること\n"
+                  },
+                  {
+                    id: "STRATEGY", name: "戦略・Tips", icon: TrendingUp, color: "text-amber-500", desc: "試した結果を共有",
                     title: "【Tips】",
-                    template: "## 戦略の概要\n\n\n## 具体的なやり方\n1. \n2. \n3. \n\n## 実際の結果\n- 期間: \n- 効果: \n\n## おすすめ度\n★★★☆☆\n\n## 注意点・コツ\n" },
-                  { id: "BUGS", name: "不具合・エラー", icon: AlertCircle, color: "text-red-500", desc: "問題を報告",
+                    template: "## 戦略の概要\n\n\n## 具体的なやり方\n1. \n2. \n3. \n\n## 実際の結果\n- 期間: \n- 効果: \n\n## おすすめ度\n★★★☆☆\n\n## 注意点・コツ\n"
+                  },
+                  {
+                    id: "BUGS", name: "不具合・エラー", icon: AlertCircle, color: "text-red-500", desc: "問題を報告",
                     title: "【不具合】",
-                    template: "## 発生した問題\n\n\n## 再現手順\n1. \n2. \n3. \n\n## 期待する動作\n\n\n## 実際の動作\n\n\n## 環境\n- デバイス: \n- ブラウザ: \n- 発生日時: \n" },
+                    template: "## 発生した問題\n\n\n## 再現手順\n1. \n2. \n3. \n\n## 期待する動作\n\n\n## 実際の動作\n\n\n## 環境\n- デバイス: \n- ブラウザ: \n- 発生日時: \n"
+                  },
                 ].map((item) => (
                   <Link
                     key={item.id}
@@ -692,21 +701,31 @@ export default function ForumPage() {
                   <AccordionContent className="pb-1">
                     <div className="space-y-1">
                       {[
-                        { id: "ALGORITHM", name: "アルゴリズム解説", icon: BookOpen, color: "text-violet-500",
+                        {
+                          id: "ALGORITHM", name: "アルゴリズム解説", icon: BookOpen, color: "text-violet-500",
                           title: "【解説】",
-                          template: "## 対象アルゴリズム\n\n\n## 概要\n\n\n## 仕組みの詳細\n\n\n## 運用への影響\n- ポジティブ: \n- ネガティブ: \n\n## まとめ・推奨アクション\n" },
-                        { id: "UPDATES", name: "最新アップデート", icon: Flame, color: "text-orange-500",
+                          template: "## 対象アルゴリズム\n\n\n## 概要\n\n\n## 仕組みの詳細\n\n\n## 運用への影響\n- ポジティブ: \n- ネガティブ: \n\n## まとめ・推奨アクション\n"
+                        },
+                        {
+                          id: "UPDATES", name: "最新アップデート", icon: Flame, color: "text-orange-500",
                           title: "【速報】",
-                          template: "## アップデート概要\n\n\n## 変更点\n- \n- \n\n## 運用への影響\n\n\n## 推奨アクション\n\n\n## ソース・参考リンク\n" },
-                        { id: "HEAVY_RANKER", name: "Heavy Ranker", icon: TrendingUp, color: "text-cyan-500",
+                          template: "## アップデート概要\n\n\n## 変更点\n- \n- \n\n## 運用への影響\n\n\n## 推奨アクション\n\n\n## ソース・参考リンク\n"
+                        },
+                        {
+                          id: "HEAVY_RANKER", name: "Heavy Ranker", icon: TrendingUp, color: "text-cyan-500",
                           title: "【Heavy Ranker】",
-                          template: "## 対象パラメータ/機能\n\n\n## 検証内容\n\n\n## 結果・データ\n\n\n## 考察\n\n\n## 実運用への示唆\n" },
-                        { id: "SIMCLUSTERS", name: "SimClusters", icon: Users, color: "text-indigo-500",
+                          template: "## 対象パラメータ/機能\n\n\n## 検証内容\n\n\n## 結果・データ\n\n\n## 考察\n\n\n## 実運用への示唆\n"
+                        },
+                        {
+                          id: "SIMCLUSTERS", name: "SimClusters", icon: Users, color: "text-indigo-500",
                           title: "【SimClusters】",
-                          template: "## 対象トピック\n\n\n## 検証内容\n\n\n## 結果・データ\n\n\n## 考察\n\n\n## 実運用への示唆\n" },
-                        { id: "TWEEPCRED", name: "TweepCred", icon: Award, color: "text-yellow-500",
+                          template: "## 対象トピック\n\n\n## 検証内容\n\n\n## 結果・データ\n\n\n## 考察\n\n\n## 実運用への示唆\n"
+                        },
+                        {
+                          id: "TWEEPCRED", name: "TweepCred", icon: Award, color: "text-yellow-500",
                           title: "【TweepCred】",
-                          template: "## 対象トピック\n\n\n## 検証内容\n\n\n## 結果・データ\n\n\n## 考察\n\n\n## 実運用への示唆\n" },
+                          template: "## 対象トピック\n\n\n## 検証内容\n\n\n## 結果・データ\n\n\n## 考察\n\n\n## 実運用への示唆\n"
+                        },
                       ].map((item) => (
                         <Link
                           key={item.id}

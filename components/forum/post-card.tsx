@@ -32,6 +32,7 @@ const CATEGORY_LABELS: Record<string, { label: string; color: string; bg: string
   UPDATES: { label: "最新アップデート", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/30" },
   QUESTIONS: { label: "質問・相談", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30" },
   BUGS: { label: "不具合・エラー", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" },
+  MURMUR: { label: "つぶやき", color: "text-violet-400", bg: "bg-violet-500/10 border-violet-500/30" },
 };
 
 interface PostCardProps {

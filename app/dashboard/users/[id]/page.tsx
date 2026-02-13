@@ -61,6 +61,7 @@ const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
   STRATEGY: { label: "戦略・Tips", color: "border-emerald-500/50 text-emerald-400" },
   UPDATES: { label: "最新アップデート", color: "border-orange-500/50 text-orange-400" },
   QUESTIONS: { label: "質問・相談", color: "border-yellow-500/50 text-yellow-400" },
+  MURMUR: { label: "つぶやき", color: "border-violet-500/50 text-violet-400" },
 };
 
 interface UserProfile {
@@ -239,18 +240,18 @@ export default function UserProfilePage({
                   {user.name ?? "匿名ユーザー"}
                 </h1>
                 {isOwnPage && user.role !== "USER" && (
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    "text-xs",
-                    user.role === "ADMIN"
-                      ? "border-red-500/50 text-red-400"
-                      : "border-blue-500/50 text-blue-400"
-                  )}
-                >
-                  {user.role}
-                </Badge>
-              )}
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "text-xs",
+                      user.role === "ADMIN"
+                        ? "border-red-500/50 text-red-400"
+                        : "border-blue-500/50 text-blue-400"
+                    )}
+                  >
+                    {user.role}
+                  </Badge>
+                )}
               </div>
               {isOwnPage && (
                 <div className="flex items-center gap-2 shrink-0">

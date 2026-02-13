@@ -14,6 +14,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   STRATEGY: "戦略・Tips",
   UPDATES: "最新アップデート",
   QUESTIONS: "質問・相談",
+  MURMUR: "つぶやき",
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -25,6 +26,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   STRATEGY: "#10b981",
   UPDATES: "#f97316",
   QUESTIONS: "#eab308",
+  MURMUR: "#8b5cf6",
 };
 
 export async function GET(

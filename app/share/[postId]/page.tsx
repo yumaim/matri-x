@@ -11,6 +11,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   STRATEGY: "戦略・Tips",
   UPDATES: "最新アップデート",
   QUESTIONS: "質問・相談",
+  MURMUR: "つぶやき",
 };
 
 interface Props {
