@@ -13,6 +13,7 @@ export async function GET() {
         image: true,
         company: true,
         xHandle: true,
+        role: true,
         _count: {
           select: {
             posts: true,
@@ -25,17 +26,23 @@ export async function GET() {
     });
 
     // Composite score: posts×3 + comments×2 + votes×1
-    // Active users (higher score) rank above inactive users
+    // ADMIN/MODERATOR users get ×0.4 multiplier to prevent
+    // admin activity from dominating the ranking
+    const ADMIN_MULTIPLIER = 0.4;
     const scored = users
-      .map((u) => ({
-        ...u,
-        _score: u._count.posts * 3 + u._count.comments * 2 + u._count.votes * 1,
-      }))
+      .map((u) => {
+        const rawScore = u._count.posts * 3 + u._count.comments * 2 + u._count.votes * 1;
+        const multiplier = (u.role === "ADMIN" || u.role === "MODERATOR") ? ADMIN_MULTIPLIER : 1;
+        return {
+          ...u,
+          _score: Math.round(rawScore * multiplier),
+        };
+      })
       .sort((a, b) => b._score - a._score)
       .slice(0, 20);
 
-    // Strip internal score before returning
-    const result = scored.map(({ _score, ...rest }) => rest);
+    // Strip internal score and role before returning
+    const result = scored.map(({ _score, role, ...rest }) => rest);
 
     return NextResponse.json(result);
   } catch (error) {
