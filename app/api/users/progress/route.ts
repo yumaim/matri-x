@@ -23,6 +23,15 @@ const ACHIEVEMENTS = [
   { id: "simulator_pro", name: "シミュレーター達人", description: "シミュレーターを5回以上使用", icon: "🧮", xp: 30, tier: "silver" },
   { id: "deepwiki_seeker", name: "知識の探求者", description: "Deep AI検索で10回以上検索", icon: "🔍", xp: 30, tier: "silver" },
   { id: "algorithm_sage", name: "アルゴリズム賢者", description: "全トピックの学習を完了", icon: "🧠", xp: 100, tier: "gold" },
+  // 新アルゴリズム学習系（Phoenix/Thunder/Comparison）
+  { id: "phoenix_basics", name: "Phoenix入門", description: "Phoenixの基礎を学習", icon: "🔥", xp: 30, tier: "silver" },
+  { id: "phoenix_master", name: "Phoenix マスター", description: "Phoenixページを完全理解（3回以上閲覧）", icon: "🔥🏆", xp: 50, tier: "gold" },
+  { id: "thunder_basics", name: "Thunder入門", description: "Thunderの基礎を学習", icon: "⚡", xp: 30, tier: "silver" },
+  { id: "thunder_master", name: "Thunder マスター", description: "Thunderページを完全理解（3回以上閲覧）", icon: "⚡🏆", xp: 50, tier: "gold" },
+  { id: "comparison_basics", name: "新旧比較入門", description: "新旧アルゴリズム比較を学習", icon: "📊", xp: 30, tier: "silver" },
+  { id: "comparison_master", name: "比較分析マスター", description: "新旧比較ページを完全理解（3回以上閲覧）", icon: "📊🏆", xp: 50, tier: "gold" },
+  { id: "new_algo_complete", name: "新アルゴリズム完全制覇", description: "Phoenix/Thunder/Comparisonを全て完了", icon: "🎓", xp: 100, tier: "platinum" },
+  { id: "glossary_explorer", name: "用語集探検家", description: "用語集で10個以上の用語を閲覧", icon: "📖", xp: 20, tier: "bronze" },
 ];
 
 const LEARNING_TOPICS = [
@@ -92,7 +101,7 @@ export async function GET() {
     const completedTopics = learningProgress.filter((p) => p.completed).length;
     if (completedTopics >= LEARNING_TOPICS.length && !earned.includes("algorithm_sage")) {
       newAchievements.push("algorithm_sage");
-  // 新アルゴリズム学習系（Phoenix/Thunder/Comparison）
+    }
 
     // 新アルゴリズム学習系アチーブメント
     const phoenixProgress = learningProgress.find((p) => p.topicId === "phoenix");
@@ -126,15 +135,6 @@ export async function GET() {
       !earned.includes("new_algo_complete")
     ) {
       newAchievements.push("new_algo_complete");
-    }
-  { id: "phoenix_basics", name: "Phoenix入門", description: "Phoenixの基礎を学習", icon: "🔥", xp: 30, tier: "silver" },
-  { id: "phoenix_master", name: "Phoenix マスター", description: "Phoenixページを完全理解（3回以上閲覧）", icon: "🔥🏆", xp: 50, tier: "gold" },
-  { id: "thunder_basics", name: "Thunder入門", description: "Thunderの基礎を学習", icon: "⚡", xp: 30, tier: "silver" },
-  { id: "thunder_master", name: "Thunder マスター", description: "Thunderページを完全理解（3回以上閲覧）", icon: "⚡🏆", xp: 50, tier: "gold" },
-  { id: "comparison_basics", name: "新旧比較入門", description: "新旧アルゴリズム比較を学習", icon: "📊", xp: 30, tier: "silver" },
-  { id: "comparison_master", name: "比較分析マスター", description: "新旧比較ページを完全理解（3回以上閲覧）", icon: "📊🏆", xp: 50, tier: "gold" },
-  { id: "new_algo_complete", name: "新アルゴリズム完全制覇", description: "Phoenix/Thunder/Comparisonを全て完了", icon: "🎓", xp: 100, tier: "platinum" },
-  { id: "glossary_explorer", name: "用語集探検家", description: "用語集で10個以上の用語を閲覧", icon: "📖", xp: 20, tier: "bronze" },
     }
 
     // Award new achievements
