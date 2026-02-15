@@ -299,6 +299,14 @@ export default function AnalyticsPage() {
                     interval="preserveStartEnd"
                   />
                   <YAxis
+                    yAxisId="left"
+                    tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                    allowDecimals={false}
+                    width={30}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
                     tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
                     allowDecimals={false}
                     width={30}
@@ -314,10 +322,12 @@ export default function AnalyticsPage() {
                     strokeWidth={2}
                     fill="url(#viewsGrad)"
                     name="閲覧"
+                    yAxisId="right"
                   />
                   <Area
                     type="monotone"
                     dataKey="likes"
+                    yAxisId="left"
                     stroke="#f91880"
                     strokeWidth={2}
                     fill="url(#likesGrad)"
@@ -326,6 +336,7 @@ export default function AnalyticsPage() {
                   <Area
                     type="monotone"
                     dataKey="bookmarks"
+                    yAxisId="left"
                     stroke="#ffd400"
                     strokeWidth={2}
                     fill="url(#bookmarksGrad)"
@@ -334,6 +345,7 @@ export default function AnalyticsPage() {
                   <Area
                     type="monotone"
                     dataKey="posts"
+                    yAxisId="left"
                     stroke="#1d9bf0"
                     strokeWidth={2}
                     fill="url(#postsGrad)"
@@ -342,6 +354,7 @@ export default function AnalyticsPage() {
                   <Area
                     type="monotone"
                     dataKey="comments"
+                    yAxisId="left"
                     stroke="#7856ff"
                     strokeWidth={2}
                     fill="url(#commentsGrad)"

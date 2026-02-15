@@ -21,6 +21,97 @@ export const GLOSSARY_CATEGORIES: { id: GlossaryCategory | "すべて"; label: s
   { id: "エンゲージメント", label: "エンゲージメント" },
   { id: "フィルタリング", label: "フィルタリング" },
   { id: "その他", label: "その他" },
+  // 新アルゴリズム (2026) - xai-org/x-algorithm
+  {
+    id: "phoenix",
+    nameEn: "Phoenix",
+    nameJa: "フェニックス",
+    category: "スコアリング",
+    description:
+      "2026年公開のGrokベースML推薦エンジン。Two-Tower Retrieval（類似検索）+ Transformer Ranking（15アクション予測）の2段階構成。Candidate Isolation技術により候補同士が独立してスコアリングされる点が革新的。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "thunder",
+    nameEn: "Thunder",
+    nameJa: "サンダー",
+    category: "パイプライン",
+    description:
+      "2026年導入のRust製インメモリポストストア。Kafkaからリアルタイムに投稿を取り込み、フォロー中アカウントの投稿を<1msで取得。Original/Reply+Repost/Videoの3種別で管理し、旧Earlybirdを置き換える。",
+    relatedLink: { label: "Thunder解説", href: "/dashboard/thunder" },
+  },
+  {
+    id: "grok",
+    nameEn: "Grok",
+    nameJa: "グロック",
+    category: "スコアリング",
+    description:
+      "xAI社が開発した大規模言語モデル。Phoenixの基盤技術として、Transformerアーキテクチャでツイートのエンゲージメント確率を予測。手動特徴量エンジニアリングを完全排除し、全てを学習で獲得。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "two-tower",
+    nameEn: "Two-Tower Model",
+    nameJa: "ツータワーモデル",
+    category: "スコアリング",
+    description:
+      "Phoenix Retrievalの類似検索手法。User Tower（ユーザー特徴）とCandidate Tower（投稿特徴）を独立してエンコードし、Dot Product類似度で候補を取得。数百万投稿から数千候補へ高速絞込が可能。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "candidate-isolation",
+    nameEn: "Candidate Isolation",
+    nameJa: "候補アイソレーション",
+    category: "スコアリング",
+    description:
+      "Phoenix Rankerの革新的設計思想。Attention Maskで候補同士が互いにattendできないよう制約し、スコアが他候補に依存しない独立性を確保。キャッシング効率・一貫性・スケーラビリティが向上。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "home-mixer-2026",
+    nameEn: "Home Mixer (2026)",
+    nameJa: "ホームミキサー (2026)",
+    category: "パイプライン",
+    description:
+      "2026年版のRust製オーケストレーション層（gRPC）。Candidate Pipelineフレームワーク上で Source → Hydration → Filter → Score → Select → SideEffect の6段パイプラインを実行。旧Java/Scala版を完全置換。",
+    relatedLink: { label: "新旧比較", href: "/dashboard/comparison" },
+  },
+  {
+    id: "15-action-prediction",
+    nameEn: "15-Action Prediction",
+    nameJa: "15アクション予測",
+    category: "エンゲージメント",
+    description:
+      "Phoenix Rankerが同時予測する15種のエンゲージメント確率。ポジティブ4種（fav/reply/repost/quote）、インタレスト3種、消費3種、ソーシャル1種、ネガティブ4種（not_interested/block/mute/report）に分類され、重み付け合計で最終スコア算出。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "rust-rewrite",
+    nameEn: "Rust Rewrite",
+    nameJa: "Rust リライト",
+    category: "その他",
+    description:
+      "2026年アルゴリズムの62.9%がRustで記述。Java/Scalaからの全面移行により、メモリ安全性・並行性・低レイテンシを実現。Home Mixer、Thunder、Candidate Pipelineが主要Rustコンポーネント。",
+    relatedLink: { label: "新旧比較", href: "/dashboard/comparison" },
+  },
+  {
+    id: "xai",
+    nameEn: "xAI",
+    nameJa: "xAI社",
+    category: "その他",
+    description:
+      "イーロン・マスクが2023年設立したAI企業。Grok LLMを開発し、2026年2月にxai-org/x-algorithmとして最新推薦アルゴリズムをオープンソース公開。Phoenix技術の源泉。",
+    relatedLink: { label: "新旧比較", href: "/dashboard/comparison" },
+  },
+  {
+    id: "hash-based-embeddings",
+    nameEn: "Hash-Based Embeddings",
+    nameJa: "ハッシュベース埋め込み",
+    category: "スコアリング",
+    description:
+      "Phoenixで採用された埋め込み手法。複数ハッシュ関数でIDをルックアップし、疎な特徴量を効率的にベクトル化。従来の辞書ベース手法より省メモリで高速。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
 ];
 
 export const glossaryTerms: GlossaryTerm[] = [
@@ -211,5 +302,96 @@ export const glossaryTerms: GlossaryTerm[] = [
     category: "その他",
     description:
       "Home Mixerの最終段階で、オーガニックツイート、広告、おすすめアカウント、トレンド等を最終的なタイムラインに混合するプロセス。広告の挿入位置やフリークエンシーもここで制御される。",
+  },
+  // 新アルゴリズム (2026) - xai-org/x-algorithm
+  {
+    id: "phoenix",
+    nameEn: "Phoenix",
+    nameJa: "フェニックス",
+    category: "スコアリング",
+    description:
+      "2026年公開のGrokベースML推薦エンジン。Two-Tower Retrieval（類似検索）+ Transformer Ranking（15アクション予測）の2段階構成。Candidate Isolation技術により候補同士が独立してスコアリングされる点が革新的。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "thunder",
+    nameEn: "Thunder",
+    nameJa: "サンダー",
+    category: "パイプライン",
+    description:
+      "2026年導入のRust製インメモリポストストア。Kafkaからリアルタイムに投稿を取り込み、フォロー中アカウントの投稿を<1msで取得。Original/Reply+Repost/Videoの3種別で管理し、旧Earlybirdを置き換える。",
+    relatedLink: { label: "Thunder解説", href: "/dashboard/thunder" },
+  },
+  {
+    id: "grok",
+    nameEn: "Grok",
+    nameJa: "グロック",
+    category: "スコアリング",
+    description:
+      "xAI社が開発した大規模言語モデル。Phoenixの基盤技術として、Transformerアーキテクチャでツイートのエンゲージメント確率を予測。手動特徴量エンジニアリングを完全排除し、全てを学習で獲得。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "two-tower",
+    nameEn: "Two-Tower Model",
+    nameJa: "ツータワーモデル",
+    category: "スコアリング",
+    description:
+      "Phoenix Retrievalの類似検索手法。User Tower（ユーザー特徴）とCandidate Tower（投稿特徴）を独立してエンコードし、Dot Product類似度で候補を取得。数百万投稿から数千候補へ高速絞込が可能。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "candidate-isolation",
+    nameEn: "Candidate Isolation",
+    nameJa: "候補アイソレーション",
+    category: "スコアリング",
+    description:
+      "Phoenix Rankerの革新的設計思想。Attention Maskで候補同士が互いにattendできないよう制約し、スコアが他候補に依存しない独立性を確保。キャッシング効率・一貫性・スケーラビリティが向上。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "home-mixer-2026",
+    nameEn: "Home Mixer (2026)",
+    nameJa: "ホームミキサー (2026)",
+    category: "パイプライン",
+    description:
+      "2026年版のRust製オーケストレーション層（gRPC）。Candidate Pipelineフレームワーク上で Source → Hydration → Filter → Score → Select → SideEffect の6段パイプラインを実行。旧Java/Scala版を完全置換。",
+    relatedLink: { label: "新旧比較", href: "/dashboard/comparison" },
+  },
+  {
+    id: "15-action-prediction",
+    nameEn: "15-Action Prediction",
+    nameJa: "15アクション予測",
+    category: "エンゲージメント",
+    description:
+      "Phoenix Rankerが同時予測する15種のエンゲージメント確率。ポジティブ4種（fav/reply/repost/quote）、インタレスト3種、消費3種、ソーシャル1種、ネガティブ4種（not_interested/block/mute/report）に分類され、重み付け合計で最終スコア算出。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "rust-rewrite",
+    nameEn: "Rust Rewrite",
+    nameJa: "Rust リライト",
+    category: "その他",
+    description:
+      "2026年アルゴリズムの62.9%がRustで記述。Java/Scalaからの全面移行により、メモリ安全性・並行性・低レイテンシを実現。Home Mixer、Thunder、Candidate Pipelineが主要Rustコンポーネント。",
+    relatedLink: { label: "新旧比較", href: "/dashboard/comparison" },
+  },
+  {
+    id: "xai",
+    nameEn: "xAI",
+    nameJa: "xAI社",
+    category: "その他",
+    description:
+      "イーロン・マスクが2023年設立したAI企業。Grok LLMを開発し、2026年2月にxai-org/x-algorithmとして最新推薦アルゴリズムをオープンソース公開。Phoenix技術の源泉。",
+    relatedLink: { label: "新旧比較", href: "/dashboard/comparison" },
+  },
+  {
+    id: "hash-based-embeddings",
+    nameEn: "Hash-Based Embeddings",
+    nameJa: "ハッシュベース埋め込み",
+    category: "スコアリング",
+    description:
+      "Phoenixで採用された埋め込み手法。複数ハッシュ関数でIDをルックアップし、疎な特徴量を効率的にベクトル化。従来の辞書ベース手法より省メモリで高速。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
   },
 ];

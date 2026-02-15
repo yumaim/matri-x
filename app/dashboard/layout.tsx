@@ -216,6 +216,18 @@ function NotificationBell() {
             </div>
           )}
         </ScrollArea>
+        {notifications.length > 0 && (
+          <div className="border-t border-border p-3">
+            <Link
+              href="/dashboard/notifications"
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+            >
+              <Bell className="h-4 w-4" />
+              一覧で確認する
+            </Link>
+          </div>
+        )}
       </PopoverContent>
     </Popover>
   );
@@ -243,7 +255,7 @@ const learningNavigation: NavItem[] = [
   { name: "新旧アルゴ比較", href: "/dashboard/comparison", icon: GitCompareArrows, badge: "新Ver" },
   { name: "パイプライン探索", href: "/dashboard/explore", icon: GitBranch, badge: "旧Ver" },
   { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3, badge: "旧Ver" },
-  { name: "用語集", href: "/dashboard/glossary", icon: BookOpen, badge: "旧Ver" },
+  { name: "用語集", href: "/dashboard/glossary", icon: BookOpen, badge: null },
 ];
 
 const toolsNavigation: NavItem[] = [
