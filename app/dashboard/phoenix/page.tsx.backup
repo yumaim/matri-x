@@ -17,7 +17,6 @@ import {
   TrendingUp,
   TrendingDown,
 } from "lucide-react";
-import { GlossarySection } from "@/components/learning/glossary-section";
 import { cn } from "@/lib/utils";
 
 // ── Data ──
@@ -264,62 +263,6 @@ export default function PhoenixPage() {
         </p>
       </div>
 
-
-      {/* 用語ガイド */}
-      <GlossarySection
-        terms={[
-          {
-            term: "Phoenix (フェニックス)",
-            definition: "Grok AIを使った新しいランキングシステム。より文脈を理解してツイートをスコアリングします。",
-            example: "あなたの興味や過去の行動を深く理解して、「今のあなたに最適なツイート」を選びます。",
-            category: "システム全体",
-          },
-          {
-            term: "Transformer (トランスフォーマー)",
-            definition: "文脈を理解して情報を処理するAIモデルの仕組み。文章の前後関係を把握して、より正確な予測ができます。",
-            example: "ChatGPTもTransformerを使っています。あなたの過去の会話を覚えているのと同じように、Xもあなたの過去のいいねやリプライを記憶しています。",
-            category: "AI技術",
-          },
-          {
-            term: "Two-Tower Model (ツータワーモデル)",
-            definition: "ユーザーと投稿を別々に処理してから、マッチング度を計算する仕組み。",
-            example: "マッチングアプリで「あなた」と「相手」のプロフィールを別々に分析してから、相性スコアを出すイメージです。",
-            category: "検索ステージ",
-          },
-          {
-            term: "Embedding (埋め込み)",
-            definition: "テキストやユーザーを数値のリストに変換したもの。似ている内容は似た数値になります。",
-            example: "「猫が好き」と「ネコが好き」は同じembeddingになります。",
-            category: "AI技術",
-          },
-          {
-            term: "Dot Product (内積)",
-            definition: "2つの数値リストの類似度を計算する方法。値が大きいほど似ています。",
-            example: "あなたの好みベクトルと投稿の特徴ベクトルをかけ合わせて、マッチ度を出します。",
-            category: "検索ステージ",
-          },
-          {
-            term: "Candidate Isolation (候補分離)",
-            definition: "各候補ツイートを独立して評価する仕組み。他のツイートの影響を受けません。",
-            example: "複数の商品を見る時、1つ1つ独立して評価するので、比較する商品が変わってもスコアは変わりません。",
-            category: "ランキングステージ",
-          },
-          {
-            term: "Attention Mask (アテンションマスク)",
-            definition: "AIが「どの情報を見ていいか」を制御するルール。",
-            example: "試験中に「この問題は教科書のこのページだけ見ていい」と指定されるのと同じです。",
-            category: "ランキングステージ",
-          },
-          {
-            term: "Out-of-Network",
-            definition: "フォローしていないアカウントからのツイート。アルゴリズムがおすすめするもの。",
-            example: "「おすすめ」タブに出てくる、知らない人の投稿です。",
-            category: "システム全体",
-          },
-        ]}
-        title="📖 用語ガイド"
-        description="Phoenixで使われる専門用語を分かりやすく解説します（クリックして展開）"
-      />
       {/* Two-Stage Pipeline */}
       <div className="rounded-xl border border-border bg-card/50 p-6">
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">

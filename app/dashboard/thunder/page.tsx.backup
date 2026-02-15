@@ -16,7 +16,6 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GlossarySection } from "@/components/learning/glossary-section";
 
 // ── Data ──
 
@@ -323,56 +322,6 @@ export default function ThunderPage() {
         </div>
       </div>
 
-
-      {/* 用語ガイド */}
-      <GlossarySection
-        terms={[
-          {
-            term: "Thunder (サンダー)",
-            definition: "フォローしているアカウントからのツイートを超高速で取得する新システム（Rust製）。",
-            example: "従来の10倍以上速く、フォロー中の人の最新ツイートを取ってきます。レイテンシは1ミリ秒以下（瞬き1回より速い）。",
-            category: "システム全体",
-          },
-          {
-            term: "In-Network",
-            definition: "あなたがフォローしているアカウントからのツイート。",
-            example: "友達の投稿やフォローしている有名人のツイートです。",
-            category: "データの種類",
-          },
-          {
-            term: "Kafka",
-            definition: "リアルタイムでデータを流すシステム。ツイートやいいねなどのイベントを瞬時に配信します。",
-            example: "YouTubeのライブストリームのように、今起きていることを即座に他のシステムに伝えます。",
-            category: "インフラ",
-          },
-          {
-            term: "Latency (レイテンシ)",
-            definition: "処理にかかる時間。低いほど高速です。",
-            example: "Thunderはレイテンシが1ミリ秒以下（瞬き1回より速い）です。旧システムは10ミリ秒以上かかっていました。",
-            category: "パフォーマンス",
-          },
-          {
-            term: "In-Memory Store (インメモリストア)",
-            definition: "データをメモリ（RAM）に保存して超高速にアクセスできる仕組み。",
-            example: "ハードディスクではなく、PCのRAMに保存するのと同じ。100倍以上速くなります。",
-            category: "技術",
-          },
-          {
-            term: "Batch Processing (バッチ処理)",
-            definition: "データをまとめて一度に処理すること。リアルタイムではありません。",
-            example: "旧システムは削除されたツイートを夜中に一括で消していました。Thunderは削除イベントを即座に反映します。",
-            category: "技術",
-          },
-          {
-            term: "Rust",
-            definition: "高速で安全なプログラミング言語。Thunderはこれで書かれています。",
-            example: "JavaやScalaより速く、メモリエラーも少ない言語です。",
-            category: "技術",
-          },
-        ]}
-        title="📖 用語ガイド"
-        description="Thunderで使われる専門用語を分かりやすく解説します（クリックして展開）"
-      />
       {/* Kafka Stream Simulation */}
       <KafkaStreamSimulator />
 
@@ -424,53 +373,5 @@ export default function ThunderPage() {
         </div>
       </div>
     </div>
-
-      {/* 用語ガイド */}
-      <GlossarySection
-        terms={[
-          {
-            term: "Thunder (サンダー)",
-            definition: "フォローしているアカウントからのツイートを超高速で取得する新システム（Rust製）。",
-            example: "従来の10倍以上速く、フォロー中の人の最新ツイートを取ってきます。レイテンシは1ミリ秒以下（瞬き1回より速い）。",
-            category: "システム全体",
-          },
-          {
-            term: "In-Network",
-            definition: "あなたがフォローしているアカウントからのツイート。",
-            example: "友達の投稿やフォローしている有名人のツイートです。",
-            category: "データの種類",
-          },
-          {
-            term: "Kafka",
-            definition: "リアルタイムでデータを流すシステム。ツイートやいいねなどのイベントを瞬時に配信します。",
-            example: "YouTubeのライブストリームのように、今起きていることを即座に他のシステムに伝えます。",
-            category: "インフラ",
-          },
-          {
-            term: "Latency (レイテンシ)",
-            definition: "処理にかかる時間。低いほど高速です。",
-            example: "Thunderはレイテンシが1ミリ秒以下（瞬き1回より速い）です。旧システムは10ミリ秒以上かかっていました。",
-            category: "パフォーマンス",
-          },
-          {
-            term: "In-Memory Store (インメモリストア)",
-            definition: "データをメモリ（RAM）に保存して超高速にアクセスできる仕組み。",
-            example: "ハードディスクではなく、PCのRAMに保存するのと同じ。100倍以上速くなります。",
-            category: "技術",
-          },
-          {
-            term: "Batch Processing (バッチ処理)",
-            definition: "データをまとめて一度に処理すること。リアルタイムではありません。",
-            example: "旧システムは削除されたツイートを夜中に一括で消していました。Thunderは削除イベントを即座に反映します。",
-            category: "技術",
-          },
-          {
-            term: "Rust",
-            definition: "高速で安全なプログラミング言語。Thunderはこれで書かれています。",
-            example: "JavaやScalaより速く、メモリエラーも少ない言語です。",
-            category: "技術",
-          },
-        ]}
-        title="📖 用語ガイド"
-        description="Thunderで使われる専門用語を分かりやすく解説します（クリックして展開）"
-      />
+  );
+}

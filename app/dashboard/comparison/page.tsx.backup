@@ -13,7 +13,6 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GlossarySection } from "@/components/learning/glossary-section";
 
 // ── Data ──
 
@@ -136,56 +135,6 @@ export default function ComparisonPage() {
         </p>
       </div>
 
-
-      {/* 用語ガイド */}
-      <GlossarySection
-        terms={[
-          {
-            term: "旧アルゴリズム vs 新アルゴリズム",
-            definition: "2023年のオープンソース版（Java/Scala）と2024年の新バージョン（Rust/Python/Grok）の比較。",
-            example: "旧: 手動で6,000個の特徴量を設計。新: Transformerが自動学習。",
-            category: "全体",
-          },
-          {
-            term: "手動特徴量 → 自動学習",
-            definition: "以前はエンジニアが「リプライ=重要」などのルールを手動で作っていましたが、今はAIが自動で学習します。",
-            example: "旧: reply_weightを75.0と手動設定。新: Transformerが文脈から動的に判断。",
-            category: "設計思想",
-          },
-          {
-            term: "SimClusters",
-            definition: "ユーザーを145,000のコミュニティに分類する旧システム。",
-            example: "「猫好きクラスタ」「テック系クラスタ」のように、似た興味を持つ人をグループ化していました。",
-            category: "旧システム",
-          },
-          {
-            term: "MaskNet (Heavy Ranker)",
-            definition: "旧アルゴリズムのランキングモデル。6,000個の特徴量を使っていました。",
-            example: "ツイートの文字数、画像の有無、リプライ数など、1つ1つ手動で設計した特徴を見ていました。",
-            category: "旧システム",
-          },
-          {
-            term: "Grok-1",
-            definition: "xAIが開発した大規模言語モデル。新アルゴリズムのベースになっています。",
-            example: "ChatGPTのような会話AIと同じ技術を、ツイートのランキングに応用しています。",
-            category: "新システム",
-          },
-          {
-            term: "バッチ依存 → Candidate Isolation",
-            definition: "旧システムは複数のツイートを同時に見てスコアを出していたので、比較対象が変わるとスコアも変わりました。新システムは1つ1つ独立して評価します。",
-            example: "旧: AとBを比較してA=80点。CとDを比較してA=75点（矛盾）。新: Aは常に80点。",
-            category: "設計思想",
-          },
-          {
-            term: "Rust",
-            definition: "高速で安全なプログラミング言語。新システムの多くがこれで書かれています。",
-            example: "JavaやScalaより速く、メモリエラーも少ない言語です。Thunderなどに使われています。",
-            category: "技術スタック",
-          },
-        ]}
-        title="📖 用語ガイド"
-        description="旧→新の変化で使われる専門用語を分かりやすく解説します（クリックして展開）"
-      />
       {/* Version Cards */}
       <div className="grid md:grid-cols-2 gap-4">
         <div className="rounded-xl border border-muted bg-muted/20 p-5">
