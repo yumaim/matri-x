@@ -107,15 +107,6 @@ export const glossaryTerms: GlossaryTerm[] = [
       "2人のユーザー間の関係強度を0〜1で予測するMLモデル。相互フォロー、DM頻度、リプライ回数、プロフィール訪問頻度などを特徴量として使用。スコアが高いほどタイムラインに表示されやすい。",
   },
   {
-    id: "simclusters",
-    nameEn: "SimClusters",
-    nameJa: "シムクラスターズ",
-    category: "スコアリング",
-    description:
-      "約145,000のコミュニティクラスターによる興味関心モデリング。ユーザーとツイートをクラスター空間に埋め込み、類似度を計算。フォロー外おすすめの主要ソース。",
-    relatedLink: { label: "パイプライン探索", href: "/dashboard/explore" },
-  },
-  {
     id: "trust-safety-score",
     nameEn: "Trust & Safety Score",
     nameJa: "トラスト＆セーフティスコア",
@@ -151,14 +142,6 @@ export const glossaryTerms: GlossaryTerm[] = [
     description:
       "「興味がない」「このユーザーをミュート」「ブロック」「スパム報告」等のネガティブシグナル。スパム報告(-369x)は最も強力なペナルティで、いいね738個分のマイナスに相当する。",
     relatedLink: { label: "エンゲージメント分析", href: "/dashboard/engagement" },
-  },
-  {
-    id: "out-of-network",
-    nameEn: "Out-of-Network (OON)",
-    nameJa: "アウトオブネットワーク",
-    category: "エンゲージメント",
-    description:
-      "フォローしていないユーザーからのおすすめツイート。タイムラインの約50%を占める。UTEG、SimClusters、トレンド等から候補が取得され、Heavy Rankerでスコアリングされる。",
   },
 
   // フィルタリング系

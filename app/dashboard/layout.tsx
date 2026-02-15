@@ -58,7 +58,7 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 interface Notification {
   id: string;
@@ -596,6 +596,7 @@ export default function DashboardLayout({
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-0" aria-label="ナビゲーションメニュー">
+              <SheetTitle className="sr-only">ナビゲーションメニュー</SheetTitle>
               <div className="flex h-full flex-col">
                 <SidebarContent collapsed={false} pathname={pathname} user={myUserName ? { name: myUserName, id: myUserId, image: myUserImage, role: myUserRole } : null} onNavClick={() => setMobileMenuOpen(false)} />
               </div>

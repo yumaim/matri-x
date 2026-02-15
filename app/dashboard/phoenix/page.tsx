@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Flame,
   ArrowRight,
@@ -147,9 +147,8 @@ function AttentionMaskVisualizer() {
 
           {/* Rows */}
           {labels.map((rowLabel, row) => (
-            <>
+            <React.Fragment key={`row-${row}`}>
               <div
-                key={`rl-${row}`}
                 className={cn(
                   "w-10 h-10 flex items-center justify-center text-xs font-mono rounded",
                   rowLabel.type === "user" && "text-purple-400",
@@ -175,7 +174,7 @@ function AttentionMaskVisualizer() {
                   </div>
                 );
               })}
-            </>
+            </React.Fragment>
           ))}
         </div>
       </div>
