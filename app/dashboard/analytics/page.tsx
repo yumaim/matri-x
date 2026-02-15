@@ -40,11 +40,15 @@ interface AnalyticsData {
     totalComments: number;
     receivedLikes: number;
     receivedBookmarks: number;
+    totalViews: number;
   };
   dailyActivity: {
     date: string;
     posts: number;
     comments: number;
+    views: number;
+    likes: number;
+    bookmarks: number;
   }[];
   popularPosts: {
     id: string;
@@ -71,6 +75,18 @@ interface AnalyticsData {
 }
 
 const chartConfig = {
+  views: {
+    label: "閲覧",
+    color: "#00ba7c",
+  },
+  likes: {
+    label: "いいね",
+    color: "#f91880",
+  },
+  bookmarks: {
+    label: "ブックマーク",
+    color: "#ffd400",
+  },
   posts: {
     label: "投稿",
     color: "#1d9bf0",
@@ -195,7 +211,13 @@ export default function AnalyticsPage() {
       ) : (
         <>
           {/* Overview Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+            <StatCard
+              icon={Eye}
+              label="総閲覧数"
+              value={data.overview.totalViews}
+              color="#00ba7c"
+            />
             <StatCard
               icon={FileText}
               label="総投稿数"
@@ -212,13 +234,13 @@ export default function AnalyticsPage() {
               icon={ThumbsUp}
               label="獲得いいね"
               value={data.overview.receivedLikes}
-              color="#00ba7c"
+              color="#f91880"
             />
             <StatCard
               icon={Bookmark}
               label="獲得ブックマーク"
               value={data.overview.receivedBookmarks}
-              color="#f91880"
+              color="#ffd400"
             />
           </div>
 
@@ -241,35 +263,25 @@ export default function AnalyticsPage() {
                   margin={{ left: 0, right: 10, top: 5, bottom: 5 }}
                 >
                   <defs>
-                    <linearGradient id="postsGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop
-                        offset="5%"
-                        stopColor="#1d9bf0"
-                        stopOpacity={0.3}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="#1d9bf0"
-                        stopOpacity={0}
-                      />
+                    <linearGradient id="viewsGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#00ba7c" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#00ba7c" stopOpacity={0} />
                     </linearGradient>
-                    <linearGradient
-                      id="commentsGrad"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor="#7856ff"
-                        stopOpacity={0.3}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="#7856ff"
-                        stopOpacity={0}
-                      />
+                    <linearGradient id="likesGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f91880" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#f91880" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="bookmarksGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ffd400" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#ffd400" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="postsGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#1d9bf0" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#1d9bf0" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="commentsGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#7856ff" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#7856ff" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
@@ -294,6 +306,30 @@ export default function AnalyticsPage() {
                   <ChartTooltip
                     content={<ChartTooltipContent />}
                     cursor={{ stroke: "hsl(var(--muted-foreground))" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="views"
+                    stroke="#00ba7c"
+                    strokeWidth={2}
+                    fill="url(#viewsGrad)"
+                    name="閲覧"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="likes"
+                    stroke="#f91880"
+                    strokeWidth={2}
+                    fill="url(#likesGrad)"
+                    name="いいね"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="bookmarks"
+                    stroke="#ffd400"
+                    strokeWidth={2}
+                    fill="url(#bookmarksGrad)"
+                    name="ブックマーク"
                   />
                   <Area
                     type="monotone"
@@ -491,8 +527,8 @@ export default function AnalyticsPage() {
 function AnalyticsSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {[1, 2, 3, 4].map((i) => (
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        {[1, 2, 3, 4, 5].map((i) => (
           <Card key={i} className="glass">
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-center gap-3">

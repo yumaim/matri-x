@@ -221,31 +221,40 @@ function NotificationBell() {
   );
 }
 
-const mainNavigation = [
-  { name: "ダッシュボード", href: "/dashboard", icon: LayoutDashboard },
-  { name: "フォーラム", href: "/dashboard/forum", icon: MessageCircle },
-  { name: "ランキング", href: "/dashboard/ranking", icon: Trophy },
-  { name: "アナリティクス", href: "/dashboard/analytics", icon: Activity },
+
+// Navigation item type
+type NavItem = {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: string | null;
+};
+
+const mainNavigation: NavItem[] = [
+  { name: "ダッシュボード", href: "/dashboard", icon: LayoutDashboard, badge: null },
+  { name: "フォーラム", href: "/dashboard/forum", icon: MessageCircle, badge: null },
+  { name: "ランキング", href: "/dashboard/ranking", icon: Trophy, badge: null },
+  { name: "アナリティクス", href: "/dashboard/analytics", icon: Activity, badge: null },
 ];
 
-const learningNavigation = [
-  { name: "パイプライン探索", href: "/dashboard/explore", icon: GitBranch },
-  { name: "Phoenix (Grok ML)", href: "/dashboard/phoenix", icon: Flame },
-  { name: "Thunder (In-Network)", href: "/dashboard/thunder", icon: Cpu },
-  { name: "新旧比較", href: "/dashboard/comparison", icon: GitCompareArrows },
-  { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3 },
-  { name: "用語集", href: "/dashboard/glossary", icon: BookOpen },
+const learningNavigation: NavItem[] = [
+  { name: "パイプライン探索", href: "/dashboard/explore", icon: GitBranch, badge: null },
+  { name: "Phoenix (Grok ML)", href: "/dashboard/phoenix", icon: Flame, badge: "2026" },
+  { name: "Thunder (In-Network)", href: "/dashboard/thunder", icon: Cpu, badge: "2026" },
+  { name: "新旧比較", href: "/dashboard/comparison", icon: GitCompareArrows, badge: "2026" },
+  { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3, badge: "2023" },
+  { name: "用語集", href: "/dashboard/glossary", icon: BookOpen, badge: "2023" },
 ];
 
-const toolsNavigation = [
-  { name: "TweepCredシミュレーター", href: "/dashboard/simulator", icon: Users },
-  { name: "Deep AI検索", href: "/dashboard/deepwiki", icon: Search },
+const toolsNavigation: NavItem[] = [
+  { name: "TweepCredシミュレーター", href: "/dashboard/simulator", icon: Users, badge: null },
+  { name: "Deep AI検索", href: "/dashboard/deepwiki", icon: Search, badge: null },
 ];
 
-const extraNavigation = [
-  { name: "通知", href: "/dashboard/notifications", icon: Bell },
-  { name: "開発チケット", href: "/dashboard/tickets", icon: TicketPlus },
-  { name: "更新履歴", href: "/dashboard/updates", icon: History },
+const extraNavigation: NavItem[] = [
+  { name: "通知", href: "/dashboard/notifications", icon: Bell, badge: null },
+  { name: "開発チケット", href: "/dashboard/tickets", icon: TicketPlus, badge: null },
+  { name: "更新履歴", href: "/dashboard/updates", icon: History, badge: null },
 ];
 
 // プロフィールと設定はユーザーアイコンメニューに集約
@@ -284,7 +293,7 @@ function SidebarContent({
     if (toolsNavigation.some((item) => pathname === item.href)) setToolsOpen(true);
   }, [pathname]);
 
-  const renderNavItem = (item: { name: string; href: string; icon: React.ComponentType<{ className?: string }> }, nested = false) => {
+  const renderNavItem = (item: NavItem, nested = false) => {
     const isActive = pathname === item.href;
     return (
       <Link
@@ -300,7 +309,23 @@ function SidebarContent({
         )}
       >
         <item.icon className={cn("shrink-0", nested ? "h-4 w-4" : "h-5 w-5")} />
-        {!collapsed && <span>{item.name}</span>}
+        {!collapsed && (
+          <>
+            <span className="flex-1">{item.name}</span>
+            {item.badge && (
+              <span
+                className={cn(
+                  "text-[10px] font-bold px-1.5 py-0.5 rounded",
+                  item.badge === "2026"
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                    : "bg-muted text-muted-foreground border border-border"
+                )}
+              >
+                {item.badge}
+              </span>
+            )}
+          </>
+        )}
       </Link>
     );
   };

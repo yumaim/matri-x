@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
       totalComments,
       receivedLikes,
       receivedBookmarks,
+      totalViews,
       simulationCount,
       completedTopics,
       totalXP,
@@ -34,6 +35,8 @@ export async function GET(request: NextRequest) {
       // For graph data
       posts,
       comments,
+      votesDaily,
+      bookmarksDaily,
       // Popular posts
       popularPosts,
       // Engagement averages
@@ -59,6 +62,11 @@ export async function GET(request: NextRequest) {
           ...(dateWhere ? { createdAt: dateWhere } : {}),
         },
       }),
+      // Total views (sum of viewCount from all user's posts)
+      prisma.forumPost.aggregate({
+        where: { authorId: userId, ...(dateWhere ? { createdAt: dateWhere } : {}) },
+        _sum: { viewCount: true },
+      }),
       // Simulation count
       prisma.simulation.count({
         where: { userId, ...(dateWhere ? { createdAt: dateWhere } : {}) },
@@ -74,13 +82,13 @@ export async function GET(request: NextRequest) {
       prisma.userAchievement.count({
         where: { userId },
       }),
-      // Daily post data (for graph, always 30 days)
+      // Daily post data (for graph, always 30 days) - now includes viewCount
       prisma.forumPost.findMany({
         where: {
           authorId: userId,
           createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
         },
-        select: { createdAt: true },
+        select: { createdAt: true, viewCount: true },
         orderBy: { createdAt: "asc" },
       }),
       // Daily comment data (for graph, always 30 days)
@@ -91,6 +99,23 @@ export async function GET(request: NextRequest) {
         },
         select: { createdAt: true },
         orderBy: { createdAt: "asc" },
+      }),
+      // Daily votes (for graph)
+      prisma.vote.findMany({
+        where: {
+          post: { authorId: userId },
+          value: 1,
+          createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+        },
+        select: { createdAt: true },
+      }),
+      // Daily bookmarks (for graph)
+      prisma.bookmark.findMany({
+        where: {
+          post: { authorId: userId },
+          createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+        },
+        select: { createdAt: true },
       }),
       // Popular posts (top 5 by voteScore + viewCount)
       prisma.forumPost.findMany({
@@ -119,25 +144,39 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    // Build daily activity data (30 days)
-    const dailyMap: Record<string, { posts: number; comments: number }> = {};
+    // Build daily activity data (30 days) - now includes views, likes, bookmarks
+    const dailyMap: Record<string, { posts: number; comments: number; views: number; likes: number; bookmarks: number }> = {};
     for (let i = 29; i >= 0; i--) {
       const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
       const key = d.toISOString().slice(0, 10);
-      dailyMap[key] = { posts: 0, comments: 0 };
+      dailyMap[key] = { posts: 0, comments: 0, views: 0, likes: 0, bookmarks: 0 };
     }
     for (const p of posts) {
       const key = new Date(p.createdAt).toISOString().slice(0, 10);
-      if (dailyMap[key]) dailyMap[key].posts++;
+      if (dailyMap[key]) {
+        dailyMap[key].posts++;
+        dailyMap[key].views += p.viewCount;
+      }
     }
     for (const c of comments) {
       const key = new Date(c.createdAt).toISOString().slice(0, 10);
       if (dailyMap[key]) dailyMap[key].comments++;
     }
+    for (const v of votesDaily) {
+      const key = new Date(v.createdAt).toISOString().slice(0, 10);
+      if (dailyMap[key]) dailyMap[key].likes++;
+    }
+    for (const b of bookmarksDaily) {
+      const key = new Date(b.createdAt).toISOString().slice(0, 10);
+      if (dailyMap[key]) dailyMap[key].bookmarks++;
+    }
     const dailyActivity = Object.entries(dailyMap).map(([date, data]) => ({
       date,
       posts: data.posts,
       comments: data.comments,
+      views: data.views,
+      likes: data.likes,
+      bookmarks: data.bookmarks,
     }));
 
     // Rank popular posts by voteScore + viewCount
@@ -178,6 +217,7 @@ export async function GET(request: NextRequest) {
         totalComments,
         receivedLikes,
         receivedBookmarks,
+        totalViews: totalViews._sum.viewCount ?? 0,
       },
       dailyActivity,
       popularPosts: rankedPosts,
