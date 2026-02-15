@@ -238,12 +238,12 @@ const mainNavigation: NavItem[] = [
 ];
 
 const learningNavigation: NavItem[] = [
-  { name: "パイプライン探索", href: "/dashboard/explore", icon: GitBranch, badge: null },
-  { name: "Phoenix (Grok ML)", href: "/dashboard/phoenix", icon: Flame, badge: "2026" },
-  { name: "Thunder (In-Network)", href: "/dashboard/thunder", icon: Cpu, badge: "2026" },
-  { name: "新旧比較", href: "/dashboard/comparison", icon: GitCompareArrows, badge: "2026" },
-  { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3, badge: "2023" },
-  { name: "用語集", href: "/dashboard/glossary", icon: BookOpen, badge: "2023" },
+  { name: "Phoenix (Grok ML)", href: "/dashboard/phoenix", icon: Flame, badge: "新Ver" },
+  { name: "Thunder (In-Network)", href: "/dashboard/thunder", icon: Cpu, badge: "新Ver" },
+  { name: "新旧アルゴ比較", href: "/dashboard/comparison", icon: GitCompareArrows, badge: "新Ver" },
+  { name: "パイプライン探索", href: "/dashboard/explore", icon: GitBranch, badge: "旧Ver" },
+  { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3, badge: "旧Ver" },
+  { name: "用語集", href: "/dashboard/glossary", icon: BookOpen, badge: "旧Ver" },
 ];
 
 const toolsNavigation: NavItem[] = [
