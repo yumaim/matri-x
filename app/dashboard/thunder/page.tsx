@@ -63,6 +63,7 @@ const comparisonRows = [
 
 export default function ThunderPage() {
   return (
+      <LearningProgressTracker topicId="thunder" topicName="Thunder (In-Network)" />
     <div className="p-6 lg:p-8 space-y-8 max-w-6xl mx-auto">
       {/* Hero */}
       <div>
@@ -150,7 +151,6 @@ export default function ThunderPage() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
           <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-4 text-center">
             <span className="text-2xl">📨</span>
-      <LearningProgressTracker topicId="thunder" topicName="Thunder (In-Network)" />
             <div className="text-sm font-semibold mt-1">Kafka</div>
             <div className="text-xs text-muted-foreground">イベントストリーム</div>
           </div>

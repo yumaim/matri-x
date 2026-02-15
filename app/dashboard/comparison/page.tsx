@@ -118,7 +118,6 @@ const engagementComparison = {
 
 // ── Page ──
 
-      <LearningProgressTracker topicId="comparison" topicName="新旧アルゴ比較" />
 export default function ComparisonPage() {
   return (
     <div className="p-6 lg:p-8 space-y-8 max-w-6xl mx-auto">
