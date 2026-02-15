@@ -21,6 +21,7 @@ import { GlossarySection } from "@/components/learning/glossary-section";
 import { cn } from "@/lib/utils";
 import { PracticalTips, phoenixTips } from "@/components/learning/practical-tips";
 
+import { LearningProgressTracker } from "@/components/learning/learning-progress-tracker";
 import { VisualExplainer } from "@/components/learning/visual-explainer";
 // ── Data ──
 
@@ -250,6 +251,7 @@ export default function PhoenixPage() {
 
   return (
     <div className="p-6 lg:p-8 space-y-8 max-w-6xl mx-auto">
+      <LearningProgressTracker topicId="phoenix" topicName="Phoenix (Grok ML)" />
       {/* Hero */}
       <div>
         <div className="flex items-center gap-3 mb-3">

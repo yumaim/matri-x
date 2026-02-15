@@ -36,10 +36,6 @@ const LEARNING_TOPICS = [
   { id: "tweepcred", name: "TweepCred", description: "アカウント信頼度スコア", plan: "PRO" },
   { id: "simclusters", name: "SimClusters", description: "興味コミュニティの分類", plan: "PRO" },
   { id: "grok", name: "Grok統合", description: "AI品質評価と配信判定", plan: "PRO" },
-  // 新アルゴリズム（Phoenix/Thunder/Comparison）
-  { id: "phoenix", name: "Phoenix (Grok ML)", description: "Two-Tower + Transformer ランキング", plan: "FREE" },
-  { id: "thunder", name: "Thunder (In-Network)", description: "超高速インメモリポストストア", plan: "FREE" },
-  { id: "comparison", name: "新旧アルゴ比較", description: "Java/Scala → Rust/Python の進化", plan: "FREE" },
 ];
 
 export async function GET() {
@@ -92,49 +88,6 @@ export async function GET() {
     const completedTopics = learningProgress.filter((p) => p.completed).length;
     if (completedTopics >= LEARNING_TOPICS.length && !earned.includes("algorithm_sage")) {
       newAchievements.push("algorithm_sage");
-  // 新アルゴリズム学習系（Phoenix/Thunder/Comparison）
-
-    // 新アルゴリズム学習系アチーブメント
-    const phoenixProgress = learningProgress.find((p) => p.topicId === "phoenix");
-    const thunderProgress = learningProgress.find((p) => p.topicId === "thunder");
-    const comparisonProgress = learningProgress.find((p) => p.topicId === "comparison");
-
-    if (phoenixProgress && phoenixProgress.viewCount >= 1 && !earned.includes("phoenix_basics")) {
-      newAchievements.push("phoenix_basics");
-    }
-    if (phoenixProgress && phoenixProgress.viewCount >= 3 && !earned.includes("phoenix_master")) {
-      newAchievements.push("phoenix_master");
-    }
-    if (thunderProgress && thunderProgress.viewCount >= 1 && !earned.includes("thunder_basics")) {
-      newAchievements.push("thunder_basics");
-    }
-    if (thunderProgress && thunderProgress.viewCount >= 3 && !earned.includes("thunder_master")) {
-      newAchievements.push("thunder_master");
-    }
-    if (comparisonProgress && comparisonProgress.viewCount >= 1 && !earned.includes("comparison_basics")) {
-      newAchievements.push("comparison_basics");
-    }
-    if (comparisonProgress && comparisonProgress.viewCount >= 3 && !earned.includes("comparison_master")) {
-      newAchievements.push("comparison_master");
-    }
-
-    // 新アルゴリズム完全制覇
-    if (
-      phoenixProgress?.completed &&
-      thunderProgress?.completed &&
-      comparisonProgress?.completed &&
-      !earned.includes("new_algo_complete")
-    ) {
-      newAchievements.push("new_algo_complete");
-    }
-  { id: "phoenix_basics", name: "Phoenix入門", description: "Phoenixの基礎を学習", icon: "🔥", xp: 30, tier: "silver" },
-  { id: "phoenix_master", name: "Phoenix マスター", description: "Phoenixページを完全理解（3回以上閲覧）", icon: "🔥🏆", xp: 50, tier: "gold" },
-  { id: "thunder_basics", name: "Thunder入門", description: "Thunderの基礎を学習", icon: "⚡", xp: 30, tier: "silver" },
-  { id: "thunder_master", name: "Thunder マスター", description: "Thunderページを完全理解（3回以上閲覧）", icon: "⚡🏆", xp: 50, tier: "gold" },
-  { id: "comparison_basics", name: "新旧比較入門", description: "新旧アルゴリズム比較を学習", icon: "📊", xp: 30, tier: "silver" },
-  { id: "comparison_master", name: "比較分析マスター", description: "新旧比較ページを完全理解（3回以上閲覧）", icon: "📊🏆", xp: 50, tier: "gold" },
-  { id: "new_algo_complete", name: "新アルゴリズム完全制覇", description: "Phoenix/Thunder/Comparisonを全て完了", icon: "🎓", xp: 100, tier: "platinum" },
-  { id: "glossary_explorer", name: "用語集探検家", description: "用語集で10個以上の用語を閲覧", icon: "📖", xp: 20, tier: "bronze" },
     }
 
     // Award new achievements
