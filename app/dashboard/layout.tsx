@@ -264,7 +264,6 @@ const toolsNavigation: NavItem[] = [
 ];
 
 const extraNavigation: NavItem[] = [
-  { name: "通知", href: "/dashboard/notifications", icon: Bell, badge: null },
   { name: "開発チケット", href: "/dashboard/tickets", icon: TicketPlus, badge: null },
   { name: "更新履歴", href: "/dashboard/updates", icon: History, badge: null },
 ];
@@ -328,8 +327,8 @@ function SidebarContent({
               <span
                 className={cn(
                   "text-[10px] font-bold px-1.5 py-0.5 rounded",
-                  item.badge === "2026"
-                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  item.badge === "新Ver"
+                    ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                     : "bg-muted text-muted-foreground border border-border"
                 )}
               >
