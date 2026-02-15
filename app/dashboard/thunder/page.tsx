@@ -63,9 +63,9 @@ const comparisonRows = [
 
 export default function ThunderPage() {
   return (
-      <LearningProgressTracker topicId="thunder" topicName="Thunder (In-Network)" />
     <div className="p-6 lg:p-8 space-y-8 max-w-6xl mx-auto">
       {/* Hero */}
+      <LearningProgressTracker topicId="thunder" topicName="Thunder (In-Network)" />
       <div>
         <div className="flex items-center gap-3 mb-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/20">
