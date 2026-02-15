@@ -151,7 +151,6 @@ export default function ThunderPage() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
           <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-4 text-center">
             <span className="text-2xl">📨</span>
-            <div className="text-sm font-semibold mt-1">Kafka</div>
             <div className="text-xs text-muted-foreground">イベントストリーム</div>
           </div>
           <div className="flex items-center justify-center">
