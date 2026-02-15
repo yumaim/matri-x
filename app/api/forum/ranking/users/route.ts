@@ -26,9 +26,9 @@ export async function GET() {
     });
 
     // Composite score: posts×3 + comments×2 + votes×1
-    // ADMIN/MODERATOR users get ×0.4 multiplier to prevent
+    // ADMIN/MODERATOR users get ×0.1 multiplier to prevent
     // admin activity from dominating the ranking
-    const ADMIN_MULTIPLIER = 0.4;
+    const ADMIN_MULTIPLIER = 0.1;
     const scored = users
       .map((u) => {
         const rawScore = u._count.posts * 3 + u._count.comments * 2 + u._count.votes * 1;

@@ -370,8 +370,9 @@ function TopUsersPodium({ users }: { users: RankedUser[] }) {
         const total = user._count.posts + user._count.comments + user._count.votes;
 
         return (
-          <div
+          <Link
             key={user.id}
+            href={`/dashboard/users/${user.id}`}
             className={cn(
               "relative flex flex-col items-center rounded-xl border p-3 transition-all duration-300",
               style.border,
@@ -411,11 +412,11 @@ function TopUsersPodium({ users }: { users: RankedUser[] }) {
               <Star className="h-3 w-3" />
               <span className="text-[10px] font-bold tabular-nums">{total}</span>
             </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+            </Link>
+          );
+        })}
+      </div>
+    );
 }
 
 function UserRankCard({
@@ -432,7 +433,8 @@ function UserRankCard({
   const totalContributions = user._count.posts + user._count.comments + user._count.votes;
 
   return (
-    <div
+    <Link
+      href={`/dashboard/users/${user.id}`}
       className={cn(
         "group flex items-center gap-3 rounded-xl border p-3 transition-all duration-300",
         "hover:border-primary/30 hover:bg-card/80",
@@ -757,7 +759,7 @@ export default function RankingPage() {
 
                   {/* Rest of list */}
                   <div className="space-y-2">
-                    {users.slice(users.length >= 3 ? 3 : 0).map((user, i) => {
+                    {users.slice(users.length >= 3 ? 3 : 0, 12).map((user, i) => {
                       const rank = users.length >= 3 ? i + 4 : i + 1;
                       return (
                         <UserRankCard

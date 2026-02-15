@@ -237,16 +237,14 @@ const toolsNavigation = [
 ];
 
 const extraNavigation = [
-  { name: "通知", href: "/dashboard/notifications", icon: Bell },
   { name: "開発チケット", href: "/dashboard/tickets", icon: TicketPlus },
   { name: "更新履歴", href: "/dashboard/updates", icon: History },
 ];
 
-// プロフィールと設定はユーザーアイコンメニューに集約
-// const bottomNavigation = [
-//   { name: "プロフィール", href: "/dashboard/profile", icon: User },
-//   { name: "設定", href: "/dashboard/settings", icon: Settings },
-// ];
+const bottomNavigation = [
+  { name: "プロフィール", href: "/dashboard/profile", icon: User },
+  { name: "設定", href: "/dashboard/settings", icon: Settings },
+];
 
 function SidebarContent({
   collapsed,
@@ -371,7 +369,6 @@ function SidebarContent({
 
       {/* Bottom Navigation */}
       <div className="border-t border-border p-3 space-y-1">
-        {/* プロフィールと設定はユーザーアイコンメニューに集約
         {bottomNavigation.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -389,7 +386,7 @@ function SidebarContent({
               {!collapsed && <span>{item.name}</span>}
             </Link>
           );
-        })} */}
+        })}
 
         {/* Discord Link */}
         <Dialog>
