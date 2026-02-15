@@ -276,10 +276,13 @@ export default function ThunderPage() {
             GitHub で見る <ArrowRight className="h-3 w-3" />
           </a>
         </div>
-      </div>
-    </div>
-
       {/* 実践的なTips */}
       <PracticalTips tips={thunderTips} />
+
+      </div>
+
+    </div>
+
+
   );
 }

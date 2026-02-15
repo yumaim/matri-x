@@ -400,9 +400,9 @@ export default function ComparisonPage() {
           </ul>
         </div>
       </div>
+
     </div>
 
-      {/* 実践的なTips */}
-      <PracticalTips tips={comparisonTips} />
+
   );
 }

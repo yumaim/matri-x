@@ -555,9 +555,12 @@ export default function PhoenixPage() {
           </a>
         </div>
       </div>
-    </div>
-
       {/* 実践的なTips */}
       <PracticalTips tips={phoenixTips} />
+
+
+    </div>
+
+
   );
 }
