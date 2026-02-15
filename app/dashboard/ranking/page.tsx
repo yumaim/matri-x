@@ -499,7 +499,7 @@ function UserRankCard({
         <Trophy className="h-3.5 w-3.5" />
         <span className="font-semibold tabular-nums">{totalContributions}</span>
       </div>
-    </div>
+    </Link>
   );
 }
 

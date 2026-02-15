@@ -33,6 +33,9 @@ import {
   BookOpen,
   TicketPlus,
   Shield,
+  Flame,
+  Cpu,
+  GitCompareArrows,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -227,6 +230,9 @@ const mainNavigation = [
 
 const learningNavigation = [
   { name: "パイプライン探索", href: "/dashboard/explore", icon: GitBranch },
+  { name: "Phoenix (Grok ML)", href: "/dashboard/phoenix", icon: Flame },
+  { name: "Thunder (In-Network)", href: "/dashboard/thunder", icon: Cpu },
+  { name: "新旧比較", href: "/dashboard/comparison", icon: GitCompareArrows },
   { name: "エンゲージメント分析", href: "/dashboard/engagement", icon: BarChart3 },
   { name: "用語集", href: "/dashboard/glossary", icon: BookOpen },
 ];

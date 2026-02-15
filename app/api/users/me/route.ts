@@ -16,8 +16,6 @@ const USER_SELECT = {
   website: true,
   xHandle: true,
   headerColor: true,
-  level: true,
-  xp: true,
   createdAt: true,
 } as const;
 
