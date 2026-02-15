@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { GlossarySection } from "@/components/learning/glossary-section";
 import { KafkaSimulatorSimple } from "@/components/learning/kafka-simulator-simple";
 import { PracticalTips, thunderTips } from "@/components/learning/practical-tips";
+import { VisualExplainer } from "@/components/learning/visual-explainer";
 
 // ── Data ──
 
@@ -81,6 +82,14 @@ export default function ThunderPage() {
       </div>
 
 
+
+        <VisualExplainer
+          what="Thunderは投稿を3種類（Original Posts / Replies + Reposts / Video Posts）に分けて管理します。それぞれ独立したストア（保存場所）を持ち、超高速にアクセスできます。"
+          why="動画投稿は通常投稿よりデータ量が大きく、処理方法も異なるため、専用ストアで管理することで効率が上がります。また、Replies（返信）とReposts（リポスト）も、Original Postsとは取得タイミングやキャッシュ戦略が異なるため、分けて管理されています。"
+          how="あなたの運用では、動画投稿は専用の高速ストアから配信されるため、旧システムより速く表示されます。また、返信やリポストも即座にフォロワーのタイムラインに反映されます。"
+          example="例: あなたがフォローしている人が動画を投稿すると、Video Posts専用ストアから瞬時に取得され、タイムラインに表示されます。通常投稿と混在していた旧システムより10倍以上速くなっています。"
+          variant="blue"
+        />
       {/* 用語ガイド */}
       <GlossarySection
         terms={[

@@ -21,6 +21,7 @@ import { GlossarySection } from "@/components/learning/glossary-section";
 import { cn } from "@/lib/utils";
 import { PracticalTips, phoenixTips } from "@/components/learning/practical-tips";
 
+import { VisualExplainer } from "@/components/learning/visual-explainer";
 // ── Data ──
 
 const predictions = [
@@ -372,6 +373,14 @@ export default function PhoenixPage() {
         </div>
       </div>
 
+
+        <VisualExplainer
+          what="Phoenixは2つのステージで動作します。Stage 1（Retrieval）では、全投稿の中からTwo-Tower Modelを使って数千件に絞り込み、Stage 2（Ranking）では、Transformerで最終的なランク付けをします。"
+          why="全投稿（数百万件）をTransformerで評価するのは計算コストが高すぎるため、2段階に分けています。Retrievalで「関連性が高そうなもの」を高速に絞り込み、Rankingで「本当に見るべきもの」を精密に選びます。これにより、速度と精度を両立しています。"
+          how="あなたの運用では、まずRetrieval段階で「このトピックに興味がある人」にツイートが届くようにする（Two-Tower Modelが類似度を計算）。その後、Ranking段階で「今のあなたに最適なツイート」として最終評価されます。"
+          example="例: あなたが猫好きなら、Retrievalで「猫関連の全ツイート」が候補に上がり、Rankingで「今日のあなたの気分・時間帯・過去の行動」から「今見たい猫ツイート」が選ばれます。"
+          variant="blue"
+        />
       {/* Stage Detail */}
       {activeTab === "retrieval" ? (
         <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-6 space-y-4">
@@ -475,6 +484,14 @@ export default function PhoenixPage() {
       {/* Attention Mask Visualization */}
       <AttentionMaskVisualizer />
 
+        <VisualExplainer
+          what="Attention Maskは、Transformerが「どの情報を見ていいか」を制御する仕組みです。この図では、ユーザー(U)・履歴(H)・候補(C)が互いにどの情報を参照できるかを✓と✗で示しています。緑の✓は「見える」、赤の✗は「見えない」を意味します。"
+          why="Candidate Isolationを実現するために、候補ツイート同士が互いに参照できないようにしています。これにより、候補Aのスコアが候補B・Cに影響されず、独立して評価されます。結果として、スコアの一貫性が保たれ、キャッシュも可能になります。"
+          how="あなたの運用では、「同じ投稿でも、比較対象が変わるとスコアが変わる」という旧システムの問題が解消されます。常に高品質なツイートをすれば、必ずフォロワーのタイムラインに表示されるようになりました。"
+          example="旧システムでは、優れたツイートAが他の超人気ツイートと比較されると埋もれてしまうことがありました。新システムでは、ツイートAは独立して評価されるため、他のツイートに関係なく適切にスコアリングされます。"
+          variant="purple"
+        />
+
       {/* 15 Predictions */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -486,6 +503,14 @@ export default function PhoenixPage() {
           ポジティブアクションは正の重み、ネガティブアクションは負の重みで最終スコアに反映されます。
         </p>
         <PredictionGrid />
+
+        <VisualExplainer
+          what="Phoenixは15種類のエンゲージメント（ユーザーアクション）の確率を予測します。左側の「旧:固定重み」は手動で設定された固定値、右側の「新:動的予測」はTransformerが文脈から動的に計算する確率です。"
+          why="旧システムは「reply_engaged_by_author=75.0」のように固定値でしたが、新システムはTransformerが「このユーザーにとってこのツイートはどうか？」を文脈から判断します。同じツイートでも、見る人によって評価が変わるため、よりパーソナライズされた配信が可能になります。"
+          how="あなたの運用では、「万人受けを狙う」よりも「特定のペルソナ（ターゲット層）に刺さるツイート」を作ることが重要になります。Transformerが「このユーザーが過去にエンゲージした内容」から最適なスコアを出してくれます。"
+          example="例: あなたがテック系のツイートをよくリポストする人なら、テック系ツイートの「P(repost)」確率が高く評価されます。同じツイートでも、グルメ好きな人には「P(repost)」が低く、「P(not_interested)」が高くなる可能性があります。"
+          variant="emerald"
+        />
       </div>
 
       {/* Key Insight: Why Candidate Isolation */}
