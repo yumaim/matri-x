@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { GlossarySection } from "@/components/learning/glossary-section";
 import { cn } from "@/lib/utils";
+import { PracticalTips, phoenixTips } from "@/components/learning/practical-tips";
 
 // ── Data ──
 
@@ -555,5 +556,8 @@ export default function PhoenixPage() {
         </div>
       </div>
     </div>
+
+      {/* 実践的なTips */}
+      <PracticalTips tips={phoenixTips} />
   );
 }

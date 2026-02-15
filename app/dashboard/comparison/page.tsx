@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GlossarySection } from "@/components/learning/glossary-section";
+import { PracticalTips, comparisonTips } from "@/components/learning/practical-tips";
 
 // ── Data ──
 
@@ -400,5 +401,8 @@ export default function ComparisonPage() {
         </div>
       </div>
     </div>
+
+      {/* 実践的なTips */}
+      <PracticalTips tips={comparisonTips} />
   );
 }

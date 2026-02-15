@@ -212,4 +212,140 @@ export const glossaryTerms: GlossaryTerm[] = [
     description:
       "Home Mixerの最終段階で、オーガニックツイート、広告、おすすめアカウント、トレンド等を最終的なタイムラインに混合するプロセス。広告の挿入位置やフリークエンシーもここで制御される。",
   },
+  // 新アルゴリズム（Phoenix/Thunder/Grok）
+  {
+    id: "phoenix",
+    nameEn: "Phoenix",
+    nameJa: "フェニックス",
+    category: "パイプライン",
+    description:
+      "Grok AIを使った新しいランキングシステム。Two-Tower ModelによるRetrieval（検索）とTransformerによるRanking（ランキング）の2ステージで動作。従来の手動特徴量設計から自動学習へシフト。あなたの興味や過去の行動を深く理解して、「今のあなたに最適なツイート」を選びます。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "thunder",
+    nameEn: "Thunder",
+    nameJa: "サンダー",
+    category: "パイプライン",
+    description:
+      "フォローしているアカウントからのツイートを超高速で取得する新システム（Rust製）。従来のEarlybirdと比べて10倍以上速く、レイテンシは1ミリ秒以下（瞬き1回より速い）。完全インメモリストアで外部DB不要。KafkaからリアルタイムでイベントItを受け取り、即座に反映。",
+    relatedLink: { label: "Thunder解説", href: "/dashboard/thunder" },
+  },
+  {
+    id: "grok",
+    nameEn: "Grok",
+    nameJa: "グロック",
+    category: "スコアリング",
+    description:
+      "xAIが開発した大規模言語モデル。新アルゴリズムのベースになっており、Phoenixのランキングモデルに使われています。ChatGPTのような会話AIと同じTransformer技術を、ツイートのランキングに応用。文脈を深く理解して、より精度の高いスコアリングを実現。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "two-tower-model",
+    nameEn: "Two-Tower Model",
+    nameJa: "ツータワーモデル",
+    category: "スコアリング",
+    description:
+      "ユーザーと投稿を別々に処理してから、マッチング度を計算する仕組み。User TowerとCandidate Towerの2つのTransformerがそれぞれ埋め込み（Embedding）を生成し、Dot Product（内積）で類似度を算出。マッチングアプリで「あなた」と「相手」のプロフィールを別々に分析してから、相性スコアを出すイメージ。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "embedding",
+    nameEn: "Embedding",
+    nameJa: "埋め込み",
+    category: "スコアリング",
+    description:
+      "テキストやユーザーを数値のリストに変換したもの。似ている内容は似た数値（ベクトル）になります。「猫が好き」と「ネコが好き」は同じembeddingになる。Transformerがこれを自動生成し、Two-Tower Modelで類似度計算に使われます。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "candidate-isolation",
+    nameEn: "Candidate Isolation",
+    nameJa: "候補分離",
+    category: "スコアリング",
+    description:
+      "各候補ツイートを独立して評価する仕組み。他のツイートの影響を受けません。旧システムは複数のツイートを同時に見てスコアを出していたので、比較対象が変わるとスコアも変わっていました。新システムは1つ1つ独立して評価するため、スコアの一貫性が向上し、キャッシュも可能に。複数の商品を見る時、1つ1つ独立して評価するので、比較する商品が変わってもスコアは変わりません。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "attention-mask",
+    nameEn: "Attention Mask",
+    nameJa: "アテンションマスク",
+    category: "スコアリング",
+    description:
+      "AIが「どの情報を見ていいか」を制御するルール。Transformerが文脈を理解する際、どの部分を参照できるかを制限します。試験中に「この問題は教科書のこのページだけ見ていい」と指定されるのと同じ。Candidate Isolationを実現するために、候補ツイート同士が互いにattendしないようマスクをかけています。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "transformer",
+    nameEn: "Transformer",
+    nameJa: "トランスフォーマー",
+    category: "スコアリング",
+    description:
+      "文脈を理解して情報を処理するAIモデルの仕組み。文章の前後関係を把握して、より正確な予測ができます。ChatGPTもTransformerを使っています。あなたの過去の会話を覚えているのと同じように、Xもあなたの過去のいいねやリプライを記憶して、次に見たいツイートを予測します。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "in-network",
+    nameEn: "In-Network",
+    nameJa: "インネットワーク",
+    category: "パイプライン",
+    description:
+      "あなたがフォローしているアカウントからのツイート。友達の投稿やフォローしている有名人のツイートです。Thunderが超高速で取得します。",
+    relatedLink: { label: "Thunder解説", href: "/dashboard/thunder" },
+  },
+  {
+    id: "out-of-network",
+    nameEn: "Out-of-Network",
+    nameJa: "アウトオブネットワーク",
+    category: "パイプライン",
+    description:
+      "フォローしていないアカウントからのツイート。アルゴリズムがおすすめするもの。「おすすめ」タブに出てくる、知らない人の投稿です。PhoenixのTwo-Tower Modelが検索して、ランキングします。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "kafka",
+    nameEn: "Kafka",
+    nameJa: "カフカ",
+    category: "パイプライン",
+    description:
+      "リアルタイムでデータを流すシステム。ツイートやいいねなどのイベントを瞬時に配信します。YouTubeのライブストリームのように、今起きていることを即座に他のシステムに伝えます。Thunderはこれを使ってリアルタイム更新を実現。",
+    relatedLink: { label: "Thunder解説", href: "/dashboard/thunder" },
+  },
+  {
+    id: "dot-product",
+    nameEn: "Dot Product",
+    nameJa: "内積",
+    category: "スコアリング",
+    description:
+      "2つの数値リスト（ベクトル）の類似度を計算する方法。値が大きいほど似ています。あなたの好みベクトルと投稿の特徴ベクトルをかけ合わせて、マッチ度を出します。Two-Tower Modelで使われる。",
+    relatedLink: { label: "Phoenix解説", href: "/dashboard/phoenix" },
+  },
+  {
+    id: "simclusters",
+    nameEn: "SimClusters",
+    nameJa: "シムクラスターズ",
+    category: "パイプライン",
+    description:
+      "ユーザーを145,000のコミュニティに分類する旧システム。「猫好きクラスタ」「テック系クラスタ」のように、似た興味を持つ人をグループ化していました。新アルゴリズムではTwo-Tower Modelに置き換えられています。",
+    relatedLink: { label: "新旧アルゴ比較", href: "/dashboard/comparison" },
+  },
+  {
+    id: "masknet",
+    nameEn: "MaskNet",
+    nameJa: "マスクネット",
+    category: "スコアリング",
+    description:
+      "旧アルゴリズムのHeavy Rankerで使われていたMLモデル。6,000個の手動設計された特徴量を使っていました。ツイートの文字数、画像の有無、リプライ数など、1つ1つ手動で設計した特徴を見ていました。新アルゴリズムではGrok Transformerに置き換えられ、自動学習するようになりました。",
+    relatedLink: { label: "新旧アルゴ比較", href: "/dashboard/comparison" },
+  },
+  {
+    id: "rust",
+    nameEn: "Rust",
+    nameJa: "ラスト",
+    category: "その他",
+    description:
+      "高速で安全なプログラミング言語。新システムの多くがこれで書かれています。JavaやScalaより速く、メモリエラーも少ない言語です。Thunderなどに使われています。",
+    relatedLink: { label: "新旧アルゴ比較", href: "/dashboard/comparison" },
+  },
 ];
