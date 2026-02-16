@@ -252,11 +252,31 @@ const impactConfig: Record<string, { label: string; color: string }> = {
   low: { label: "影響度: 低", color: "text-muted-foreground" },
 };
 
+interface DBUpdate {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  source: string;
+  impact: string;
+  category: string;
+  publishedAt: string;
+}
+
 export default function UpdatesPage() {
   useTrackLearning("grok");
   const [selectedType, setSelectedType] = useState<UpdateType | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [dbUpdates, setDbUpdates] = useState<DBUpdate[]>([]);
+
+  // DBからアルゴリズム更新のみを取得（ALGORITHM typeのみ）
+  useEffect(() => {
+    fetch("/api/updates")
+      .then((res) => res.json())
+      .then((data) => setDbUpdates(data))
+      .catch(console.error);
+  }, []);
 
   const filteredUpdates = updates.filter((update) => {
     const matchesType = selectedType === "all" || update.type === selectedType;
@@ -381,7 +401,66 @@ export default function UpdatesPage() {
         </div>
       </div>
 
-      {/* Timeline */}
+      {/* 最新のアルゴリズム更新（DBから取得） */}
+      {dbUpdates.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Bell className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold">最新のアルゴリズム更新</h2>
+            <Badge variant="secondary" className="bg-primary/10 text-primary">{dbUpdates.length}件</Badge>
+          </div>
+          <div className="space-y-3">
+            {dbUpdates.map((update) => {
+              const impactColors = {
+                CRITICAL: "border-red-500/30 bg-red-500/10",
+                HIGH: "border-orange-500/30 bg-orange-500/10",
+                MEDIUM: "border-yellow-500/30 bg-yellow-500/10",
+                LOW: "border-emerald-500/30 bg-emerald-500/10",
+              };
+              const impactLabels = {
+                CRITICAL: "🔴 緊急",
+                HIGH: "🟠 重要",
+                MEDIUM: "🟡 注目",
+                LOW: "🟢 観察",
+              };
+              return (
+                <TimelineItem key={update.id}>
+                  <Card id={update.id} className={cn("glass cursor-pointer", impactColors[update.impact as keyof typeof impactColors])}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/50">
+                              {impactLabels[update.impact as keyof typeof impactLabels]}
+                            </Badge>
+                            <Badge variant="outline" className="bg-muted/50">{update.category}</Badge>
+                          </div>
+                          <h3 className="font-semibold text-foreground mb-2">{update.title}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2">{update.description}</p>
+                          <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(update.publishedAt).toLocaleDateString("ja-JP")}
+                            </span>
+                            {update.source && (
+                              <a href={update.source} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-primary">
+                                <ExternalLink className="h-3 w-3" />
+                                ソース
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TimelineItem>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Timeline（過去の静的データ） */}
       <div className="space-y-8">
         {Object.entries(groupedUpdates).map(([month, monthUpdates]) => (
           <div key={month}>
