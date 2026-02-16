@@ -116,19 +116,38 @@ export async function notifyOnPostVote({
 }
 
 /**
- * Notify all users about an algorithm update (batched)
+ * Notify all users about an update (algorithm/feature/announcement) (batched)
  */
 export async function notifyAlgorithmUpdate({
   title,
   impact,
   updateId,
+  type = "ALGORITHM_UPDATE",
 }: {
   title: string;
   impact: string;
   updateId: string;
+  type?: "ALGORITHM_UPDATE" | "FEATURE_UPDATE" | "ANNOUNCEMENT";
 }) {
-  const impactLabel = impact === "CRITICAL" ? "🔴 緊急" : impact === "HIGH" ? "🟠 重要" : impact === "MEDIUM" ? "🟡 注意" : "🟢 軽微";
-  const message = `${impactLabel} アルゴリズム更新: ${title}`;
+  // タイプに応じたプレフィックスとアイコン
+  let prefix = "";
+  if (type === "ALGORITHM_UPDATE") {
+    const impactLabel =
+      impact === "CRITICAL"
+        ? "🔴 緊急"
+        : impact === "HIGH"
+        ? "🟠 重要"
+        : impact === "MEDIUM"
+        ? "🟡 注目"
+        : "🟢 観察";
+    prefix = `${impactLabel} アルゴリズム更新`;
+  } else if (type === "FEATURE_UPDATE") {
+    prefix = "✨ 新機能";
+  } else {
+    prefix = "📢 お知らせ";
+  }
+
+  const message = `${prefix}: ${title}`;
   const link = `/dashboard/updates#${updateId}`;
 
   const BATCH_SIZE = 500;
@@ -145,7 +164,7 @@ export async function notifyAlgorithmUpdate({
     await prisma.notification.createMany({
       data: users.map((u) => ({
         userId: u.id,
-        type: "ALGORITHM_UPDATE",
+        type,
         message,
         link,
       })),
