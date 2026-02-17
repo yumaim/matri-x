@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import prisma from '@/lib/db'
+import { prisma } from '@/lib/db'
 
 // レート制限用の簡易インメモリストア（本番環境ではRedis推奨）
 const shareRateLimits = new Map<string, { count: number; resetAt: number }>()
