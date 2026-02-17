@@ -5,11 +5,11 @@ export const runtime = 'edge'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { type: string } }
+  { params }: { params: Promise<{ type: string }> }
 ) {
   try {
     const { searchParams } = new URL(req.url)
-    const type = params.type
+    const { type } = await params
     const id = searchParams.get('id')
     const title = searchParams.get('title') || 'matri-x'
     const score = searchParams.get('score')
