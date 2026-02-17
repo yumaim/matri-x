@@ -508,6 +508,12 @@ function SidebarContent({
               </DropdownMenuItem>
             )}
             <DropdownMenuItem asChild>
+              <a href="https://blog.matri-x-algo.wiki" target="_blank" rel="noopener noreferrer">
+                <BookOpen className="mr-2 h-4 w-4" />
+                Docs
+              </a>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link href="/dashboard/settings">
                 <Settings className="mr-2 h-4 w-4" />
                 設定
