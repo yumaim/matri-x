@@ -51,12 +51,27 @@ export const authConfig: NextAuthConfig = {
       const { pathname } = nextUrl;
       const role = auth?.user?.role;
 
-      // Public paths
+      // Public paths (exact match)
       const publicPaths = ["/", "/pricing", "/about", "/login", "/register"];
       if (publicPaths.some((p) => pathname === p)) {
         if (isLoggedIn && (pathname === "/login" || pathname === "/register")) {
           return Response.redirect(new URL("/dashboard", nextUrl));
         }
+        return true;
+      }
+
+      // Public content pages (prefix match — accessible without login)
+      const publicPrefixes = [
+        "/explore",
+        "/simulator",
+        "/simclusters",
+        "/protection",
+        "/updates",
+        "/case-studies",
+        "/community",
+        "/deepwiki",
+      ];
+      if (publicPrefixes.some((p) => pathname.startsWith(p))) {
         return true;
       }
 
@@ -84,7 +99,8 @@ export const authConfig: NextAuthConfig = {
         return isLoggedIn;
       }
 
-      return true;
+      // ── Default: require login (secure by default) ──
+      return isLoggedIn;
     },
   },
 };
