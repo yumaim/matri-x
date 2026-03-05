@@ -16,6 +16,10 @@ import {
   BookOpen,
   Check,
   ChevronRight,
+  Video,
+  Brain,
+  Clock,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Metadata } from "next";
@@ -23,14 +27,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Matri-X | X(Twitter)アルゴリズム解析プラットフォーム",
   description:
-    "Xの推薦アルゴリズムをソースコードレベルで解析。6,000+特徴量、パイプライン可視化、エンゲージメント重み付け分析。",
+    "Xの推薦アルゴリズムをソースコードレベルで完全解析。2025年最新のビデオファースト戦略・Grok AI・UUS対応。150倍エンゲージメント重み付け、パイプライン可視化。",
   alternates: {
     canonical: "https://matri-x.jp",
   },
   openGraph: {
     title: "Matri-X | X(Twitter)アルゴリズム解析プラットフォーム",
     description:
-      "Xの推薦アルゴリズムをソースコードレベルで解析。6,000+特徴量、パイプライン可視化、検証コミュニティ。",
+      "2025年最新アルゴリズム完全対応。ビデオファースト3.0×、リプライ150×の重み付け、Grok AIランキングをソースコードレベルで解析。",
     type: "website",
     siteName: "Matri-X",
     url: "https://matri-x.jp",
@@ -39,15 +43,15 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Matri-X | X(Twitter)アルゴリズム解析プラットフォーム",
     description:
-      "Xの推薦アルゴリズムをソースコードレベルで解析するプラットフォーム",
+      "2025年最新Xアルゴリズムをソースコードレベルで完全解析するプラットフォーム",
   },
 };
 
 const stats = [
-  { value: "6,000+", label: "分析対象の特徴量" },
-  { value: "75.0×", label: "最強エンゲージメント重み" },
-  { value: "145K", label: "SimClustersコミュニティ" },
-  { value: "30分", label: "初速ウィンドウ" },
+  { value: "150×", label: "最強エンゲージメント重み" },
+  { value: "3.0×", label: "動画リーチブースト" },
+  { value: "145K+", label: "SimClustersコミュニティ" },
+  { value: "27M", label: "Grok AIパラメータ" },
 ];
 
 const features = [
@@ -94,13 +98,13 @@ const features = [
 ];
 
 const engagementWeights = [
-  { action: "リプライ + 著者返信", weight: "75.0", color: "bg-primary" },
+  { action: "リプライ + 著者返信", weight: "150", color: "bg-primary" },
+  { action: "リポスト", weight: "20.0", color: "bg-accent" },
   { action: "リプライ", weight: "13.5", color: "bg-primary/80" },
-  { action: "プロフィール→EG", weight: "12.0", color: "bg-orange-500" },
-  { action: "会話クリック→EG", weight: "11.0", color: "bg-[#00ba7c]" },
-  { action: "2分以上滞在", weight: "10.0", color: "bg-cyan-500" },
-  { action: "リポスト", weight: "1.0", color: "bg-accent" },
-  { action: "いいね", weight: "0.5", color: "bg-pink-500" },
+  { action: "プロフィール→アクション", weight: "12.0", color: "bg-orange-500" },
+  { action: "リンククリック (2分+)", weight: "11.0", color: "bg-[#00ba7c]" },
+  { action: "ブックマーク", weight: "10.0", color: "bg-cyan-500" },
+  { action: "いいね", weight: "1.0", color: "bg-pink-500" },
   { action: "スパム報告", weight: "-369", color: "bg-red-600" },
 ];
 
@@ -108,28 +112,44 @@ const pricingPlans = [
   {
     name: "Free",
     price: "¥0",
-    description: "今なら全機能が無料で使えます",
+    description: "アルゴリズムの基礎を無料で学ぶ",
     features: [
-      "パイプライン完全探索",
-      "エンゲージメント重み付け分析",
-      "TweepCredシミュレーター",
-      "検証コミュニティ参加",
+      "パイプライン基礎解説",
+      "エンゲージメント重み確認",
+      "コミュニティ閲覧",
       "アルゴリズム更新通知",
     ],
     cta: "今すぐ無料で始める",
-    popular: true,
+    popular: false,
     comingSoon: false,
   },
   {
-    name: "Pro",
-    price: "—",
-    period: "",
-    description: "より深い分析機能を準備中",
+    name: "Standard",
+    price: "¥2,980",
+    period: "/月",
+    description: "シミュレーターで実践的に分析",
     features: [
       "Free全機能",
-      "Deep AI検索",
-      "高度なシミュレーション",
-      "カスタムレポート",
+      "エンゲージメントシミュレーター",
+      "TweepCred分析",
+      "コミュニティ閲覧",
+      "メールサポート",
+    ],
+    cta: "Coming Soon",
+    popular: true,
+    comingSoon: true,
+  },
+  {
+    name: "Pro",
+    price: "¥5,980",
+    period: "/月",
+    description: "AI検索・視覚化でアルゴリズムを完全攻略",
+    features: [
+      "Standard全機能",
+      "DeepWiki AI検索 無制限",
+      "SimClusters視覚化",
+      "週次レポート",
+      "コミュニティ投稿",
       "優先サポート",
     ],
     cta: "Coming Soon",
@@ -138,15 +158,14 @@ const pricingPlans = [
   },
   {
     name: "Enterprise",
-    price: "—",
+    price: "お問い合わせ",
     period: "",
-    description: "チーム・代理店向けの高度な分析",
+    description: "チーム・代理店向けの高度な分析環境",
     features: [
       "Pro全機能",
       "API アクセス",
-      "チーム共有機能",
-      "カスタムレポート",
-      "専用サポート",
+      "チームプライベートフォーラム",
+      "専属担当 (SLA)",
     ],
     cta: "Coming Soon",
     popular: false,
@@ -165,9 +184,9 @@ const pipelineSteps = [
   {
     step: "02",
     title: "ランキング",
-    desc: "AIが「あなたが反応しそうな投稿」を予測してスコアをつけます",
+    desc: "Grok AI（27Mパラメータ Transformer）が「あなたが反応しそうな投稿」を予測してスコアをつけます",
     color: "bg-accent",
-    tags: ["約1,000件に絞込"],
+    tags: ["約1,000件に絞込", "Grok AI"],
   },
   {
     step: "03",
@@ -185,34 +204,82 @@ const pipelineSteps = [
   },
 ];
 
+const algorithmHighlights = [
+  {
+    icon: Video,
+    title: "ビデオファースト戦略",
+    subtitle: "2025年、Xは動画中心モデルへ完全移行",
+    items: [
+      { label: "ネイティブ動画", value: "3.0×", color: "text-primary" },
+      { label: "動画", value: "2.5×", color: "text-primary/80" },
+      { label: "複数画像", value: "2.0×", color: "text-orange-500" },
+      { label: "画像", value: "1.8×", color: "text-cyan-500" },
+      { label: "外部リンク", value: "0.8×", color: "text-red-400" },
+    ],
+  },
+  {
+    icon: Brain,
+    title: "Grok AI Heavy Ranker",
+    subtitle: "27Mパラメータ Transformer がFor Youを決定",
+    items: [
+      { label: "パラメータ数", value: "27M", color: "text-primary" },
+      { label: "フォロー中フィード", value: "関連度順", color: "text-orange-500" },
+      { label: "フォロータブ", value: "時系列", color: "text-cyan-500" },
+    ],
+  },
+  {
+    icon: Clock,
+    title: "Unregretted User-Seconds",
+    subtitle: "ユーザーが後悔しない滞在時間を最大化する新指標",
+    items: [
+      { label: "情報的", value: "1.3×", color: "text-primary" },
+      { label: "教育的", value: "1.25×", color: "text-[#00ba7c]" },
+      { label: "エンタメ", value: "1.2×", color: "text-orange-500" },
+      { label: "ネガティブ", value: "0.7×", color: "text-red-400" },
+      { label: "炎上系", value: "0.85×", color: "text-red-400" },
+    ],
+  },
+  {
+    icon: Shield,
+    title: "90日ルール & TweepCred",
+    subtitle: "アカウント信頼度がリーチを決定づける",
+    items: [
+      { label: "新規 (<90日)", value: "0.5×", color: "text-red-400" },
+      { label: "ベテラン (>1年)", value: "1.2×", color: "text-[#00ba7c]" },
+      { label: "Premium", value: "2〜4×", color: "text-primary" },
+      { label: "TweepCred閾値", value: ">0.65", color: "text-orange-500" },
+    ],
+  },
+];
+
 const personas = [
   {
     icon: "🎨",
     title: "クリエイター",
-    subtitle: "Xを健全に伸ばしたいクリエイター",
+    subtitle: "ビデオファースト時代にリーチを伸ばしたいクリエイター",
     description:
-      "ソースコードに基づいた正しい運用知識で、BAN・シャドウバンのリスクを回避",
+      "動画3.0×ブースト、リンク0.8×ペナルティなどの最新係数を把握し、BAN・シャドウバンのリスクを回避しながら最大リーチを実現",
   },
   {
     icon: "🏢",
     title: "マーケティング企業",
-    subtitle: "アルゴトレンドをキャッチし続けたいマーケティング企業",
+    subtitle: "Grok AI & UUS時代のトレンドをキャッチしたい企業",
     description:
-      "アルゴリズム変更を即座にキャッチ、データドリブンな戦略立案",
+      "Grok AIランキング、UUSスコアなど2025年最新のアルゴリズム変更を即座にキャッチし、データドリブンな戦略を立案",
   },
   {
     icon: "📊",
     title: "X運用代行",
-    subtitle: "技術力を評価され案件獲得したいX運用代行",
+    subtitle: "150倍の重み付けデータで案件獲得したいX運用代行",
     description:
-      "ソースコード解析という差別化要素で、クライアントに根拠ある提案",
+      "リプライ150倍、ブックマーク10倍などソースコード解析という差別化要素で、クライアントに数値根拠ある提案を提供",
   },
   {
     icon: "⚡",
     title: "Xディープ界隈",
-    subtitle: "インプレッションを効率的に出したいXディープ層",
+    subtitle: "90日ルール・TweepCredを活用したいXディープ層",
     description:
-      "重み付け係数や信頼度スコアの仕組みを理解して、最小労力で最大効果",
+      "アカウント信頼度スコア、90日サンドボックス、フィード配分50:50の仕組みを理解して、最小労力で最大効果",
   },
 ];
 
@@ -235,13 +302,13 @@ function HeroSection() {
 
           <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl min-h-[4.5rem] sm:min-h-[6rem] md:min-h-[7.5rem] lg:min-h-[9rem]">
             {/* SSR-visible text for SEO crawlers */}
-            <span className="sr-only">Xのソースコードは、嘘をつかない — Matri-X アルゴリズム解析</span>
+            <span className="sr-only">動画3倍・リプライ150倍 — 2025年Xアルゴリズム完全解析 Matri-X</span>
             <TypewriterText />
           </h1>
 
           <p className="mt-6 text-pretty text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            ソースコードから判明した実際の数値で、Xアルゴリズムの真実を解き明かす。
-            あなたの運用戦略が、根拠に基づいたものに変わります。
+            ソースコードから判明した2025年最新の重み付けで、Xアルゴリズムの真実を解き明かす。
+            ビデオファースト時代の運用戦略が、数値根拠に基づいたものに変わります。
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -375,7 +442,7 @@ function EngagementSection() {
 
         <div className="mx-auto mt-16 grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {engagementWeights.map((item) => {
-            const pct = Math.max(5, Math.min(100, (Math.abs(parseFloat(item.weight)) / 75) * 100));
+            const pct = Math.max(5, Math.min(100, (Math.abs(parseFloat(item.weight)) / 150) * 100));
             return (
               <div
                 key={item.action}
@@ -397,7 +464,7 @@ function EngagementSection() {
                   aria-label={`${item.action}の重み: ${item.weight}倍`}
                   aria-valuenow={Math.abs(parseFloat(item.weight))}
                   aria-valuemin={0}
-                  aria-valuemax={75}
+                  aria-valuemax={150}
                 >
                   <div
                     className={`h-2 rounded-full ${item.color} transition-all duration-500`}
@@ -420,6 +487,61 @@ function EngagementSection() {
               スコア計算から除外されます。継続的な活動が重要です。
             </p>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AlgorithmHighlightsSection() {
+  return (
+    <section id="algorithm-highlights" className="py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <span className="text-gradient">2025年 アルゴリズム最前線</span>
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            ソースコードから解析した4つの重要な変化
+          </p>
+        </div>
+
+        <div className="mx-auto mt-16 grid max-w-6xl gap-6 sm:grid-cols-2">
+          {algorithmHighlights.map((highlight) => (
+            <div
+              key={highlight.title}
+              className="glass group rounded-2xl p-6 transition-all hover:glow-primary"
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
+                  <highlight.icon className="h-6 w-6 text-primary" aria-hidden="true" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold text-foreground">
+                    {highlight.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {highlight.subtitle}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {highlight.items.map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-lg bg-muted/50 px-3 py-2 text-center transition-colors hover:bg-muted"
+                  >
+                    <div className={`text-lg font-bold ${item.color}`}>
+                      {item.value}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {item.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -482,7 +604,7 @@ function PricingSection() {
           </p>
         </div>
 
-        <div className="mx-auto mt-16 grid max-w-5xl gap-8 lg:grid-cols-3">
+        <div className="mx-auto mt-16 grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {pricingPlans.map((plan) => (
             <div
               key={plan.name}
@@ -548,7 +670,7 @@ function CTASection() {
             <span className="text-gradient">今すぐ始めましょう</span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Xアルゴリズムを理解し、あなたのコンテンツ戦略を最適化しましょう。
+            2025年最新ビデオファースト × Grok AI時代のアルゴリズムを理解し、あなたのコンテンツ戦略を最適化しましょう。
           </p>
           <Button asChild size="lg" className="mt-8 glow-primary group">
             <Link href="/register">
@@ -583,6 +705,12 @@ function Footer() {
                 className="inline-flex items-center justify-center rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
               >
                 プライバシー
+              </Link>
+              <Link
+                href="/faq"
+                className="inline-flex items-center justify-center rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                FAQ
               </Link>
               <Link
                 href="https://tally.so/r/wA6o1z"
@@ -628,6 +756,7 @@ export default function Home() {
       <HeroSection />
       <FeaturesSection />
       <EngagementSection />
+      <AlgorithmHighlightsSection />
       <PersonaSection />
       <PricingSection />
       <CTASection />
