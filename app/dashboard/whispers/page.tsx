@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import WhisperCard from "@/components/whispers/whisper-card";
 import WhisperCompose from "@/components/whispers/whisper-compose";
-import { Loader2, Wind, Sparkles, TrendingUp, Users } from "lucide-react";
+import { Loader2, Bird, Sparkles, TrendingUp, Users } from "lucide-react";
 
 interface WhisperAuthor {
   id: string;
@@ -67,7 +67,7 @@ export default function WhispersPage() {
         setNextCursor(data.nextCursor);
         setHasMore(data.nextCursor !== null);
       } catch {
-        setError("囁きの取得に失敗しました");
+        setError("呟きの取得に失敗しました");
       }
     },
     []
@@ -145,8 +145,8 @@ export default function WhispersPage() {
       <div className="sticky top-0 z-30 backdrop-blur-xl bg-background/80 border-b border-border/50">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Wind className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-bold">囁き</h1>
+            <Bird className="h-5 w-5 text-primary" />
+            <h1 className="text-lg font-bold">呟き</h1>
           </div>
           <div className="flex items-center gap-1.5">
             <Sparkles className="h-4 w-4 text-muted-foreground/50" />
@@ -175,12 +175,12 @@ export default function WhispersPage() {
         ) : whispers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4 text-center px-8">
             <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center animate-float">
-              <Wind className="h-8 w-8 text-primary" />
+              <Bird className="h-8 w-8 text-primary" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-lg font-semibold">まだ囁きがありません</h3>
+              <h3 className="text-lg font-semibold">まだ呟きがありません</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                最初の囁きを投稿して、
+                最初の呟きを投稿して、
                 <br />
                 タイムラインを始めましょう！
               </p>
@@ -211,7 +211,7 @@ export default function WhispersPage() {
               {!hasMore && whispers.length > 0 && (
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground/50">
-                    すべての囁きを読みました ✨
+                    すべての呟きを読みました ✨
                   </p>
                 </div>
               )}
@@ -225,7 +225,7 @@ export default function WhispersPage() {
         <div className="glass rounded-2xl p-5 space-y-4">
           <h3 className="text-sm font-semibold flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-primary" />
-            囁きについて
+            呟きについて
           </h3>
           <div className="space-y-3 text-xs text-muted-foreground leading-relaxed">
             <p>

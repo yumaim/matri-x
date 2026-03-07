@@ -90,7 +90,7 @@ export default function WhisperCompose({ user, onSubmit, disabled }: WhisperComp
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             onKeyDown={handleKeyDown}
-            placeholder="いま何を考えていますか？ 囁いてみましょう..."
+            placeholder="いま何を考えていますか？ 呟いてみましょう..."
             disabled={disabled || isSubmitting}
             rows={1}
             className={cn(
@@ -163,7 +163,7 @@ export default function WhisperCompose({ user, onSubmit, disabled }: WhisperComp
                 className="rounded-full px-4 gap-1.5 h-8"
               >
                 <Send className="h-3.5 w-3.5" />
-                <span className="text-xs font-semibold">囁く</span>
+                <span className="text-xs font-semibold">呟く</span>
               </Button>
             </div>
           </div>

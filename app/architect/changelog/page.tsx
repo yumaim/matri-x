@@ -112,6 +112,17 @@ export default function ChangelogPage() {
                 <div className="space-y-3">
                     {[
                         {
+                            version: "v1.0.0",
+                            date: "2025-03-07",
+                            changes: [
+                                "呟き（Whisper）タイムライン機能を追加",
+                                "cursor-based 無限スクロール対応",
+                                "絵文字リアクション（🔥👏💡🎯）",
+                                "1日5回の投稿制限（JST基準）",
+                                "サイドバーに呟きナビゲーション追加",
+                            ],
+                        },
+                        {
                             version: "v0.9.0",
                             date: "2025-02-13",
                             changes: [

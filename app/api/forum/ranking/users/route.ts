@@ -6,24 +6,26 @@ export async function GET() {
   try {
     await requireAuth();
 
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        image: true,
-        company: true,
-        xHandle: true,
-        role: true,
-        _count: {
-          select: {
-            posts: true,
-            comments: true,
-            votes: true,
+    const [users, totalUsers] = await Promise.all([
+      prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          company: true,
+          xHandle: true,
+          role: true,
+          _count: {
+            select: {
+              posts: true,
+              comments: true,
+              votes: true,
+            },
           },
         },
-      },
-      take: 50,
-    });
+      }),
+      prisma.user.count(),
+    ]);
 
     // Composite score: posts×3 + comments×2 + votes×1
     // ADMIN/MODERATOR users get ×0.1 multiplier to prevent
@@ -38,13 +40,12 @@ export async function GET() {
           _score: Math.round(rawScore * multiplier),
         };
       })
-      .sort((a, b) => b._score - a._score)
-      .slice(0, 20);
+      .sort((a, b) => b._score - a._score);
 
     // Strip internal score and role before returning
     const result = scored.map(({ _score, role, ...rest }) => rest);
 
-    return NextResponse.json(result);
+    return NextResponse.json({ users: result, totalUsers });
   } catch (error) {
     return handleApiError(error);
   }

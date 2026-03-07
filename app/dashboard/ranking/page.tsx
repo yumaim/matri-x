@@ -572,6 +572,7 @@ export default function RankingPage() {
   const [users, setUsers] = useState<RankedUser[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [totalUsers, setTotalUsers] = useState(0);
 
   // Fetch posts based on active tab
   const fetchPosts = useCallback(async (tabId: string) => {
@@ -616,7 +617,8 @@ export default function RankingPage() {
       const res = await fetch("/api/forum/ranking/users");
       if (!res.ok) throw new Error("Failed to fetch user ranking");
       const data = await res.json();
-      setUsers(data);
+      setUsers(data.users ?? data);
+      setTotalUsers(data.totalUsers ?? (data.users ?? data).length);
     } catch (e) {
       console.error("Fetch user ranking error:", e);
       setUsers([]);
@@ -759,7 +761,7 @@ export default function RankingPage() {
 
                   {/* Rest of list */}
                   <div className="space-y-2">
-                    {users.slice(users.length >= 3 ? 3 : 0, 12).map((user, i) => {
+                    {users.slice(users.length >= 3 ? 3 : 0).map((user, i) => {
                       const rank = users.length >= 3 ? i + 4 : i + 1;
                       return (
                         <UserRankCard
@@ -781,7 +783,7 @@ export default function RankingPage() {
       {/* ─── Stats ─────────────────────────────── */}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
-          { label: "登録ユーザー数", icon: Users, value: users.length > 0 ? users.length.toString() : "—" },
+          { label: "登録ユーザー数", icon: Users, value: totalUsers > 0 ? totalUsers.toString() : "—" },
           { label: "ランキング投稿数", icon: FileText, value: posts.length > 0 ? posts.length.toString() : "—" },
           { label: "総コメント数", icon: MessageSquare, value: posts.length > 0 ? posts.reduce((sum, p) => sum + p._count.comments, 0).toString() : "—" },
         ].map((stat) => (
