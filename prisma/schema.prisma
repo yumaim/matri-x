@@ -26,6 +26,7 @@ model User {
   website       String?
   xHandle       String?
   headerColor   String?   @default("blue") // blue | purple | green | orange | red
+  inviteCodeUsed String?  // 登録時に使用した招待コード
   banned        Boolean   @default(false)
   bannedAt      DateTime?
   bannedReason  String?
@@ -43,6 +44,8 @@ model User {
   achievements  UserAchievement[]
   progress      LearningProgress[]
   tickets       Ticket[]
+  whispers         Whisper[]
+  whisperReactions WhisperReaction[]
 }
 
 model Account {
@@ -243,4 +246,43 @@ model AdminAuditLog {
   @@index([actorId])
   @@index([action])
   @@index([createdAt(sort: Desc)])
+}
+
+model InviteCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  description String?               // 管理者用メモ
+  maxUses     Int       @default(1)  // 最大使用回数
+  usedCount   Int       @default(0)  // 現在使用回数
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?             // 有効期限 (null = 無期限)
+  createdBy   String                // 作成した管理者ID
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Whisper {
+  id        String   @id @default(cuid())
+  content   String   @db.VarChar(280)
+  authorId  String
+  createdAt DateTime @default(now())
+
+  author    User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reactions WhisperReaction[]
+
+  @@index([createdAt(sort: Desc)])
+  @@index([authorId])
+}
+
+model WhisperReaction {
+  id        String   @id @default(cuid())
+  whisperId String
+  userId    String
+  emoji     String   @db.VarChar(4)
+  createdAt DateTime @default(now())
+
+  whisper Whisper @relation(fields: [whisperId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([whisperId, userId, emoji])
 }

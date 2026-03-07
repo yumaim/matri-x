@@ -22,6 +22,7 @@ import {
   Bell,
   Menu,
   MessageCircle,
+  Wind,
   History,
   User,
   Trophy,
@@ -245,6 +246,7 @@ type NavItem = {
 const mainNavigation: NavItem[] = [
   { name: "ダッシュボード", href: "/dashboard", icon: LayoutDashboard, badge: null },
   { name: "フォーラム", href: "/dashboard/forum", icon: MessageCircle, badge: null },
+  { name: "囁き", href: "/dashboard/whispers", icon: Wind, badge: "NEW" },
   { name: "ランキング", href: "/dashboard/ranking", icon: Trophy, badge: null },
   { name: "アナリティクス", href: "/dashboard/analytics", icon: Activity, badge: null },
 ];
