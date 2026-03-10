@@ -44,7 +44,6 @@ const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
     QUESTION: { label: "質問", color: "bg-amber-500/10 text-amber-400 border-amber-500/30" },
     TIPS: { label: "Tips & テクニック", color: "bg-purple-500/10 text-purple-400 border-purple-500/30" },
     NEWS: { label: "ニュース", color: "bg-red-500/10 text-red-400 border-red-500/30" },
-    MURMUR: { label: "つぶやき", color: "bg-violet-500/10 text-violet-400 border-violet-500/30" },
 };
 
 export default function ModerationPage() {

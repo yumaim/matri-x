@@ -126,7 +126,7 @@ export default function ChangelogPage() {
                             version: "v0.9.0",
                             date: "2025-02-13",
                             changes: [
-                                "つぶやき（MURMUR）カテゴリを追加",
+                                "つぶやき（MURMUR）カテゴリを呟き（Whisper）へ移行",
                                 "コンテンツ管理パネル（モデレーション機能）",
                                 "モデレーター権限サポート",
                                 "フォーラムのマイ投稿・ブックマークフィルタ",

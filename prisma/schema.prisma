@@ -286,3 +286,18 @@ model WhisperReaction {
 
   @@unique([whisperId, userId, emoji])
 }
+
+model LinkPreviewCache {
+  id          String   @id @default(cuid())
+  url         String   @unique
+  title       String?
+  description String?  @db.Text
+  image       String?
+  siteName    String?
+  favicon     String?
+  fetchedAt   DateTime @default(now())
+  expiresAt   DateTime
+
+  @@index([url])
+  @@index([expiresAt])
+}

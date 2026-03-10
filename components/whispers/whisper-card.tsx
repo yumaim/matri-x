@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { extractUrls } from "@/lib/url-utils";
+import { UrlPreviews } from "@/components/shared/url-preview-card";
 
 const REACTION_EMOJIS = ["🔥", "👏", "💡", "🎯"] as const;
 
@@ -72,6 +74,7 @@ export default function WhisperCard({
   const [reactionCounts, setReactionCounts] = useState(whisper.reactionCounts);
   const [userReactions, setUserReactions] = useState(whisper.userReactions);
   const [isAnimating, setIsAnimating] = useState<string | null>(null);
+  const urls = useMemo(() => extractUrls(whisper.content), [whisper.content]);
 
   const handleReaction = async (emoji: string) => {
     setIsAnimating(emoji);
@@ -135,6 +138,9 @@ export default function WhisperCard({
           <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap break-words">
             {whisper.content}
           </p>
+
+          {/* URL Previews */}
+          <UrlPreviews urls={urls} compact />
 
           {/* Reactions */}
           <div className="flex items-center gap-1.5 mt-3">

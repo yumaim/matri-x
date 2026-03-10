@@ -3,25 +3,12 @@ import { hash } from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { registerSchema } from "@/lib/validations/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { auth } from "@/lib/auth";
+
+// Invite-code-only registration period deadline
+const INVITE_ONLY_DEADLINE = new Date("2026-03-31T23:59:59+09:00");
 
 export async function POST(request: Request) {
   try {
-    // Invite-only mode: only admins can register new users
-    if (process.env.REGISTRATION_MODE === "invite") {
-      const session = await auth();
-      if (!session?.user?.id) {
-        return NextResponse.json({ error: "招待制のため、管理者にお問い合わせください" }, { status: 403 });
-      }
-      const admin = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { role: true },
-      });
-      if (admin?.role !== "ADMIN") {
-        return NextResponse.json({ error: "管理者のみがユーザーを登録できます" }, { status: 403 });
-      }
-    }
-
     // Rate limit: 5 registrations per minute per IP
     const ip = request.headers.get("x-forwarded-for") || "unknown";
     const { allowed } = checkRateLimit(`register:${ip}`, 5, 60000);
@@ -31,6 +18,7 @@ export async function POST(request: Request) {
         { status: 429 }
       );
     }
+
     const body = await request.json();
     const result = registerSchema.safeParse(body);
 
@@ -41,7 +29,52 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, email, password, company } = result.data;
+    const { name, email, password, company, inviteCode } = result.data;
+
+    // Validate invite code (required until INVITE_ONLY_DEADLINE)
+    const now = new Date();
+    const isInviteOnlyPeriod = now <= INVITE_ONLY_DEADLINE;
+
+    if (isInviteOnlyPeriod) {
+      if (!inviteCode) {
+        return NextResponse.json(
+          { error: "招待コードを入力してください" },
+          { status: 400 }
+        );
+      }
+
+      const invite = await prisma.inviteCode.findUnique({
+        where: { code: inviteCode },
+      });
+
+      if (!invite) {
+        return NextResponse.json(
+          { error: "無効な招待コードです" },
+          { status: 400 }
+        );
+      }
+
+      if (!invite.isActive) {
+        return NextResponse.json(
+          { error: "この招待コードは無効化されています" },
+          { status: 400 }
+        );
+      }
+
+      if (invite.usedCount >= invite.maxUses) {
+        return NextResponse.json(
+          { error: "この招待コードの使用回数が上限に達しました" },
+          { status: 400 }
+        );
+      }
+
+      if (invite.expiresAt && now > invite.expiresAt) {
+        return NextResponse.json(
+          { error: "この招待コードの有効期限が切れています" },
+          { status: 400 }
+        );
+      }
+    }
 
     // Check for existing user
     const existingUser = await prisma.user.findUnique({
@@ -59,14 +92,27 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await hash(password, 12);
 
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        company: company || null,
-      },
+    // Create user and increment invite code usage in a transaction
+    const user = await prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          company: company || null,
+          inviteCodeUsed: inviteCode || null,
+        },
+      });
+
+      // Increment invite code usage
+      if (inviteCode && isInviteOnlyPeriod) {
+        await tx.inviteCode.update({
+          where: { code: inviteCode },
+          data: { usedCount: { increment: 1 } },
+        });
+      }
+
+      return newUser;
     });
 
     return NextResponse.json(

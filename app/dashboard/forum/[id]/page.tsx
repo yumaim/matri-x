@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -53,6 +53,8 @@ import { VoteButton } from "@/components/forum/vote-button";
 import { PostReactions } from "@/components/forum/post-reactions";
 import { CommentSection } from "@/components/forum/comment-section";
 import { EvidenceSection } from "@/components/forum/evidence-card";
+import { UrlPreviews } from "@/components/shared/url-preview-card";
+import { extractUrls } from "@/lib/url-utils";
 import { cn } from "@/lib/utils";
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
@@ -61,7 +63,6 @@ const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
   STRATEGY: { label: "戦略・Tips", color: "border-emerald-500/50 text-emerald-400" },
   UPDATES: { label: "最新アップデート", color: "border-orange-500/50 text-orange-400" },
   QUESTIONS: { label: "質問・相談", color: "border-yellow-500/50 text-yellow-400" },
-  MURMUR: { label: "つぶやき", color: "border-violet-500/50 text-violet-400" },
 };
 
 const EVIDENCE_TYPES = [
@@ -407,6 +408,7 @@ export default function PostDetailPage() {
 
   const cat = CATEGORY_LABELS[post.category];
   const isAuthor = currentUser?.id === post.author?.id;
+  const urls = useMemo(() => extractUrls(post?.content ?? ""), [post?.content]);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 overflow-x-hidden">
@@ -517,6 +519,9 @@ export default function PostDetailPage() {
                   <div className="prose prose-sm prose-invert max-w-none">
                     {renderMarkdown(post.content)}
                   </div>
+
+                  {/* URL Previews */}
+                  <UrlPreviews urls={urls} />
 
                   <Separator className="bg-border/30" />
 

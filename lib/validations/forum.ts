@@ -6,7 +6,6 @@ export const POST_CATEGORIES = [
   "STRATEGY",
   "UPDATES",
   "QUESTIONS",
-  "MURMUR",
 ] as const;
 
 export const EVIDENCE_TYPES = [

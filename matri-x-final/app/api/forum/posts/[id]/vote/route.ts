@@ -1,0 +1,101 @@
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { voteSchema } from "@/lib/validations/forum";
+
+type RouteParams = { params: Promise<{ id: string }> };
+
+// POST /api/forum/posts/[id]/vote — 投票（トグル）
+export async function POST(request: NextRequest, { params }: RouteParams) {
+  try {
+    const { id } = await params;
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { value } = voteSchema.parse(body);
+
+    // Check post exists
+    const post = await prisma.forumPost.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!post) {
+      return NextResponse.json({ error: "投稿が見つかりません" }, { status: 404 });
+    }
+
+    // Check existing vote
+    const existingVote = await prisma.vote.findUnique({
+      where: {
+        userId_postId: {
+          userId: session.user.id,
+          postId: id,
+        },
+      },
+    });
+
+    let action: "created" | "removed" | "updated";
+
+    if (existingVote) {
+      if (existingVote.value === value) {
+        // Same vote — remove (toggle off)
+        await prisma.vote.delete({
+          where: { id: existingVote.id },
+        });
+        action = "removed";
+      } else {
+        // Different vote — update
+        await prisma.vote.update({
+          where: { id: existingVote.id },
+          data: { value },
+        });
+        action = "updated";
+      }
+    } else {
+      // New vote
+      await prisma.vote.create({
+        data: {
+          value,
+          userId: session.user.id,
+          postId: id,
+        },
+      });
+      action = "created";
+    }
+
+    // Get new score
+    const voteSum = await prisma.vote.aggregate({
+      where: { postId: id },
+      _sum: { value: true },
+    });
+
+    // Get user's current vote
+    const userVote = await prisma.vote.findUnique({
+      where: {
+        userId_postId: {
+          userId: session.user.id,
+          postId: id,
+        },
+      },
+      select: { value: true },
+    });
+
+    return NextResponse.json({
+      action,
+      voteScore: voteSum._sum.value ?? 0,
+      userVote: userVote?.value ?? null,
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "ZodError") {
+      return NextResponse.json({ error: "バリデーションエラー" }, { status: 400 });
+    }
+    console.error("POST /api/forum/posts/[id]/vote error:", error);
+    return NextResponse.json(
+      { error: "投票に失敗しました" },
+      { status: 500 }
+    );
+  }
+}

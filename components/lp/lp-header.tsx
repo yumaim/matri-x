@@ -6,6 +6,7 @@ const navigation = [
   { name: "探索", href: "#features" },
   { name: "シミュレーター", href: "#engagement" },
   { name: "料金", href: "#pricing" },
+  { name: "FAQ", href: "/faq" },
   { name: "Docs", href: "https://blog.matri-x-algo.wiki" },
 ];
 

@@ -11,9 +11,10 @@ export const registerSchema = z.object({
     .min(8, "パスワードは8文字以上で入力してください")
     .regex(
       /^(?=.*[a-zA-Z])(?=.*\d)/,
-      "パスワードには英字と数字を含めてください"
+      "パスワードには英字と数字を含めてください",
     ),
   company: z.string().max(100).optional().or(z.literal("")),
+  inviteCode: z.string().min(1, "招待コードを入力してください"),
 });
 
 export const loginSchema = z.object({

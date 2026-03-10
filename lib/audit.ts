@@ -11,13 +11,16 @@ export type AuditAction =
   | "UPDATE_POST"
   | "DELETE_POST"
   | "DELETE_COMMENT"
-  | "MODERATOR_ALERT";
+  | "MODERATOR_ALERT"
+  | "CREATE_INVITE_CODE"
+  | "UPDATE_INVITE_CODE"
+  | "DELETE_INVITE_CODE";
 
 export async function logAudit(params: {
   actorId: string;
   action: AuditAction;
   targetId?: string;
-  targetType?: "USER" | "TICKET" | "UPDATE" | "POST";
+  targetType?: "USER" | "TICKET" | "UPDATE" | "POST" | "INVITE_CODE";
   details?: string;
 }) {
   try {

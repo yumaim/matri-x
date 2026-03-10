@@ -15,6 +15,7 @@ import {
   AlertCircle,
   User,
   Building2,
+  Ticket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [company, setCompany] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +43,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, company }),
+        body: JSON.stringify({ name, email, password, company, inviteCode: inviteCode.trim().toUpperCase() }),
       });
 
       const data = await res.json();
@@ -85,8 +87,20 @@ export default function RegisterPage() {
       <div className="space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">アカウント作成</h2>
         <p className="text-muted-foreground">
-          無料で始められます。クレジットカード不要。
+          招待コードをお持ちの方のみ登録できます。
         </p>
+      </div>
+
+      {/* Invite code notice */}
+      <div className="flex items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3">
+        <Ticket className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+        <div className="text-sm">
+          <p className="font-medium text-foreground">招待制登録</p>
+          <p className="text-muted-foreground mt-0.5">
+            現在は招待コードをお持ちの方のみ無料登録が可能です。
+            招待コードをお持ちでない場合は、公式Xアカウントまたはお問い合わせよりご連絡ください。
+          </p>
+        </div>
       </div>
 
       {error && (
@@ -137,6 +151,27 @@ export default function RegisterPage() {
 
       {/* Registration form */}
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Invite Code - placed first for emphasis */}
+        <div className="space-y-2">
+          <Label htmlFor="inviteCode">
+            招待コード <span className="text-destructive">*</span>
+          </Label>
+          <div className="relative">
+            <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="inviteCode"
+              type="text"
+              placeholder="例: ABCD1234"
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+              className="pl-10 h-12 bg-card border-border uppercase tracking-widest font-mono"
+              required
+              disabled={isLoading}
+              autoComplete="off"
+            />
+          </div>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="name">名前</Label>
           <div className="relative">

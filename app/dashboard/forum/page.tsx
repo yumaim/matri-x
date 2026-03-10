@@ -60,7 +60,6 @@ const categories = [
   { id: "HEAVY_RANKER", name: "Heavy Ranker", icon: TrendingUp },
   { id: "SIMCLUSTERS", name: "SimClusters", icon: Users },
   { id: "TWEEPCRED", name: "TweepCred", icon: Award },
-  { id: "MURMUR", name: "つぶやき", icon: MessageSquare },
 ];
 
 const sortOptions = [

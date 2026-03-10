@@ -20,7 +20,9 @@ import { Button } from "@/components/ui/button";
 import { VoteButton } from "@/components/forum/vote-button";
 import { PostReactions } from "@/components/forum/post-reactions";
 import { cn } from "@/lib/utils";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
+import { extractUrls } from "@/lib/url-utils";
+import { UrlPreviews } from "@/components/shared/url-preview-card";
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   ALGORITHM: { label: "アルゴリズム解説", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/30" },
@@ -32,7 +34,6 @@ const CATEGORY_LABELS: Record<string, { label: string; color: string; bg: string
   UPDATES: { label: "最新アップデート", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/30" },
   QUESTIONS: { label: "質問・相談", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30" },
   BUGS: { label: "不具合・エラー", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" },
-  MURMUR: { label: "つぶやき", color: "text-violet-400", bg: "bg-violet-500/10 border-violet-500/30" },
 };
 
 interface PostCardProps {
@@ -95,6 +96,7 @@ export function PostCard({ post }: PostCardProps) {
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
   const [isPending, startTransition] = useTransition();
   const cat = CATEGORY_LABELS[post.category];
+  const urls = useMemo(() => extractUrls(post.content), [post.content]);
 
   const handleBookmark = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -221,6 +223,7 @@ export function PostCard({ post }: PostCardProps) {
               <p className="mt-1 text-xs sm:text-sm text-muted-foreground line-clamp-2">
                 {preview}
               </p>
+              <UrlPreviews urls={urls} compact />
             </Link>
 
             {/* Action bar (X-style bottom row) */}
